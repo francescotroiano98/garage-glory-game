@@ -1,13 +1,67 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { useState } from 'react';
+import { GameProvider } from '@/contexts/GameContext';
+import { StatsBar } from '@/components/game/StatsBar';
+import { BottomNav, Screen } from '@/components/game/BottomNav';
+import { GarageScreen } from '@/components/game/screens/GarageScreen';
+import { NewspaperScreen } from '@/components/game/screens/NewspaperScreen';
+import { RepairScreen } from '@/components/game/screens/RepairScreen';
+import { ShopScreen } from '@/components/game/screens/ShopScreen';
+import { SettingsScreen } from '@/components/game/screens/SettingsScreen';
+
+function GameContent() {
+  const [currentScreen, setCurrentScreen] = useState<Screen>('garage');
+  const [selectedCarId, setSelectedCarId] = useState<string | null>(null);
+
+  const handleSelectCar = (carId: string) => {
+    setSelectedCarId(carId);
+  };
+
+  const handleBackFromRepair = () => {
+    setSelectedCarId(null);
+  };
+
+  const handleCarBought = () => {
+    setCurrentScreen('garage');
+  };
+
+  // If a car is selected, show repair screen
+  if (selectedCarId) {
+    return (
+      <div className="min-h-screen bg-background flex flex-col">
+        <StatsBar />
+        <div className="flex-1 overflow-auto">
+          <RepairScreen carId={selectedCarId} onBack={handleBackFromRepair} />
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-background flex flex-col">
+      <StatsBar />
+      <div className="flex-1 overflow-auto">
+        {currentScreen === 'garage' && (
+          <GarageScreen 
+            onNavigateToNewspaper={() => setCurrentScreen('newspaper')} 
+            onSelectCar={handleSelectCar}
+          />
+        )}
+        {currentScreen === 'newspaper' && (
+          <NewspaperScreen onCarBought={handleCarBought} />
+        )}
+        {currentScreen === 'shop' && <ShopScreen />}
+        {currentScreen === 'settings' && <SettingsScreen />}
+      </div>
+      <BottomNav currentScreen={currentScreen} onNavigate={setCurrentScreen} />
+    </div>
+  );
+}
 
 const Index = () => {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="mb-4 text-4xl font-bold">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
-      </div>
-    </div>
+    <GameProvider>
+      <GameContent />
+    </GameProvider>
   );
 };
 
