@@ -35,25 +35,29 @@ export function CarCard({
   return (
     <Card
       className={cn(
-        'cursor-pointer transition-all hover:shadow-md hover:scale-[1.01] active:scale-[0.99]',
+        'cursor-pointer transition-all hover:shadow-lg hover:scale-[1.01] active:scale-[0.99] border-2',
         compact ? 'p-2' : ''
       )}
       onClick={onClick}
     >
       <CardContent className={cn('p-4', compact && 'p-2')}>
         <div className="flex items-center gap-3">
-          {/* Car Icon */}
+          {/* Car Image */}
           <div className={cn(
-            'flex items-center justify-center bg-secondary rounded-lg',
-            compact ? 'w-12 h-12 text-2xl' : 'w-16 h-16 text-4xl'
+            'flex items-center justify-center bg-secondary/50 rounded-lg overflow-hidden',
+            compact ? 'w-14 h-14' : 'w-20 h-20'
           )}>
-            {car.image}
+            <img 
+              src={car.image} 
+              alt={car.name}
+              className="w-full h-full object-contain p-1"
+            />
           </div>
 
           {/* Car Info */}
           <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 mb-1">
-              <h3 className={cn('font-semibold truncate', compact ? 'text-sm' : 'text-base')}>
+            <div className="flex items-center gap-2 mb-1 flex-wrap">
+              <h3 className={cn('font-bold truncate', compact ? 'text-sm' : 'text-base')}>
                 {car.name}
               </h3>
               <Badge variant="secondary" className={cn('text-xs shrink-0', categoryColors[car.category])}>
@@ -64,14 +68,14 @@ export function CarCard({
             {showDamages && (
               <div className="flex items-center gap-2 text-xs text-muted-foreground">
                 {visibleDamages.length > 0 ? (
-                  <span className="text-destructive">
+                  <span className="text-destructive font-medium">
                     {visibleDamages.length} visible issue{visibleDamages.length !== 1 ? 's' : ''}
                   </span>
                 ) : (
                   <span className="text-muted-foreground">No visible issues</span>
                 )}
                 {car.purchased && (
-                  <span className="text-primary">
+                  <span className="text-primary font-medium">
                     {repaired}/{repaired + unrepaired} fixed
                   </span>
                 )}

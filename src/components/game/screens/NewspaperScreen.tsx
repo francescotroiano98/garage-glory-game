@@ -8,6 +8,7 @@ import { generateCar, CUSTOMER_NAMES } from '@/data/cars';
 import { NewspaperAd, Car } from '@/types/game';
 import { Newspaper, RefreshCw, DollarSign } from 'lucide-react';
 import { toast } from 'sonner';
+import { useSound } from '@/hooks/useSound';
 
 interface NewspaperScreenProps {
   onCarBought: () => void;
@@ -19,6 +20,7 @@ export function NewspaperScreen({ onCarBought }: NewspaperScreenProps) {
   const [selectedAd, setSelectedAd] = useState<NewspaperAd | null>(null);
   const [negotiatePrice, setNegotiatePrice] = useState(0);
   const [isNegotiating, setIsNegotiating] = useState(false);
+  const { playSound } = useSound();
 
   // Generate initial ads
   useEffect(() => {
@@ -40,6 +42,7 @@ export function NewspaperScreen({ onCarBought }: NewspaperScreenProps) {
     setSelectedAd(ad);
     setNegotiatePrice(ad.car.askingPrice);
     setIsNegotiating(false);
+    playSound('buttonClick');
   };
 
   const handleBuy = (price: number) => {
@@ -58,6 +61,7 @@ export function NewspaperScreen({ onCarBought }: NewspaperScreenProps) {
 
     const car: Car = { ...selectedAd.car, askingPrice: price };
     dispatch({ type: 'BUY_CAR', payload: car });
+    playSound('purchase');
     toast.success(`Bought ${car.name} for $${price.toLocaleString()}!`);
     
     // Remove ad from list
@@ -71,7 +75,7 @@ export function NewspaperScreen({ onCarBought }: NewspaperScreenProps) {
     
     const minPrice = Math.round(selectedAd.car.askingPrice * 0.7);
     const negotiationBonus = getNegotiationBonus();
-    const successChance = 0.3 + (negotiationBonus - 1) * 5; // 30% base + bonus
+    const successChance = 0.3 + (negotiationBonus - 1) * 5;
     
     if (negotiatePrice < minPrice) {
       toast.error("That offer is too low!");
@@ -80,15 +84,12 @@ export function NewspaperScreen({ onCarBought }: NewspaperScreenProps) {
 
     const discount = selectedAd.car.askingPrice - negotiatePrice;
     const discountPercent = discount / selectedAd.car.askingPrice;
-    
-    // Higher discount = lower chance of acceptance
     const adjustedChance = successChance - discountPercent;
     
     if (Math.random() < adjustedChance) {
       toast.success("Seller accepted your offer!");
       handleBuy(negotiatePrice);
     } else {
-      // Counter offer
       const counterPrice = Math.round(selectedAd.car.askingPrice * (0.9 + Math.random() * 0.1));
       setNegotiatePrice(counterPrice);
       toast.info(`Seller counters with $${counterPrice.toLocaleString()}`);
@@ -101,7 +102,7 @@ export function NewspaperScreen({ onCarBought }: NewspaperScreenProps) {
   return (
     <div className="flex flex-col min-h-full pb-20">
       {/* Header */}
-      <div className="p-4 border-b border-border">
+      <div className="p-4 border-b-2 border-border bg-gradient-to-b from-secondary/30 to-transparent">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-xl font-bold flex items-center gap-2">
@@ -112,7 +113,7 @@ export function NewspaperScreen({ onCarBought }: NewspaperScreenProps) {
               Find your next project car
             </p>
           </div>
-          <Button variant="outline" size="sm" onClick={refreshAds}>
+          <Button variant="outline" size="sm" onClick={refreshAds} className="border-2">
             <RefreshCw className="w-4 h-4 mr-1" />
             Refresh
           </Button>
@@ -120,7 +121,7 @@ export function NewspaperScreen({ onCarBought }: NewspaperScreenProps) {
       </div>
 
       {garageFull && (
-        <div className="mx-4 mt-4 p-3 bg-destructive/10 border border-destructive/30 rounded-lg">
+        <div className="mx-4 mt-4 p-3 bg-destructive/10 border-2 border-destructive/30 rounded-lg">
           <p className="text-sm text-destructive font-medium">
             Your garage is full! Sell a car or upgrade your garage to buy more.
           </p>
@@ -136,9 +137,9 @@ export function NewspaperScreen({ onCarBought }: NewspaperScreenProps) {
               onClick={() => handleSelectAd(ad)}
               visibilityChance={getVisibilityChance()}
             />
-            <div className="absolute top-2 right-2 flex items-center gap-1 text-xs text-muted-foreground bg-background/80 px-2 py-1 rounded">
+            <div className="absolute top-2 right-2 flex items-center gap-1 text-xs text-muted-foreground bg-background/90 px-2 py-1 rounded-md border">
               <span>by {ad.seller}</span>
-              {ad.negotiable && <span className="text-primary">• Negotiable</span>}
+              {ad.negotiable && <span className="text-primary font-medium">• Negotiable</span>}
             </div>
           </div>
         ))}
@@ -179,7 +180,7 @@ export function NewspaperScreen({ onCarBought }: NewspaperScreenProps) {
 
                 <div className="flex justify-between text-sm text-muted-foreground">
                   <span>Your Balance:</span>
-                  <span className={canAfford(negotiatePrice) ? 'text-primary' : 'text-destructive'}>
+                  <span className={canAfford(negotiatePrice) ? 'text-primary font-bold' : 'text-destructive font-bold'}>
                     ${state.money.toLocaleString()}
                   </span>
                 </div>
@@ -189,7 +190,7 @@ export function NewspaperScreen({ onCarBought }: NewspaperScreenProps) {
 
           <DialogFooter className="flex gap-2">
             {selectedAd?.negotiable && (
-              <Button variant="outline" onClick={handleNegotiate} className="flex-1">
+              <Button variant="outline" onClick={handleNegotiate} className="flex-1 border-2">
                 <DollarSign className="w-4 h-4 mr-1" />
                 Negotiate
               </Button>
