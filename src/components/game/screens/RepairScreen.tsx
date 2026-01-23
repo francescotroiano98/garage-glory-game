@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { useGame } from '@/contexts/GameContext';
 import { PartRepairCard } from '@/components/game/PartRepairCard';
 import { CustomerCard } from '@/components/game/CustomerCard';
@@ -6,10 +6,25 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Slider } from '@/components/ui/slider';
-import { Car, Customer, PartType, PartCategory } from '@/types/game';
-import { CUSTOMER_NAMES, CUSTOMER_AVATARS } from '@/data/cars';
-import { ArrowLeft, DollarSign, Wrench, Tag, Loader2 } from 'lucide-react';
+import { PartCategory } from '@/types/game';
+import { ArrowLeft, DollarSign, Tag, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
+import { useSound } from '@/hooks/useSound';
+
+// Import car images
+import economyHatch from '@/assets/cars/economy-hatch.png';
+import sedanImg from '@/assets/cars/sedan.png';
+import suvImg from '@/assets/cars/suv.png';
+import sportsImg from '@/assets/cars/sports.png';
+import luxuryImg from '@/assets/cars/luxury.png';
+
+const CAR_IMAGES: Record<string, string> = {
+  economy: economyHatch,
+  sedan: sedanImg,
+  suv: suvImg,
+  sports: sportsImg,
+  luxury: luxuryImg,
+};
 
 interface RepairScreenProps {
   carId: string;
@@ -24,98 +39,71 @@ const categories: { id: PartCategory; label: string; icon: string }[] = [
 ];
 
 export function RepairScreen({ carId, onBack }: RepairScreenProps) {
-  const { state, dispatch, hasEnergy, getEnergyMultiplier, getRepairSpeedMultiplier, getVisibilityChance } = useGame();
+  const { 
+    state, 
+    dispatch, 
+    hasEnergy, 
+    getEnergyMultiplier, 
+    getRepairSpeedMultiplier,
+    startRepair,
+    getRepairProgress,
+    isRepairing,
+    getSaleState,
+  } = useGame();
+  
   const [selectedCategory, setSelectedCategory] = useState<PartCategory>('mechanical');
-  const [repairingPart, setRepairingPart] = useState<PartType | null>(null);
-  const [repairProgress, setRepairProgress] = useState(0);
   const [showSellDialog, setShowSellDialog] = useState(false);
   const [sellPrice, setSellPrice] = useState(0);
-  const [waitingForCustomer, setWaitingForCustomer] = useState(false);
-  const [customer, setCustomer] = useState<Customer | null>(null);
-  const [customerOffer, setCustomerOffer] = useState(0);
-  const [negotiationRound, setNegotiationRound] = useState(0);
+  const { playSound } = useSound();
 
   const car = state.carsInGarage.find(c => c.id === carId);
+  const saleState = getSaleState(carId);
+  const waitingForCustomer = saleState && !saleState.customer;
+  const customer = saleState?.customer;
+  const customerOffer = saleState?.customerOffer || 0;
+  const negotiationRound = saleState?.negotiationRound || 0;
 
   // Initialize sell price
   useEffect(() => {
     if (car) {
-      setSellPrice(Math.round(car.currentValue * 1.2)); // 20% markup target
+      setSellPrice(Math.round(car.currentValue * 1.2));
     }
   }, [car?.currentValue]);
 
-  // Handle repair progress
+  // Play sound when customer arrives
   useEffect(() => {
-    if (!repairingPart || !car) return;
+    if (customer) {
+      playSound('customerCall');
+    }
+  }, [customer, playSound]);
 
-    const damage = car.damages.find(d => d.part === repairingPart);
-    if (!damage) return;
-
-    const speedMultiplier = getRepairSpeedMultiplier();
-    const totalTime = damage.repairTime * speedMultiplier * 1000; // in ms
-    const interval = 50; // Update every 50ms
-    const increment = (interval / totalTime) * 100;
-
-    const timer = setInterval(() => {
-      setRepairProgress(prev => {
-        const next = prev + increment;
-        if (next >= 100) {
-          clearInterval(timer);
-          dispatch({ type: 'REPAIR_PART', payload: { carId, partType: repairingPart } });
-          dispatch({ type: 'ADD_XP', payload: 10 + damage.energyCost });
-          toast.success(`Repaired ${repairingPart.replace('_', ' ')}!`);
-          setRepairingPart(null);
-          return 0;
-        }
-        return next;
-      });
-    }, interval);
-
-    return () => clearInterval(timer);
-  }, [repairingPart, carId, dispatch, getRepairSpeedMultiplier, car]);
-
-  const handleRepair = useCallback((partType: PartType) => {
+  const handleRepair = (partType: string) => {
     if (!car) return;
 
     const damage = car.damages.find(d => d.part === partType);
     if (!damage) return;
 
     const actualEnergyCost = Math.round(damage.energyCost * getEnergyMultiplier());
+    const actualDuration = damage.repairTime * getRepairSpeedMultiplier();
     
     if (!hasEnergy(actualEnergyCost)) {
       toast.error("Not enough energy! Wait for it to regenerate.");
       return;
     }
 
-    dispatch({ type: 'SPEND_ENERGY', payload: actualEnergyCost });
-    setRepairingPart(partType);
-    setRepairProgress(0);
-  }, [car, dispatch, hasEnergy, getEnergyMultiplier]);
+    const success = startRepair(carId, damage.part, actualEnergyCost, actualDuration);
+    if (success) {
+      playSound('repair');
+      toast.info(`Repairing ${partType.replace('_', ' ')}...`);
+    }
+  };
 
   const handleListForSale = () => {
     if (!car) return;
     
-    dispatch({ type: 'LIST_CAR_FOR_SALE', payload: carId });
+    dispatch({ type: 'LIST_CAR_FOR_SALE', payload: { carId, askingPrice: sellPrice } });
     setShowSellDialog(false);
-    setWaitingForCustomer(true);
-
-    // Generate customer after random delay (5-30 seconds)
-    const delay = 5000 + Math.random() * 25000;
-    setTimeout(() => {
-      const newCustomer: Customer = {
-        id: `customer_${Date.now()}`,
-        name: CUSTOMER_NAMES[Math.floor(Math.random() * CUSTOMER_NAMES.length)],
-        avatar: CUSTOMER_AVATARS[Math.floor(Math.random() * CUSTOMER_AVATARS.length)],
-        patience: ['low', 'medium', 'high'][Math.floor(Math.random() * 3)] as 'low' | 'medium' | 'high',
-        maxBudget: sellPrice * (1 + Math.random() * 0.3),
-      };
-      setCustomer(newCustomer);
-      
-      // Customer's initial offer (usually below asking price)
-      const offerVariance = newCustomer.patience === 'high' ? 0.95 : newCustomer.patience === 'medium' ? 0.85 : 0.75;
-      setCustomerOffer(Math.round(sellPrice * (offerVariance + Math.random() * 0.1)));
-      setWaitingForCustomer(false);
-    }, delay);
+    toast.info("Car listed! Waiting for customers...");
   };
 
   const handleAcceptOffer = () => {
@@ -125,31 +113,28 @@ export function RepairScreen({ carId, onBack }: RepairScreenProps) {
     dispatch({ type: 'ADD_REPUTATION', payload: 2 + Math.floor(customerOffer / 500) });
     dispatch({ type: 'ADD_XP', payload: 25 + Math.floor(customerOffer / 100) });
     
+    playSound('cashRegister');
     toast.success(`Sold ${car.name} for $${customerOffer.toLocaleString()}!`);
     onBack();
   };
 
   const handleCounterOffer = () => {
-    if (!customer) return;
+    if (!customer || !saleState) return;
 
     if (negotiationRound >= 2) {
       toast.error("Customer is losing patience and leaving!");
-      setCustomer(null);
-      dispatch({ type: 'UNLIST_CAR', payload: carId });
+      dispatch({ type: 'CANCEL_SALE', payload: carId });
       return;
     }
 
-    // Customer increases offer slightly
-    const increase = (sellPrice - customerOffer) * (0.3 + Math.random() * 0.3);
-    setCustomerOffer(Math.round(customerOffer + increase));
-    setNegotiationRound(prev => prev + 1);
+    const increase = (saleState.askingPrice - customerOffer) * (0.3 + Math.random() * 0.3);
+    const newOffer = Math.round(customerOffer + increase);
+    dispatch({ type: 'UPDATE_SALE_OFFER', payload: { carId, offer: newOffer, round: negotiationRound + 1 } });
     toast.info("Customer increased their offer.");
   };
 
   const handleRejectOffer = () => {
-    setCustomer(null);
-    dispatch({ type: 'UNLIST_CAR', payload: carId });
-    setNegotiationRound(0);
+    dispatch({ type: 'CANCEL_SALE', payload: carId });
     toast.info("Customer left. You can list the car again.");
   };
 
@@ -161,29 +146,23 @@ export function RepairScreen({ carId, onBack }: RepairScreenProps) {
     );
   }
 
-  // Get all damages (reveal hidden ones with skill)
-  const visibleDamages = car.damages.filter(d => 
-    !d.repaired && (d.visible || Math.random() < getVisibilityChance())
-  );
   const categoryDamages = car.damages.filter(d => d.category === selectedCategory);
   const unrepaired = car.damages.filter(d => !d.repaired).length;
   const repaired = car.damages.filter(d => d.repaired).length;
   const allRepaired = unrepaired === 0;
+  const carImage = CAR_IMAGES[car.category] || economyHatch;
 
   return (
     <div className="flex flex-col min-h-full pb-20">
-      {/* Header */}
-      <div className="p-4 border-b border-border">
-        <div className="flex items-center gap-3">
-          <Button variant="ghost" size="icon" onClick={onBack}>
+      {/* Header with car image */}
+      <div className="relative p-4 border-b border-border bg-gradient-to-b from-secondary/50 to-background">
+        <div className="flex items-start gap-3">
+          <Button variant="ghost" size="icon" onClick={onBack} className="shrink-0">
             <ArrowLeft className="w-5 h-5" />
           </Button>
-          <div className="flex-1">
-            <div className="flex items-center gap-2">
-              <span className="text-2xl">{car.image}</span>
-              <h1 className="text-lg font-bold">{car.name}</h1>
-            </div>
-            <div className="flex items-center gap-2 text-sm">
+          <div className="flex-1 min-w-0">
+            <h1 className="text-lg font-bold truncate">{car.name}</h1>
+            <div className="flex items-center gap-2 text-sm flex-wrap">
               <Badge variant="secondary">{repaired}/{repaired + unrepaired} fixed</Badge>
               <span className="text-muted-foreground">
                 Value: <span className="text-primary font-medium">${Math.round(car.currentValue).toLocaleString()}</span>
@@ -194,10 +173,20 @@ export function RepairScreen({ carId, onBack }: RepairScreenProps) {
             onClick={() => setShowSellDialog(true)} 
             disabled={!allRepaired || car.listedForSale}
             size="sm"
+            className="shrink-0"
           >
             <Tag className="w-4 h-4 mr-1" />
             Sell
           </Button>
+        </div>
+        
+        {/* Car image */}
+        <div className="flex justify-center mt-3">
+          <img 
+            src={carImage} 
+            alt={car.name}
+            className="h-24 object-contain drop-shadow-lg"
+          />
         </div>
       </div>
 
@@ -254,21 +243,24 @@ export function RepairScreen({ carId, onBack }: RepairScreenProps) {
       <div className="flex-1 p-4 space-y-2">
         {categoryDamages.length === 0 ? (
           <div className="text-center py-8 text-muted-foreground">
-            <Wrench className="w-8 h-8 mx-auto mb-2 opacity-50" />
             <p>No issues in this category</p>
           </div>
         ) : (
-          categoryDamages.map((damage) => (
-            <PartRepairCard
-              key={damage.part}
-              damage={damage}
-              onRepair={() => handleRepair(damage.part)}
-              canRepair={hasEnergy(Math.round(damage.energyCost * getEnergyMultiplier())) && !repairingPart}
-              isRepairing={repairingPart === damage.part}
-              repairProgress={repairingPart === damage.part ? repairProgress : 0}
-              energyMultiplier={getEnergyMultiplier()}
-            />
-          ))
+          categoryDamages.map((damage) => {
+            const partIsRepairing = isRepairing(carId, damage.part);
+            const progress = getRepairProgress(carId, damage.part);
+            return (
+              <PartRepairCard
+                key={damage.part}
+                damage={damage}
+                onRepair={() => handleRepair(damage.part)}
+                canRepair={hasEnergy(Math.round(damage.energyCost * getEnergyMultiplier())) && !partIsRepairing && !damage.repaired}
+                isRepairing={partIsRepairing}
+                repairProgress={progress}
+                energyMultiplier={getEnergyMultiplier()}
+              />
+            );
+          })
         )}
       </div>
 
@@ -281,6 +273,7 @@ export function RepairScreen({ carId, onBack }: RepairScreenProps) {
 
           <div className="space-y-4">
             <div className="text-center">
+              <img src={carImage} alt={car.name} className="h-20 mx-auto mb-2" />
               <p className="text-sm text-muted-foreground mb-1">Car Value</p>
               <p className="text-2xl font-bold text-primary">
                 ${Math.round(car.currentValue).toLocaleString()}

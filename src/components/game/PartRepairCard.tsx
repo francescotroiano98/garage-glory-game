@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Zap, Check, AlertTriangle, Clock } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useEffect, useState } from 'react';
 
 interface PartRepairCardProps {
   damage: PartDamage;
@@ -37,10 +38,26 @@ export function PartRepairCard({
   energyMultiplier,
 }: PartRepairCardProps) {
   const actualEnergyCost = Math.round(damage.energyCost * energyMultiplier);
+  const [displayProgress, setDisplayProgress] = useState(repairProgress);
+
+  // Animate progress smoothly
+  useEffect(() => {
+    if (isRepairing) {
+      const interval = setInterval(() => {
+        setDisplayProgress(prev => {
+          const diff = repairProgress - prev;
+          return prev + diff * 0.3;
+        });
+      }, 50);
+      return () => clearInterval(interval);
+    } else {
+      setDisplayProgress(repairProgress);
+    }
+  }, [isRepairing, repairProgress]);
 
   if (damage.repaired) {
     return (
-      <div className="flex items-center gap-3 p-3 bg-primary/5 rounded-lg border border-primary/20">
+      <div className="flex items-center gap-3 p-3 bg-primary/10 rounded-lg border-2 border-primary/30">
         <span className="text-xl">{categoryIcons[damage.category]}</span>
         <div className="flex-1">
           <span className="font-medium capitalize text-primary">
@@ -54,14 +71,14 @@ export function PartRepairCard({
 
   return (
     <div className={cn(
-      'flex flex-col gap-2 p-3 rounded-lg border',
-      isRepairing ? 'bg-accent/50 border-accent' : 'bg-card border-border'
+      'flex flex-col gap-2 p-3 rounded-lg border-2 transition-all',
+      isRepairing ? 'bg-accent/20 border-accent shadow-md' : 'bg-card border-border'
     )}>
       <div className="flex items-center gap-3">
         <span className="text-xl">{categoryIcons[damage.category]}</span>
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2">
-            <span className="font-medium capitalize truncate">
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="font-semibold capitalize truncate">
               {damage.part.replace('_', ' ')}
             </span>
             <Badge variant="outline" className={cn('text-xs capitalize', levelColors[damage.level])}>
@@ -82,7 +99,7 @@ export function PartRepairCard({
               <Clock className="w-3 h-3" />
               {damage.repairTime}s
             </span>
-            <span className="text-primary font-medium">
+            <span className="text-primary font-semibold">
               +${Math.round(damage.valueImpact)}
             </span>
           </div>
@@ -90,15 +107,15 @@ export function PartRepairCard({
         <Button
           size="sm"
           onClick={onRepair}
-          disabled={!canRepair || isRepairing}
-          className="shrink-0"
+          disabled={!canRepair}
+          className="shrink-0 retro-button"
         >
-          {isRepairing ? 'Repairing...' : 'Repair'}
+          {isRepairing ? 'In Progress' : 'Repair'}
         </Button>
       </div>
 
       {isRepairing && (
-        <Progress value={repairProgress} className="h-2" />
+        <Progress value={displayProgress} className="h-2" />
       )}
     </div>
   );

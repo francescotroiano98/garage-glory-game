@@ -54,6 +54,25 @@ export interface GarageUpgrades {
   hasCleaningStation: boolean;
 }
 
+// Repair job in queue
+export interface RepairJob {
+  carId: string;
+  partType: PartType;
+  startTime: number;
+  duration: number; // in ms
+  energyCost: number;
+}
+
+// Sale state for a car
+export interface SaleState {
+  carId: string;
+  askingPrice: number;
+  customerArrivalTime: number;
+  customer?: Customer;
+  customerOffer?: number;
+  negotiationRound: number;
+}
+
 export interface GameState {
   money: number;
   energy: number;
@@ -69,6 +88,10 @@ export interface GameState {
   totalCarsSold: number;
   totalProfit: number;
   lastEnergyUpdate: number;
+  // Repair queue - allows multiple repairs
+  repairQueue: RepairJob[];
+  // Active sales
+  activeSales: SaleState[];
 }
 
 // Customer Types
@@ -90,7 +113,7 @@ export interface NewspaperAd {
   negotiable: boolean;
 }
 
-// Repair Progress
+// Repair Progress (for backwards compatibility)
 export interface RepairProgress {
   carId: string;
   partType: PartType;

@@ -1,5 +1,12 @@
 import { Car, CarCategory, PartDamage, DamageLevel, PartType, PartCategory } from '@/types/game';
 
+// Import car images
+import economyHatch from '@/assets/cars/economy-hatch.png';
+import sedanImg from '@/assets/cars/sedan.png';
+import suvImg from '@/assets/cars/suv.png';
+import sportsImg from '@/assets/cars/sports.png';
+import luxuryImg from '@/assets/cars/luxury.png';
+
 // Part definitions with energy costs and value impacts
 export const PART_DEFINITIONS: Record<PartType, { category: PartCategory; baseEnergyCost: number; baseRepairTime: number }> = {
   // Mechanical
@@ -35,25 +42,25 @@ export const DAMAGE_MULTIPLIERS: Record<DamageLevel, { energy: number; time: num
   critical: { energy: 1.3, time: 1.25, value: 0.3 },
 };
 
-// Car templates
+// Car templates with images
 export const CAR_TEMPLATES: Array<{ name: string; category: CarCategory; baseValue: number; image: string }> = [
   // Economy
-  { name: 'Compact Hatch', category: 'economy', baseValue: 300, image: '🚗' },
-  { name: 'City Runner', category: 'economy', baseValue: 400, image: '🚙' },
-  { name: 'Budget Wagon', category: 'economy', baseValue: 350, image: '🚗' },
+  { name: 'Compact Hatch', category: 'economy', baseValue: 300, image: economyHatch },
+  { name: 'City Runner', category: 'economy', baseValue: 400, image: economyHatch },
+  { name: 'Budget Wagon', category: 'economy', baseValue: 350, image: economyHatch },
   // Sedan
-  { name: 'Family Sedan', category: 'sedan', baseValue: 600, image: '🚘' },
-  { name: 'Executive Sedan', category: 'sedan', baseValue: 800, image: '🚘' },
-  { name: 'Classic Sedan', category: 'sedan', baseValue: 700, image: '🚗' },
+  { name: 'Family Sedan', category: 'sedan', baseValue: 600, image: sedanImg },
+  { name: 'Executive Sedan', category: 'sedan', baseValue: 800, image: sedanImg },
+  { name: 'Classic Sedan', category: 'sedan', baseValue: 700, image: sedanImg },
   // SUV
-  { name: 'Urban SUV', category: 'suv', baseValue: 1200, image: '🚙' },
-  { name: 'Off-Road SUV', category: 'suv', baseValue: 1500, image: '🚙' },
+  { name: 'Urban SUV', category: 'suv', baseValue: 1200, image: suvImg },
+  { name: 'Off-Road SUV', category: 'suv', baseValue: 1500, image: suvImg },
   // Sports
-  { name: 'Sports Coupe', category: 'sports', baseValue: 2000, image: '🏎️' },
-  { name: 'Muscle Car', category: 'sports', baseValue: 2500, image: '🏎️' },
+  { name: 'Sports Coupe', category: 'sports', baseValue: 2000, image: sportsImg },
+  { name: 'Muscle Car', category: 'sports', baseValue: 2500, image: sportsImg },
   // Luxury
-  { name: 'Luxury Sedan', category: 'luxury', baseValue: 4000, image: '🚘' },
-  { name: 'Premium Convertible', category: 'luxury', baseValue: 5000, image: '🏎️' },
+  { name: 'Luxury Sedan', category: 'luxury', baseValue: 4000, image: luxuryImg },
+  { name: 'Premium Convertible', category: 'luxury', baseValue: 5000, image: luxuryImg },
 ];
 
 // Generate random damage for a car
