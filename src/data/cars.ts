@@ -1,4 +1,5 @@
 import { Car, CarCategory, PartDamage, DamageLevel, PartType, PartCategory } from '@/types/game';
+import { PART_DEFINITIONS } from './parts';
 
 // Import car images
 import economyHatch from '@/assets/cars/economy-hatch.png';
@@ -7,90 +8,112 @@ import suvImg from '@/assets/cars/suv.png';
 import sportsImg from '@/assets/cars/sports.png';
 import luxuryImg from '@/assets/cars/luxury.png';
 
-// Part definitions with energy costs and value impacts
-export const PART_DEFINITIONS: Record<PartType, { category: PartCategory; baseEnergyCost: number; baseRepairTime: number }> = {
-  // Mechanical
-  engine: { category: 'mechanical', baseEnergyCost: 50, baseRepairTime: 120 },
-  transmission: { category: 'mechanical', baseEnergyCost: 45, baseRepairTime: 100 },
-  brakes: { category: 'mechanical', baseEnergyCost: 25, baseRepairTime: 40 },
-  suspension: { category: 'mechanical', baseEnergyCost: 35, baseRepairTime: 60 },
-  exhaust: { category: 'mechanical', baseEnergyCost: 20, baseRepairTime: 30 },
-  // Body
-  paint: { category: 'body', baseEnergyCost: 30, baseRepairTime: 90 },
-  dents: { category: 'body', baseEnergyCost: 20, baseRepairTime: 45 },
-  rust: { category: 'body', baseEnergyCost: 35, baseRepairTime: 60 },
-  windows: { category: 'body', baseEnergyCost: 15, baseRepairTime: 25 },
-  lights: { category: 'body', baseEnergyCost: 10, baseRepairTime: 15 },
-  bumpers: { category: 'body', baseEnergyCost: 25, baseRepairTime: 40 },
-  // Tires
-  tires: { category: 'tires', baseEnergyCost: 20, baseRepairTime: 30 },
-  wheels: { category: 'tires', baseEnergyCost: 25, baseRepairTime: 35 },
-  alignment: { category: 'tires', baseEnergyCost: 15, baseRepairTime: 20 },
-  // Interior
-  seats: { category: 'interior', baseEnergyCost: 30, baseRepairTime: 50 },
-  dashboard: { category: 'interior', baseEnergyCost: 25, baseRepairTime: 40 },
-  electronics: { category: 'interior', baseEnergyCost: 35, baseRepairTime: 55 },
-  cleaning: { category: 'interior', baseEnergyCost: 10, baseRepairTime: 20 },
-};
-
 // Damage level multipliers
 export const DAMAGE_MULTIPLIERS: Record<DamageLevel, { energy: number; time: number; value: number }> = {
   none: { energy: 0, time: 0, value: 0 },
-  minor: { energy: 0.4, time: 0.5, value: 0.05 },
-  moderate: { energy: 0.7, time: 0.75, value: 0.12 },
-  major: { energy: 1, time: 1, value: 0.2 },
-  critical: { energy: 1.3, time: 1.25, value: 0.3 },
+  minor: { energy: 0.4, time: 0.5, value: 0.03 },
+  moderate: { energy: 0.7, time: 0.75, value: 0.08 },
+  major: { energy: 1, time: 1, value: 0.15 },
+  critical: { energy: 1.3, time: 1.25, value: 0.25 },
 };
 
-// Car templates with images
+// More variety of cars - multiple images per category would be ideal
+// For now, using same images but with variety in names and values
 export const CAR_TEMPLATES: Array<{ name: string; category: CarCategory; baseValue: number; image: string }> = [
-  // Economy
-  { name: 'Compact Hatch', category: 'economy', baseValue: 300, image: economyHatch },
-  { name: 'City Runner', category: 'economy', baseValue: 400, image: economyHatch },
-  { name: 'Budget Wagon', category: 'economy', baseValue: 350, image: economyHatch },
-  // Sedan
-  { name: 'Family Sedan', category: 'sedan', baseValue: 600, image: sedanImg },
-  { name: 'Executive Sedan', category: 'sedan', baseValue: 800, image: sedanImg },
-  { name: 'Classic Sedan', category: 'sedan', baseValue: 700, image: sedanImg },
-  // SUV
-  { name: 'Urban SUV', category: 'suv', baseValue: 1200, image: suvImg },
-  { name: 'Off-Road SUV', category: 'suv', baseValue: 1500, image: suvImg },
-  // Sports
-  { name: 'Sports Coupe', category: 'sports', baseValue: 2000, image: sportsImg },
-  { name: 'Muscle Car', category: 'sports', baseValue: 2500, image: sportsImg },
-  // Luxury
-  { name: 'Luxury Sedan', category: 'luxury', baseValue: 4000, image: luxuryImg },
-  { name: 'Premium Convertible', category: 'luxury', baseValue: 5000, image: luxuryImg },
+  // Economy (8 varieties)
+  { name: 'Compact Hatch', category: 'economy', baseValue: 800, image: economyHatch },
+  { name: 'City Runner', category: 'economy', baseValue: 950, image: economyHatch },
+  { name: 'Budget Wagon', category: 'economy', baseValue: 750, image: economyHatch },
+  { name: 'Mini Coupe', category: 'economy', baseValue: 1100, image: economyHatch },
+  { name: 'Urban Hatch', category: 'economy', baseValue: 850, image: economyHatch },
+  { name: 'Eco Sprint', category: 'economy', baseValue: 700, image: economyHatch },
+  { name: 'Metro Cruiser', category: 'economy', baseValue: 900, image: economyHatch },
+  { name: 'Penny Saver', category: 'economy', baseValue: 650, image: economyHatch },
+  
+  // Sedan (8 varieties)
+  { name: 'Family Sedan', category: 'sedan', baseValue: 1800, image: sedanImg },
+  { name: 'Executive Sedan', category: 'sedan', baseValue: 2400, image: sedanImg },
+  { name: 'Classic Sedan', category: 'sedan', baseValue: 2000, image: sedanImg },
+  { name: 'Sport Sedan', category: 'sedan', baseValue: 2800, image: sedanImg },
+  { name: 'Touring Sedan', category: 'sedan', baseValue: 2200, image: sedanImg },
+  { name: 'Business Sedan', category: 'sedan', baseValue: 2600, image: sedanImg },
+  { name: 'Luxury Sedan', category: 'sedan', baseValue: 3200, image: sedanImg },
+  { name: 'Comfort Cruiser', category: 'sedan', baseValue: 1900, image: sedanImg },
+  
+  // SUV (8 varieties)
+  { name: 'Urban SUV', category: 'suv', baseValue: 3500, image: suvImg },
+  { name: 'Off-Road SUV', category: 'suv', baseValue: 4200, image: suvImg },
+  { name: 'Family SUV', category: 'suv', baseValue: 3800, image: suvImg },
+  { name: 'Compact SUV', category: 'suv', baseValue: 3000, image: suvImg },
+  { name: 'Adventure SUV', category: 'suv', baseValue: 4500, image: suvImg },
+  { name: 'Premium SUV', category: 'suv', baseValue: 5000, image: suvImg },
+  { name: 'Trail Blazer', category: 'suv', baseValue: 4000, image: suvImg },
+  { name: 'City Explorer', category: 'suv', baseValue: 3200, image: suvImg },
+  
+  // Sports (8 varieties)
+  { name: 'Sports Coupe', category: 'sports', baseValue: 6000, image: sportsImg },
+  { name: 'Muscle Car', category: 'sports', baseValue: 7500, image: sportsImg },
+  { name: 'GT Racer', category: 'sports', baseValue: 8500, image: sportsImg },
+  { name: 'Turbo Coupe', category: 'sports', baseValue: 7000, image: sportsImg },
+  { name: 'Street Rocket', category: 'sports', baseValue: 6500, image: sportsImg },
+  { name: 'Track Monster', category: 'sports', baseValue: 9000, image: sportsImg },
+  { name: 'Drift King', category: 'sports', baseValue: 7800, image: sportsImg },
+  { name: 'Speed Demon', category: 'sports', baseValue: 8000, image: sportsImg },
+  
+  // Luxury (8 varieties)
+  { name: 'Luxury Limousine', category: 'luxury', baseValue: 12000, image: luxuryImg },
+  { name: 'Premium Convertible', category: 'luxury', baseValue: 15000, image: luxuryImg },
+  { name: 'Executive Class', category: 'luxury', baseValue: 18000, image: luxuryImg },
+  { name: 'Grand Tourer', category: 'luxury', baseValue: 20000, image: luxuryImg },
+  { name: 'Royal Sedan', category: 'luxury', baseValue: 16000, image: luxuryImg },
+  { name: 'Prestige Coupe', category: 'luxury', baseValue: 22000, image: luxuryImg },
+  { name: 'Elite Roadster', category: 'luxury', baseValue: 25000, image: luxuryImg },
+  { name: 'Platinum Edition', category: 'luxury', baseValue: 28000, image: luxuryImg },
 ];
+
+// Parts by category for damage generation
+const PARTS_BY_CATEGORY: Record<PartCategory, PartType[]> = {
+  mechanical: ['engine', 'transmission', 'brakes', 'suspension', 'exhaust', 'fuel_system'],
+  body: ['paint', 'dents', 'rust', 'windows', 'lights', 'bumpers'],
+  tires: ['front_tires', 'rear_tires', 'wheels', 'alignment', 'tire_pressure', 'wheel_bearings'],
+  interior: ['seats', 'dashboard', 'electronics', 'cleaning', 'air_conditioning', 'audio_system'],
+};
 
 // Generate random damage for a car
 function generateDamage(baseValue: number, damageIntensity: number): PartDamage[] {
   const damages: PartDamage[] = [];
-  const parts = Object.keys(PART_DEFINITIONS) as PartType[];
+  const categories: PartCategory[] = ['mechanical', 'body', 'tires', 'interior'];
   
-  // Randomly select parts to damage (more parts for higher intensity)
-  const numDamagedParts = Math.floor(3 + Math.random() * (damageIntensity * 5));
-  const shuffledParts = parts.sort(() => Math.random() - 0.5).slice(0, numDamagedParts);
-  
-  shuffledParts.forEach(partType => {
-    const def = PART_DEFINITIONS[partType];
-    const levels: DamageLevel[] = ['minor', 'moderate', 'major', 'critical'];
-    const levelIndex = Math.min(Math.floor(Math.random() * (1 + damageIntensity * 3)), 3);
-    const level = levels[levelIndex];
-    const multipliers = DAMAGE_MULTIPLIERS[level];
+  // Each category has a chance to have damaged parts
+  categories.forEach(category => {
+    const categoryParts = PARTS_BY_CATEGORY[category];
+    const numDamagedParts = Math.floor(1 + Math.random() * (damageIntensity * 4)); // 1-5 parts per category
     
-    // Some damages are hidden (30-60% chance based on category)
-    const visibilityChance = def.category === 'body' ? 0.8 : 0.4;
+    // Shuffle and pick parts
+    const shuffledParts = [...categoryParts].sort(() => Math.random() - 0.5);
+    const selectedParts = shuffledParts.slice(0, Math.min(numDamagedParts, 6));
     
-    damages.push({
-      part: partType,
-      category: def.category,
-      level,
-      visible: Math.random() < visibilityChance,
-      repaired: false,
-      energyCost: Math.round(def.baseEnergyCost * multipliers.energy),
-      repairTime: Math.round(def.baseRepairTime * multipliers.time),
-      valueImpact: baseValue * multipliers.value,
+    selectedParts.forEach(partType => {
+      const def = PART_DEFINITIONS[partType];
+      const levels: DamageLevel[] = ['minor', 'moderate', 'major', 'critical'];
+      const levelIndex = Math.min(Math.floor(Math.random() * (1 + damageIntensity * 3)), 3);
+      const level = levels[levelIndex];
+      const multipliers = DAMAGE_MULTIPLIERS[level];
+      
+      // Visibility chance based on category
+      const visibilityChance = category === 'body' ? 0.8 : category === 'tires' ? 0.6 : 0.35;
+      
+      damages.push({
+        part: partType,
+        category: def.category,
+        level,
+        visible: Math.random() < visibilityChance,
+        repaired: false,
+        energyCost: Math.round(def.baseEnergyCost * multipliers.energy),
+        repairTime: Math.round(def.baseRepairTime * multipliers.time),
+        valueImpact: baseValue * multipliers.value,
+        diyAttempts: 0,
+      });
     });
   });
   
@@ -105,12 +128,12 @@ function calculateCurrentValue(baseValue: number, damages: PartDamage[]): number
 
 // Generate a car for the newspaper
 export function generateCar(reputation: number): Car {
-  // Filter templates based on reputation
+  // Filter templates based on reputation - harder progression
   let availableTemplates = CAR_TEMPLATES.filter(t => {
-    if (reputation < 20) return t.category === 'economy';
-    if (reputation < 40) return ['economy', 'sedan'].includes(t.category);
-    if (reputation < 60) return ['economy', 'sedan', 'suv'].includes(t.category);
-    if (reputation < 80) return t.category !== 'luxury';
+    if (reputation < 15) return t.category === 'economy';
+    if (reputation < 30) return ['economy', 'sedan'].includes(t.category);
+    if (reputation < 50) return ['economy', 'sedan', 'suv'].includes(t.category);
+    if (reputation < 70) return t.category !== 'luxury';
     return true;
   });
   
@@ -119,12 +142,13 @@ export function generateCar(reputation: number): Car {
   }
   
   const template = availableTemplates[Math.floor(Math.random() * availableTemplates.length)];
-  const damageIntensity = 0.3 + Math.random() * 0.5; // 30-80% damage
+  const damageIntensity = 0.3 + Math.random() * 0.5;
   const damages = generateDamage(template.baseValue, damageIntensity);
   const currentValue = calculateCurrentValue(template.baseValue, damages);
   
-  // Asking price is slightly below or at current value (seller's perspective)
-  const askingPrice = Math.round(currentValue * (0.85 + Math.random() * 0.25));
+  // Asking price varies more for harder negotiation
+  const priceVariance = 0.75 + Math.random() * 0.35;
+  const askingPrice = Math.round(currentValue * priceVariance);
   
   return {
     id: `car_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
@@ -145,12 +169,3 @@ export function generateCar(reputation: number): Car {
 export function recalculateCarValue(car: Car): number {
   return calculateCurrentValue(car.baseValue, car.damages);
 }
-
-// Customer names for selling
-export const CUSTOMER_NAMES = [
-  'John Smith', 'Maria Garcia', 'David Johnson', 'Sarah Williams',
-  'Michael Brown', 'Emily Davis', 'James Miller', 'Jennifer Wilson',
-  'Robert Moore', 'Lisa Taylor', 'William Anderson', 'Elizabeth Thomas',
-];
-
-export const CUSTOMER_AVATARS = ['👨', '👩', '🧔', '👱‍♀️', '👨‍🦰', '👩‍🦱', '🧑', '👴', '👵', '🧑‍🦳'];

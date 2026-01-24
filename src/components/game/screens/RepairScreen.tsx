@@ -10,6 +10,8 @@ import { PartCategory } from '@/types/game';
 import { ArrowLeft, DollarSign, Tag, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useSound } from '@/hooks/useSound';
+import { CATEGORY_ICONS, CATEGORY_LABELS } from '@/data/parts';
+import { getPatienceRounds } from '@/data/customers';
 
 // Import car images
 import economyHatch from '@/assets/cars/economy-hatch.png';
@@ -17,6 +19,9 @@ import sedanImg from '@/assets/cars/sedan.png';
 import suvImg from '@/assets/cars/suv.png';
 import sportsImg from '@/assets/cars/sports.png';
 import luxuryImg from '@/assets/cars/luxury.png';
+
+// Background images for each section
+import garageBg from '@/assets/garage-bg.jpg';
 
 const CAR_IMAGES: Record<string, string> = {
   economy: economyHatch,
@@ -32,10 +37,10 @@ interface RepairScreenProps {
 }
 
 const categories: { id: PartCategory; label: string; icon: string }[] = [
-  { id: 'mechanical', label: 'Mechanical', icon: '⚙️' },
-  { id: 'body', label: 'Body', icon: '🔧' },
-  { id: 'tires', label: 'Tires', icon: '🛞' },
-  { id: 'interior', label: 'Interior', icon: '🪑' },
+  { id: 'mechanical', label: CATEGORY_LABELS.mechanical, icon: CATEGORY_ICONS.mechanical },
+  { id: 'body', label: CATEGORY_LABELS.body, icon: CATEGORY_ICONS.body },
+  { id: 'tires', label: CATEGORY_LABELS.tires, icon: CATEGORY_ICONS.tires },
+  { id: 'interior', label: CATEGORY_LABELS.interior, icon: CATEGORY_ICONS.interior },
 ];
 
 export function RepairScreen({ carId, onBack }: RepairScreenProps) {
@@ -46,9 +51,11 @@ export function RepairScreen({ carId, onBack }: RepairScreenProps) {
     getEnergyMultiplier, 
     getRepairSpeedMultiplier,
     startRepair,
+    startDiyRepair,
     getRepairProgress,
     isRepairing,
     getSaleState,
+    getDiySuccessChance,
   } = useGame();
   
   const [selectedCategory, setSelectedCategory] = useState<PartCategory>('mechanical');
@@ -63,14 +70,12 @@ export function RepairScreen({ carId, onBack }: RepairScreenProps) {
   const customerOffer = saleState?.customerOffer || 0;
   const negotiationRound = saleState?.negotiationRound || 0;
 
-  // Initialize sell price
   useEffect(() => {
     if (car) {
       setSellPrice(Math.round(car.currentValue * 1.2));
     }
   }, [car?.currentValue]);
 
-  // Play sound when customer arrives
   useEffect(() => {
     if (customer) {
       playSound('customerCall');
@@ -94,7 +99,30 @@ export function RepairScreen({ carId, onBack }: RepairScreenProps) {
     const success = startRepair(carId, damage.part, actualEnergyCost, actualDuration);
     if (success) {
       playSound('repair');
-      toast.info(`Repairing ${partType.replace('_', ' ')}...`);
+      toast.info(`Repairing ${partType.replace(/_/g, ' ')}...`);
+    }
+  };
+
+  const handleDiyRepair = (partType: string) => {
+    if (!car) return;
+
+    const damage = car.damages.find(d => d.part === partType);
+    if (!damage) return;
+
+    const actualEnergyCost = Math.round(damage.energyCost * getEnergyMultiplier() * 0.5);
+    const actualDuration = damage.repairTime * getRepairSpeedMultiplier() * 0.7;
+    
+    if (!hasEnergy(actualEnergyCost)) {
+      toast.error("Not enough energy! Wait for it to regenerate.");
+      return;
+    }
+
+    const successChance = getDiySuccessChance(damage.part);
+    const { started } = startDiyRepair(carId, damage.part, actualEnergyCost, actualDuration);
+    
+    if (started) {
+      playSound('repair');
+      toast.info(`DIY repair started (${Math.round(successChance)}% success chance)...`);
     }
   };
 
@@ -121,15 +149,17 @@ export function RepairScreen({ carId, onBack }: RepairScreenProps) {
   const handleCounterOffer = () => {
     if (!customer || !saleState) return;
 
-    if (negotiationRound >= 2) {
+    const maxRounds = getPatienceRounds(customer.patience);
+    if (negotiationRound >= maxRounds) {
       toast.error("Customer is losing patience and leaving!");
       dispatch({ type: 'CANCEL_SALE', payload: carId });
       return;
     }
 
-    const increase = (saleState.askingPrice - customerOffer) * (0.3 + Math.random() * 0.3);
-    const newOffer = Math.round(customerOffer + increase);
-    dispatch({ type: 'UPDATE_SALE_OFFER', payload: { carId, offer: newOffer, round: negotiationRound + 1 } });
+    // Counter based on customer personality
+    const increase = (saleState.askingPrice - customerOffer) * (0.2 + Math.random() * 0.3) * (1 - customer.bargainSkill * 0.05);
+    const newOffer = Math.round(customerOffer + Math.max(increase, 50));
+    dispatch({ type: 'UPDATE_SALE_OFFER', payload: { carId, offer: Math.min(newOffer, customer.maxBudget), round: negotiationRound + 1 } });
     toast.info("Customer increased their offer.");
   };
 
@@ -153,115 +183,129 @@ export function RepairScreen({ carId, onBack }: RepairScreenProps) {
   const carImage = CAR_IMAGES[car.category] || economyHatch;
 
   return (
-    <div className="flex flex-col min-h-full pb-20">
-      {/* Header with car image */}
-      <div className="relative p-4 border-b border-border bg-gradient-to-b from-secondary/50 to-background">
-        <div className="flex items-start gap-3">
-          <Button variant="ghost" size="icon" onClick={onBack} className="shrink-0">
-            <ArrowLeft className="w-5 h-5" />
-          </Button>
-          <div className="flex-1 min-w-0">
-            <h1 className="text-lg font-bold truncate">{car.name}</h1>
-            <div className="flex items-center gap-2 text-sm flex-wrap">
-              <Badge variant="secondary">{repaired}/{repaired + unrepaired} fixed</Badge>
-              <span className="text-muted-foreground">
-                Value: <span className="text-primary font-medium">${Math.round(car.currentValue).toLocaleString()}</span>
-              </span>
-            </div>
-          </div>
-          <Button 
-            onClick={() => setShowSellDialog(true)} 
-            disabled={!allRepaired || car.listedForSale}
-            size="sm"
-            className="shrink-0"
-          >
-            <Tag className="w-4 h-4 mr-1" />
-            Sell
-          </Button>
-        </div>
-        
-        {/* Car image */}
-        <div className="flex justify-center mt-3">
-          <img 
-            src={carImage} 
-            alt={car.name}
-            className="h-24 object-contain drop-shadow-lg"
-          />
-        </div>
-      </div>
-
-      {/* Customer waiting / offer */}
-      {(waitingForCustomer || customer) && (
-        <div className="p-4 border-b border-border">
-          {waitingForCustomer ? (
-            <div className="flex items-center gap-3 p-4 bg-secondary/50 rounded-lg">
-              <Loader2 className="w-5 h-5 animate-spin text-primary" />
-              <div>
-                <p className="font-medium">Waiting for a buyer...</p>
-                <p className="text-sm text-muted-foreground">A customer will arrive soon</p>
+    <div className="flex flex-col min-h-full pb-20 relative">
+      {/* Background */}
+      <div 
+        className="absolute inset-0 bg-cover bg-center"
+        style={{ backgroundImage: `url(${garageBg})` }}
+      />
+      <div className="absolute inset-0 bg-background/60" />
+      
+      <div className="relative z-10">
+        {/* Header with car image */}
+        <div className="relative p-4 border-b border-border bg-card/90 backdrop-blur-sm">
+          <div className="flex items-start gap-3">
+            <Button variant="ghost" size="icon" onClick={onBack} className="shrink-0">
+              <ArrowLeft className="w-5 h-5" />
+            </Button>
+            <div className="flex-1 min-w-0">
+              <h1 className="text-lg font-bold truncate">{car.name}</h1>
+              <div className="flex items-center gap-2 text-sm flex-wrap">
+                <Badge variant="secondary">{repaired}/{repaired + unrepaired} fixed</Badge>
+                <span className="text-muted-foreground">
+                  Value: <span className="text-primary font-medium">${Math.round(car.currentValue).toLocaleString()}</span>
+                </span>
               </div>
             </div>
-          ) : customer && (
-            <CustomerCard
-              customer={customer}
-              offerPrice={customerOffer}
-              onAccept={handleAcceptOffer}
-              onCounter={handleCounterOffer}
-              onReject={handleRejectOffer}
-              isNegotiating={negotiationRound > 0}
-            />
-          )}
-        </div>
-      )}
-
-      {/* Category Tabs */}
-      <div className="flex gap-2 p-4 overflow-x-auto">
-        {categories.map((cat) => {
-          const catDamages = car.damages.filter(d => d.category === cat.id);
-          const catUnrepaired = catDamages.filter(d => !d.repaired).length;
-          return (
-            <Button
-              key={cat.id}
-              variant={selectedCategory === cat.id ? 'default' : 'outline'}
+            <Button 
+              onClick={() => setShowSellDialog(true)} 
+              disabled={!allRepaired || car.listedForSale}
               size="sm"
-              onClick={() => setSelectedCategory(cat.id)}
               className="shrink-0"
             >
-              <span className="mr-1">{cat.icon}</span>
-              {cat.label}
-              {catUnrepaired > 0 && (
-                <Badge variant="destructive" className="ml-1 h-5 min-w-5 px-1">
-                  {catUnrepaired}
-                </Badge>
-              )}
+              <Tag className="w-4 h-4 mr-1" />
+              Sell
             </Button>
-          );
-        })}
-      </div>
-
-      {/* Parts List */}
-      <div className="flex-1 p-4 space-y-2">
-        {categoryDamages.length === 0 ? (
-          <div className="text-center py-8 text-muted-foreground">
-            <p>No issues in this category</p>
           </div>
-        ) : (
-          categoryDamages.map((damage) => {
-            const partIsRepairing = isRepairing(carId, damage.part);
-            const progress = getRepairProgress(carId, damage.part);
-            return (
-              <PartRepairCard
-                key={damage.part}
-                damage={damage}
-                onRepair={() => handleRepair(damage.part)}
-                canRepair={hasEnergy(Math.round(damage.energyCost * getEnergyMultiplier())) && !partIsRepairing && !damage.repaired}
-                isRepairing={partIsRepairing}
-                repairProgress={progress}
-                energyMultiplier={getEnergyMultiplier()}
+          
+          {/* Car image */}
+          <div className="flex justify-center mt-3">
+            <img 
+              src={carImage} 
+              alt={car.name}
+              className="h-24 object-contain drop-shadow-lg"
+            />
+          </div>
+        </div>
+
+        {/* Customer waiting / offer */}
+        {(waitingForCustomer || customer) && (
+          <div className="p-4 border-b border-border bg-card/80 backdrop-blur-sm">
+            {waitingForCustomer ? (
+              <div className="flex items-center gap-3 p-4 bg-secondary/50 rounded-lg">
+                <Loader2 className="w-5 h-5 animate-spin text-primary" />
+                <div>
+                  <p className="font-medium">Waiting for a buyer...</p>
+                  <p className="text-sm text-muted-foreground">A customer will arrive soon</p>
+                </div>
+              </div>
+            ) : customer && (
+              <CustomerCard
+                customer={customer}
+                offerPrice={customerOffer}
+                onAccept={handleAcceptOffer}
+                onCounter={handleCounterOffer}
+                onReject={handleRejectOffer}
+                isNegotiating={negotiationRound > 0}
+                negotiationRound={negotiationRound}
               />
-            );
-          })
+            )}
+          </div>
         )}
+
+        {/* Category Tabs */}
+        <div className="flex gap-2 p-4 overflow-x-auto bg-card/70 backdrop-blur-sm">
+          {categories.map((cat) => {
+            const catDamages = car.damages.filter(d => d.category === cat.id);
+            const catUnrepaired = catDamages.filter(d => !d.repaired).length;
+            return (
+              <Button
+                key={cat.id}
+                variant={selectedCategory === cat.id ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setSelectedCategory(cat.id)}
+                className="shrink-0"
+              >
+                <span className="mr-1">{cat.icon}</span>
+                {cat.label}
+                {catUnrepaired > 0 && (
+                  <Badge variant="destructive" className="ml-1 h-5 min-w-5 px-1">
+                    {catUnrepaired}
+                  </Badge>
+                )}
+              </Button>
+            );
+          })}
+        </div>
+
+        {/* Parts List */}
+        <div className="flex-1 p-4 space-y-2">
+          {categoryDamages.length === 0 ? (
+            <div className="text-center py-8 text-muted-foreground bg-card/70 backdrop-blur-sm rounded-lg">
+              <p>No issues in this category</p>
+            </div>
+          ) : (
+            categoryDamages.map((damage) => {
+              const partIsRepairing = isRepairing(carId, damage.part);
+              const progress = getRepairProgress(carId, damage.part);
+              const diyChance = getDiySuccessChance(damage.part);
+              return (
+                <PartRepairCard
+                  key={damage.part}
+                  damage={damage}
+                  onRepair={() => handleRepair(damage.part)}
+                  onDiyRepair={() => handleDiyRepair(damage.part)}
+                  canRepair={hasEnergy(Math.round(damage.energyCost * getEnergyMultiplier())) && !partIsRepairing && !damage.repaired}
+                  canDiy={hasEnergy(Math.round(damage.energyCost * getEnergyMultiplier() * 0.5)) && !partIsRepairing && !damage.repaired}
+                  isRepairing={partIsRepairing}
+                  repairProgress={progress}
+                  energyMultiplier={getEnergyMultiplier()}
+                  diySuccessChance={diyChance}
+                />
+              );
+            })
+          )}
+        </div>
       </div>
 
       {/* Sell Dialog */}

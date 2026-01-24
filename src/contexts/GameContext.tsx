@@ -1,19 +1,26 @@
 import React, { createContext, useContext, useReducer, useEffect, useCallback } from 'react';
-import { GameState, Car, PartType, ToolLevel, DiagnosticLevel, RepairJob, SaleState, Customer } from '@/types/game';
-import { recalculateCarValue, CUSTOMER_NAMES, CUSTOMER_AVATARS } from '@/data/cars';
+import { GameState, Car, PartType, ToolLevel, DiagnosticLevel, RepairJob, SaleState, Customer, Skills } from '@/types/game';
+import { recalculateCarValue } from '@/data/cars';
+import { generateCustomer, calculateCustomerOffer } from '@/data/customers';
+import { PART_DEFINITIONS, calculateDiySuccessChance } from '@/data/parts';
+import { getXpForLevel } from '@/data/upgrades';
 
 const INITIAL_STATE: GameState = {
   money: 500,
-  energy: 100,
-  maxEnergy: 100,
+  energy: 1000, // Start with 1000 energy
+  maxEnergy: 1000,
   reputation: 0,
   xp: 0,
   level: 1,
+  skillPoints: 0,
   toolLevel: 'basic',
   diagnosticLevel: 'visual',
   skills: {
     diagnosis: 1,
-    repairSpeed: 1,
+    mechanical: 1,
+    bodywork: 1,
+    electrical: 1,
+    tires: 1,
     negotiation: 1,
   },
   garageUpgrades: {
@@ -21,6 +28,8 @@ const INITIAL_STATE: GameState = {
     hasPaintBooth: false,
     hasEngineLift: false,
     hasCleaningStation: false,
+    hasAlignmentRack: false,
+    hasAdvancedTools: false,
   },
   carsInGarage: [],
   totalCarsSold: 0,
@@ -39,6 +48,7 @@ type GameAction =
   | { type: 'REGENERATE_ENERGY' }
   | { type: 'ADD_REPUTATION'; payload: number }
   | { type: 'ADD_XP'; payload: number }
+  | { type: 'ADD_SKILL_POINTS'; payload: number }
   | { type: 'BUY_CAR'; payload: Car }
   | { type: 'SELL_CAR'; payload: { carId: string; salePrice: number } }
   | { type: 'REPAIR_PART'; payload: { carId: string; partType: PartType } }
@@ -49,12 +59,12 @@ type GameAction =
   | { type: 'CANCEL_SALE'; payload: string }
   | { type: 'UPGRADE_TOOLS'; payload: ToolLevel }
   | { type: 'UPGRADE_DIAGNOSTICS'; payload: DiagnosticLevel }
-  | { type: 'UPGRADE_SKILL'; payload: { skill: keyof GameState['skills']; level: number } }
+  | { type: 'UPGRADE_SKILL'; payload: { skill: keyof Skills; level: number } }
   | { type: 'UPGRADE_GARAGE'; payload: Partial<GameState['garageUpgrades']> }
   | { type: 'UPGRADE_MAX_ENERGY'; payload: number }
   | { type: 'ADD_REPAIR_JOB'; payload: RepairJob }
-  | { type: 'COMPLETE_REPAIR'; payload: { carId: string; partType: PartType } }
-  | { type: 'PROCESS_REPAIR_QUEUE' }
+  | { type: 'COMPLETE_REPAIR'; payload: { carId: string; partType: PartType; success: boolean } }
+  | { type: 'INCREMENT_DIY_ATTEMPTS'; payload: { carId: string; partType: PartType } }
   | { type: 'LOAD_STATE'; payload: GameState };
 
 function gameReducer(state: GameState, action: GameAction): GameState {
@@ -72,7 +82,9 @@ function gameReducer(state: GameState, action: GameAction): GameState {
     case 'REGENERATE_ENERGY': {
       const now = Date.now();
       const minutesElapsed = (now - state.lastEnergyUpdate) / 60000;
-      const energyToAdd = Math.floor(minutesElapsed * 20);
+      // Slower energy regen when repairing: 10/min normal, 3/min when repairing
+      const regenRate = state.repairQueue.length > 0 ? 3 : 10;
+      const energyToAdd = Math.floor(minutesElapsed * regenRate);
       if (energyToAdd > 0) {
         return {
           ...state,
@@ -86,12 +98,20 @@ function gameReducer(state: GameState, action: GameAction): GameState {
       return { ...state, reputation: Math.min(100, state.reputation + action.payload) };
     case 'ADD_XP': {
       const newXp = state.xp + action.payload;
-      const xpForNextLevel = state.level * 100;
+      const xpForNextLevel = getXpForLevel(state.level);
       if (newXp >= xpForNextLevel) {
-        return { ...state, xp: newXp - xpForNextLevel, level: state.level + 1 };
+        // Level up! Grant skill point
+        return { 
+          ...state, 
+          xp: newXp - xpForNextLevel, 
+          level: state.level + 1,
+          skillPoints: state.skillPoints + 1,
+        };
       }
       return { ...state, xp: newXp };
     }
+    case 'ADD_SKILL_POINTS':
+      return { ...state, skillPoints: state.skillPoints + action.payload };
     case 'BUY_CAR': {
       const car = { ...action.payload, purchased: true, isInGarage: true };
       return {
@@ -183,9 +203,11 @@ function gameReducer(state: GameState, action: GameAction): GameState {
     case 'UPGRADE_DIAGNOSTICS':
       return { ...state, diagnosticLevel: action.payload };
     case 'UPGRADE_SKILL':
+      if (state.skillPoints <= 0) return state;
       return {
         ...state,
         skills: { ...state.skills, [action.payload.skill]: action.payload.level },
+        skillPoints: state.skillPoints - 1,
       };
     case 'UPGRADE_GARAGE':
       return {
@@ -200,6 +222,12 @@ function gameReducer(state: GameState, action: GameAction): GameState {
       const updatedQueue = state.repairQueue.filter(
         r => !(r.carId === action.payload.carId && r.partType === action.payload.partType)
       );
+      
+      if (!action.payload.success) {
+        // DIY failed - just remove from queue, don't mark as repaired
+        return { ...state, repairQueue: updatedQueue };
+      }
+      
       const updatedCars = state.carsInGarage.map(car => {
         if (car.id === action.payload.carId) {
           const updatedDamages = car.damages.map(d =>
@@ -213,6 +241,20 @@ function gameReducer(state: GameState, action: GameAction): GameState {
       });
       return { ...state, repairQueue: updatedQueue, carsInGarage: updatedCars };
     }
+    case 'INCREMENT_DIY_ATTEMPTS': {
+      const updatedCars = state.carsInGarage.map(car => {
+        if (car.id === action.payload.carId) {
+          const updatedDamages = car.damages.map(d =>
+            d.part === action.payload.partType 
+              ? { ...d, diyAttempts: (d.diyAttempts || 0) + 1 } 
+              : d
+          );
+          return { ...car, damages: updatedDamages };
+        }
+        return car;
+      });
+      return { ...state, carsInGarage: updatedCars };
+    }
     case 'LOAD_STATE':
       return { 
         ...INITIAL_STATE,
@@ -220,6 +262,16 @@ function gameReducer(state: GameState, action: GameAction): GameState {
         lastEnergyUpdate: Date.now(),
         repairQueue: action.payload.repairQueue || [],
         activeSales: action.payload.activeSales || [],
+        // Ensure new fields exist
+        skillPoints: action.payload.skillPoints || 0,
+        skills: {
+          ...INITIAL_STATE.skills,
+          ...action.payload.skills,
+        },
+        garageUpgrades: {
+          ...INITIAL_STATE.garageUpgrades,
+          ...action.payload.garageUpgrades,
+        },
       };
     default:
       return state;
@@ -235,15 +287,18 @@ interface GameContextType {
   getEnergyMultiplier: () => number;
   getRepairSpeedMultiplier: () => number;
   getNegotiationBonus: () => number;
-  startRepair: (carId: string, partType: PartType, energyCost: number, duration: number) => boolean;
+  getToolLevelIndex: () => number;
+  startRepair: (carId: string, partType: PartType, energyCost: number, duration: number, isDiy?: boolean) => boolean;
+  startDiyRepair: (carId: string, partType: PartType, energyCost: number, duration: number) => { started: boolean; successChance: number };
   getRepairProgress: (carId: string, partType: PartType) => number;
   isRepairing: (carId: string, partType: PartType) => boolean;
   getSaleState: (carId: string) => SaleState | undefined;
+  getDiySuccessChance: (partType: PartType) => number;
 }
 
 const GameContext = createContext<GameContextType | undefined>(undefined);
 
-const SAVE_KEY = 'car_mechanic_save';
+const SAVE_KEY = 'car_mechanic_save_v2';
 
 export function GameProvider({ children }: { children: React.ReactNode }) {
   const [state, dispatch] = useReducer(gameReducer, INITIAL_STATE);
@@ -282,30 +337,45 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
       // Check completed repairs
       state.repairQueue.forEach(job => {
         if (now >= job.startTime + job.duration) {
-          dispatch({ type: 'COMPLETE_REPAIR', payload: { carId: job.carId, partType: job.partType } });
-          dispatch({ type: 'ADD_XP', payload: 10 + job.energyCost });
+          if (job.isDiy) {
+            // Calculate DIY success
+            const partDef = PART_DEFINITIONS[job.partType];
+            const skillKey = partDef.skillRequired;
+            const skillLevel = state.skills[skillKey as keyof Skills] || 1;
+            const toolLevel = getToolLevelIndexLocal(state.toolLevel);
+            const hasEquipment = getEquipmentForCategory(partDef.category, state.garageUpgrades);
+            const successChance = calculateDiySuccessChance(job.partType, skillLevel, toolLevel, hasEquipment);
+            const success = Math.random() * 100 < successChance;
+            
+            dispatch({ type: 'COMPLETE_REPAIR', payload: { carId: job.carId, partType: job.partType, success } });
+            dispatch({ type: 'INCREMENT_DIY_ATTEMPTS', payload: { carId: job.carId, partType: job.partType } });
+            
+            if (success) {
+              dispatch({ type: 'ADD_XP', payload: 15 + job.energyCost });
+            } else {
+              dispatch({ type: 'ADD_XP', payload: 5 }); // Small XP for trying
+            }
+          } else {
+            // Professional repair always succeeds
+            dispatch({ type: 'COMPLETE_REPAIR', payload: { carId: job.carId, partType: job.partType, success: true } });
+            dispatch({ type: 'ADD_XP', payload: 10 + job.energyCost });
+          }
         }
       });
       
       // Check customer arrivals
       state.activeSales.forEach(sale => {
         if (!sale.customer && now >= sale.customerArrivalTime) {
-          const customer: Customer = {
-            id: `customer_${Date.now()}`,
-            name: CUSTOMER_NAMES[Math.floor(Math.random() * CUSTOMER_NAMES.length)],
-            avatar: CUSTOMER_AVATARS[Math.floor(Math.random() * CUSTOMER_AVATARS.length)],
-            patience: ['low', 'medium', 'high'][Math.floor(Math.random() * 3)] as 'low' | 'medium' | 'high',
-            maxBudget: sale.askingPrice * (1 + Math.random() * 0.3),
-          };
-          const offerVariance = customer.patience === 'high' ? 0.95 : customer.patience === 'medium' ? 0.85 : 0.75;
-          const offer = Math.round(sale.askingPrice * (offerVariance + Math.random() * 0.1));
+          const car = state.carsInGarage.find(c => c.id === sale.carId);
+          const customer = generateCustomer(sale.askingPrice, car?.category);
+          const offer = calculateCustomerOffer(customer, sale.askingPrice);
           dispatch({ type: 'CUSTOMER_ARRIVED', payload: { carId: sale.carId, customer, offer } });
         }
       });
     }, 100);
     
     return () => clearInterval(interval);
-  }, [state.repairQueue, state.activeSales]);
+  }, [state.repairQueue, state.activeSales, state.skills, state.toolLevel, state.garageUpgrades]);
 
   const canAfford = useCallback((amount: number) => state.money >= amount, [state.money]);
   const hasEnergy = useCallback((amount: number) => state.energy >= amount, [state.energy]);
@@ -314,18 +384,23 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
     const toolBonus: Record<DiagnosticLevel, number> = {
       visual: 0,
       basic_scanner: 0.3,
-      pro_diagnostic: 0.5,
-      master: 0.8,
+      intermediate: 0.5,
+      pro_diagnostic: 0.7,
+      advanced: 0.85,
+      master: 1.0,
     };
-    const skillBonus = (state.skills.diagnosis - 1) * 0.05;
+    const skillBonus = (state.skills.diagnosis - 1) * 0.03;
     return toolBonus[state.diagnosticLevel] + skillBonus;
   }, [state.diagnosticLevel, state.skills.diagnosis]);
 
   const getEnergyMultiplier = useCallback(() => {
     const multipliers: Record<ToolLevel, number> = {
       basic: 1,
+      standard: 0.9,
       pro: 0.8,
-      premium: 0.65,
+      advanced: 0.7,
+      premium: 0.6,
+      master: 0.5,
     };
     return multipliers[state.toolLevel];
   }, [state.toolLevel]);
@@ -333,21 +408,38 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
   const getRepairSpeedMultiplier = useCallback(() => {
     const toolBonus: Record<ToolLevel, number> = {
       basic: 1,
-      pro: 0.85,
+      standard: 1,
+      pro: 0.9,
+      advanced: 0.8,
       premium: 0.7,
+      master: 0.6,
     };
-    const skillBonus = 1 - (state.skills.repairSpeed - 1) * 0.05;
+    // Use average of all repair skills
+    const avgSkill = (state.skills.mechanical + state.skills.bodywork + state.skills.electrical + state.skills.tires) / 4;
+    const skillBonus = 1 - (avgSkill - 1) * 0.02;
     return toolBonus[state.toolLevel] * skillBonus;
-  }, [state.toolLevel, state.skills.repairSpeed]);
+  }, [state.toolLevel, state.skills]);
 
   const getNegotiationBonus = useCallback(() => {
-    return 1 + (state.skills.negotiation - 1) * 0.03;
+    return 1 + (state.skills.negotiation - 1) * 0.02;
   }, [state.skills.negotiation]);
 
-  const startRepair = useCallback((carId: string, partType: PartType, energyCost: number, duration: number) => {
+  const getToolLevelIndex = useCallback(() => {
+    return getToolLevelIndexLocal(state.toolLevel);
+  }, [state.toolLevel]);
+
+  const getDiySuccessChance = useCallback((partType: PartType) => {
+    const partDef = PART_DEFINITIONS[partType];
+    const skillKey = partDef.skillRequired;
+    const skillLevel = state.skills[skillKey as keyof Skills] || 1;
+    const toolLevel = getToolLevelIndexLocal(state.toolLevel);
+    const hasEquipment = getEquipmentForCategory(partDef.category, state.garageUpgrades);
+    return calculateDiySuccessChance(partType, skillLevel, toolLevel, hasEquipment);
+  }, [state.skills, state.toolLevel, state.garageUpgrades]);
+
+  const startRepair = useCallback((carId: string, partType: PartType, energyCost: number, duration: number, isDiy: boolean = false) => {
     if (!hasEnergy(energyCost)) return false;
     
-    // Check if already repairing this part
     const existingJob = state.repairQueue.find(r => r.carId === carId && r.partType === partType);
     if (existingJob) return false;
     
@@ -360,10 +452,17 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
         startTime: Date.now(),
         duration: duration * 1000,
         energyCost,
+        isDiy,
       },
     });
     return true;
   }, [hasEnergy, state.repairQueue]);
+
+  const startDiyRepair = useCallback((carId: string, partType: PartType, energyCost: number, duration: number) => {
+    const successChance = getDiySuccessChance(partType);
+    const started = startRepair(carId, partType, Math.round(energyCost * 0.5), duration * 0.7, true); // DIY costs less energy, faster but risky
+    return { started, successChance };
+  }, [startRepair, getDiySuccessChance]);
 
   const getRepairProgress = useCallback((carId: string, partType: PartType) => {
     const job = state.repairQueue.find(r => r.carId === carId && r.partType === partType);
@@ -391,10 +490,13 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
         getEnergyMultiplier,
         getRepairSpeedMultiplier,
         getNegotiationBonus,
+        getToolLevelIndex,
         startRepair,
+        startDiyRepair,
         getRepairProgress,
         isRepairing,
         getSaleState,
+        getDiySuccessChance,
       }}
     >
       {children}
@@ -408,4 +510,20 @@ export function useGame() {
     throw new Error('useGame must be used within a GameProvider');
   }
   return context;
+}
+
+// Helper functions
+function getToolLevelIndexLocal(level: ToolLevel): number {
+  const levels: ToolLevel[] = ['basic', 'standard', 'pro', 'advanced', 'premium', 'master'];
+  return levels.indexOf(level);
+}
+
+function getEquipmentForCategory(category: string, upgrades: GameState['garageUpgrades']): boolean {
+  switch (category) {
+    case 'mechanical': return upgrades.hasEngineLift;
+    case 'body': return upgrades.hasPaintBooth;
+    case 'tires': return upgrades.hasAlignmentRack;
+    case 'interior': return upgrades.hasAdvancedTools || upgrades.hasCleaningStation;
+    default: return false;
+  }
 }
