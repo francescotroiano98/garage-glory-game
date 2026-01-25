@@ -252,15 +252,23 @@ export function ShopScreen() {
             <Progress value={(state.xp / (state.level * 100)) * 100} className="h-2" />
             <div className="mt-3 space-y-1.5 text-sm">
               <div className="flex justify-between">
-                <span>Diagnosis</span>
-                <span className="font-medium">Lv.{state.skills.diagnosis}</span>
+                <span>🔧 Mechanical</span>
+                <span className="font-medium">Lv.{state.skills.mechanical}</span>
               </div>
               <div className="flex justify-between">
-                <span>Repair Speed</span>
-                <span className="font-medium">Lv.{state.skills.repairSpeed}</span>
+                <span>🚗 Bodywork</span>
+                <span className="font-medium">Lv.{state.skills.bodywork}</span>
               </div>
               <div className="flex justify-between">
-                <span>Negotiation</span>
+                <span>⚡ Electrical</span>
+                <span className="font-medium">Lv.{state.skills.electrical}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>🛞 Tires</span>
+                <span className="font-medium">Lv.{state.skills.tires}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>💬 Negotiation</span>
                 <span className="font-medium">Lv.{state.skills.negotiation}</span>
               </div>
             </div>
