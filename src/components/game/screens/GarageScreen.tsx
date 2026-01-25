@@ -116,78 +116,71 @@ export function GarageScreen({ onNavigateToNewspaper, onSelectCar }: GarageScree
                 const hasDamages = car.damages.some(d => !d.repaired);
                 const isInSale = !!saleState;
                 
-                return (
-                  <div key={car.id} className="relative">
-                    <CarCard
-                      car={car}
-                      onClick={() => onSelectCar(car.id)}
-                      showDamages={true}
-                    />
-                    
-                    {/* Sale controls overlay */}
-                    <div className="absolute bottom-2 right-2 flex gap-2">
-                      {!isInSale && (
+                // Build action button based on sale state
+                const actionButton = (() => {
+                  if (!isInSale) {
+                    return (
+                      <Button
+                        size="sm"
+                        variant={hasDamages ? "secondary" : "default"}
+                        onClick={(e) => handleStartSale(car.id, e)}
+                        disabled={hasDamages}
+                        className="shadow-lg"
+                      >
+                        <DollarSign className="w-3 h-3 mr-1" />
+                        Sell
+                      </Button>
+                    );
+                  }
+                  if (isWaitingForCustomer) {
+                    return (
+                      <div className="flex gap-1">
+                        <Button size="sm" variant="secondary" className="animate-pulse" disabled>
+                          <Clock className="w-3 h-3 mr-1 animate-spin" />
+                          Waiting...
+                        </Button>
+                        <Button size="sm" variant="outline" onClick={(e) => handleCancelSale(car.id, e)}>
+                          ✕
+                        </Button>
+                      </div>
+                    );
+                  }
+                  if (hasCustomer) {
+                    return (
+                      <div className="flex gap-1">
                         <Button
                           size="sm"
-                          variant={hasDamages ? "secondary" : "default"}
-                          onClick={(e) => handleStartSale(car.id, e)}
-                          disabled={hasDamages}
-                          className="shadow-lg"
+                          variant="default"
+                          onClick={(e) => handleAcceptOffer(car.id, e)}
+                          className="bg-green-600 hover:bg-green-700"
                         >
-                          <DollarSign className="w-3 h-3 mr-1" />
-                          Sell
+                          ✓ ${saleState.customerOffer?.toLocaleString()}
                         </Button>
-                      )}
-                      
-                      {isWaitingForCustomer && (
-                        <div className="flex gap-1">
-                          <Button
-                            size="sm"
-                            variant="secondary"
-                            className="animate-pulse"
-                            disabled
-                          >
-                            <Clock className="w-3 h-3 mr-1 animate-spin" />
-                            Waiting...
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={(e) => handleCancelSale(car.id, e)}
-                          >
-                            ✕
-                          </Button>
-                        </div>
-                      )}
-                      
-                      {hasCustomer && (
-                        <div className="flex gap-1">
-                          <Button
-                            size="sm"
-                            variant="default"
-                            onClick={(e) => handleAcceptOffer(car.id, e)}
-                            className="bg-green-600 hover:bg-green-700"
-                          >
-                            ✓ ${saleState.customerOffer?.toLocaleString()}
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="destructive"
-                            onClick={(e) => handleRejectOffer(car.id, e)}
-                          >
-                            ✕
-                          </Button>
-                        </div>
-                      )}
-                    </div>
-                    
-                    {/* Customer info badge */}
-                    {hasCustomer && (
-                      <div className="absolute top-2 right-2 px-2 py-1 rounded-md text-xs font-medium bg-primary text-primary-foreground animate-pulse">
-                        🔔 {saleState.customer?.avatar} {saleState.customer?.name}
+                        <Button size="sm" variant="destructive" onClick={(e) => handleRejectOffer(car.id, e)}>
+                          ✕
+                        </Button>
                       </div>
-                    )}
+                    );
+                  }
+                  return null;
+                })();
+
+                // Build top badge for customer info
+                const topBadge = hasCustomer ? (
+                  <div className="px-2 py-1 rounded-md text-xs font-medium bg-primary text-primary-foreground animate-pulse">
+                    🔔 {saleState.customer?.avatar} {saleState.customer?.name}
                   </div>
+                ) : null;
+
+                return (
+                  <CarCard
+                    key={car.id}
+                    car={car}
+                    onClick={() => onSelectCar(car.id)}
+                    showDamages={true}
+                    actionButton={actionButton}
+                    topBadge={topBadge}
+                  />
                 );
               })}
               
