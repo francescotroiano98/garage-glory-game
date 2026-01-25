@@ -1,9 +1,10 @@
 import { useGame } from '@/contexts/GameContext';
 import { CarCard } from '@/components/game/CarCard';
 import { Button } from '@/components/ui/button';
-import { Car as CarIcon, Plus, Wrench, Loader2 } from 'lucide-react';
+import { Car as CarIcon, Plus, Wrench, Loader2, DollarSign, Clock } from 'lucide-react';
 import { Newspaper } from 'lucide-react';
 import garageBg from '@/assets/garage-bg.jpg';
+import { toast } from 'sonner';
 
 interface GarageScreenProps {
   onNavigateToNewspaper: () => void;
@@ -11,9 +12,46 @@ interface GarageScreenProps {
 }
 
 export function GarageScreen({ onNavigateToNewspaper, onSelectCar }: GarageScreenProps) {
-  const { state, getSaleState } = useGame();
-  const { carsInGarage, garageUpgrades, repairQueue } = state;
+  const { state, dispatch, getSaleState } = useGame();
+  const { carsInGarage, garageUpgrades, repairQueue, activeSales } = state;
   const emptySlots = garageUpgrades.carBays - carsInGarage.length;
+
+  const handleStartSale = (carId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    const car = carsInGarage.find(c => c.id === carId);
+    if (!car) return;
+    
+    // Check if car has damages
+    const hasDamages = car.damages.some(d => !d.repaired);
+    if (hasDamages) {
+      toast.error("Repair all damages before selling!");
+      return;
+    }
+    
+    dispatch({ type: 'LIST_CAR_FOR_SALE', payload: { carId, askingPrice: car.currentValue } });
+    toast.success("Car listed for sale! Waiting for customers...");
+  };
+
+  const handleAcceptOffer = (carId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    const saleState = getSaleState(carId);
+    if (!saleState?.customer || !saleState.customerOffer) return;
+    
+    dispatch({ type: 'SELL_CAR', payload: { carId, salePrice: saleState.customerOffer } });
+    toast.success(`Sold for $${saleState.customerOffer.toLocaleString()}!`);
+  };
+
+  const handleRejectOffer = (carId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    dispatch({ type: 'CANCEL_SALE', payload: carId });
+    toast.info("Customer left. You can relist the car.");
+  };
+
+  const handleCancelSale = (carId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    dispatch({ type: 'CANCEL_SALE', payload: carId });
+    toast.info("Sale cancelled");
+  };
 
   return (
     <div className="flex flex-col min-h-full pb-20 relative">
@@ -75,6 +113,8 @@ export function GarageScreen({ onNavigateToNewspaper, onSelectCar }: GarageScree
                 const saleState = getSaleState(car.id);
                 const isWaitingForCustomer = saleState && !saleState.customer;
                 const hasCustomer = saleState?.customer;
+                const hasDamages = car.damages.some(d => !d.repaired);
+                const isInSale = !!saleState;
                 
                 return (
                   <div key={car.id} className="relative">
@@ -83,14 +123,68 @@ export function GarageScreen({ onNavigateToNewspaper, onSelectCar }: GarageScree
                       onClick={() => onSelectCar(car.id)}
                       showDamages={true}
                     />
-                    {/* Sale status indicator */}
-                    {(isWaitingForCustomer || hasCustomer) && (
-                      <div className={`absolute top-2 right-2 px-2 py-1 rounded-md text-xs font-medium ${
-                        hasCustomer 
-                          ? 'bg-primary text-primary-foreground animate-pulse' 
-                          : 'bg-secondary text-secondary-foreground'
-                      }`}>
-                        {hasCustomer ? '🔔 Customer waiting!' : '⏳ Listed for sale'}
+                    
+                    {/* Sale controls overlay */}
+                    <div className="absolute bottom-2 right-2 flex gap-2">
+                      {!isInSale && (
+                        <Button
+                          size="sm"
+                          variant={hasDamages ? "secondary" : "default"}
+                          onClick={(e) => handleStartSale(car.id, e)}
+                          disabled={hasDamages}
+                          className="shadow-lg"
+                        >
+                          <DollarSign className="w-3 h-3 mr-1" />
+                          Sell
+                        </Button>
+                      )}
+                      
+                      {isWaitingForCustomer && (
+                        <div className="flex gap-1">
+                          <Button
+                            size="sm"
+                            variant="secondary"
+                            className="animate-pulse"
+                            disabled
+                          >
+                            <Clock className="w-3 h-3 mr-1 animate-spin" />
+                            Waiting...
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={(e) => handleCancelSale(car.id, e)}
+                          >
+                            ✕
+                          </Button>
+                        </div>
+                      )}
+                      
+                      {hasCustomer && (
+                        <div className="flex gap-1">
+                          <Button
+                            size="sm"
+                            variant="default"
+                            onClick={(e) => handleAcceptOffer(car.id, e)}
+                            className="bg-green-600 hover:bg-green-700"
+                          >
+                            ✓ ${saleState.customerOffer?.toLocaleString()}
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="destructive"
+                            onClick={(e) => handleRejectOffer(car.id, e)}
+                          >
+                            ✕
+                          </Button>
+                        </div>
+                      )}
+                    </div>
+                    
+                    {/* Customer info badge */}
+                    {hasCustomer && (
+                      <div className="absolute top-2 right-2 px-2 py-1 rounded-md text-xs font-medium bg-primary text-primary-foreground animate-pulse">
+                        🔔 {saleState.customer?.avatar} {saleState.customer?.name}
                       </div>
                     )}
                   </div>
