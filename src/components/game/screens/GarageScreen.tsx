@@ -5,6 +5,7 @@ import { Car as CarIcon, Plus, Wrench, Loader2, DollarSign, Clock } from 'lucide
 import { Newspaper } from 'lucide-react';
 import garageBg from '@/assets/garage-bg.jpg';
 import { toast } from 'sonner';
+import { useSound } from '@/hooks/useSound';
 
 interface GarageScreenProps {
   onNavigateToNewspaper: () => void;
@@ -12,16 +13,16 @@ interface GarageScreenProps {
 }
 
 export function GarageScreen({ onNavigateToNewspaper, onSelectCar }: GarageScreenProps) {
-  const { state, dispatch, getSaleState } = useGame();
-  const { carsInGarage, garageUpgrades, repairQueue, activeSales } = state;
+  const { state, dispatch, getSaleState, handleSaleComplete } = useGame();
+  const { carsInGarage, garageUpgrades, repairQueue } = state;
   const emptySlots = garageUpgrades.carBays - carsInGarage.length;
+  const { playSound } = useSound();
 
   const handleStartSale = (carId: string, e: React.MouseEvent) => {
     e.stopPropagation();
     const car = carsInGarage.find(c => c.id === carId);
     if (!car) return;
     
-    // Check if car has damages
     const hasDamages = car.damages.some(d => !d.repaired);
     if (hasDamages) {
       toast.error("Repair all damages before selling!");
@@ -37,7 +38,11 @@ export function GarageScreen({ onNavigateToNewspaper, onSelectCar }: GarageScree
     const saleState = getSaleState(carId);
     if (!saleState?.customer || !saleState.customerOffer) return;
     
-    dispatch({ type: 'SELL_CAR', payload: { carId, salePrice: saleState.customerOffer } });
+    const car = carsInGarage.find(c => c.id === carId);
+    if (!car) return;
+    
+    handleSaleComplete(carId, saleState.customerOffer);
+    playSound('cashRegister');
     toast.success(`Sold for $${saleState.customerOffer.toLocaleString()}!`);
   };
 
@@ -55,14 +60,12 @@ export function GarageScreen({ onNavigateToNewspaper, onSelectCar }: GarageScree
 
   return (
     <div className="flex flex-col min-h-full pb-20 relative">
-      {/* Background */}
       <div 
         className="absolute inset-0 opacity-20 bg-cover bg-center"
         style={{ backgroundImage: `url(${garageBg})` }}
       />
       
       <div className="relative z-10">
-        {/* Header */}
         <div className="p-4 border-b-2 border-border bg-background/80 backdrop-blur-sm">
           <div className="flex items-center justify-between">
             <div>
@@ -81,7 +84,6 @@ export function GarageScreen({ onNavigateToNewspaper, onSelectCar }: GarageScree
           </div>
         </div>
 
-        {/* Active repairs indicator */}
         {repairQueue.length > 0 && (
           <div className="mx-4 mt-4 p-3 bg-accent/20 border-2 border-accent/30 rounded-lg flex items-center gap-2">
             <Loader2 className="w-4 h-4 animate-spin text-accent" />
@@ -91,7 +93,6 @@ export function GarageScreen({ onNavigateToNewspaper, onSelectCar }: GarageScree
           </div>
         )}
 
-        {/* Cars List */}
         <div className="flex-1 p-4">
           {carsInGarage.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-64 text-center bg-card/80 backdrop-blur-sm rounded-xl border-2 border-dashed border-border">
@@ -116,7 +117,9 @@ export function GarageScreen({ onNavigateToNewspaper, onSelectCar }: GarageScree
                 const hasDamages = car.damages.some(d => !d.repaired);
                 const isInSale = !!saleState;
                 
-                // Build action button based on sale state
+                const totalInvestment = (car.purchasePrice || car.askingPrice) + (car.totalRepairCost || 0);
+                const potentialProfit = car.currentValue - totalInvestment;
+                
                 const actionButton = (() => {
                   if (!isInSale) {
                     return (
@@ -165,12 +168,15 @@ export function GarageScreen({ onNavigateToNewspaper, onSelectCar }: GarageScree
                   return null;
                 })();
 
-                // Build top badge for customer info
                 const topBadge = hasCustomer ? (
                   <div className="px-2 py-1 rounded-md text-xs font-medium bg-primary text-primary-foreground animate-pulse">
                     🔔 {saleState.customer?.avatar} {saleState.customer?.name}
                   </div>
-                ) : null;
+                ) : (
+                  <div className={`px-2 py-1 rounded-md text-xs font-medium ${potentialProfit >= 0 ? 'bg-primary/20 text-primary' : 'bg-destructive/20 text-destructive'}`}>
+                    {potentialProfit >= 0 ? '+' : ''}{potentialProfit.toLocaleString()}
+                  </div>
+                );
 
                 return (
                   <CarCard
@@ -184,7 +190,6 @@ export function GarageScreen({ onNavigateToNewspaper, onSelectCar }: GarageScree
                 );
               })}
               
-              {/* Empty slots */}
               {Array.from({ length: emptySlots }).map((_, i) => (
                 <div
                   key={`empty-${i}`}

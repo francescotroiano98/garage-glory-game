@@ -4,10 +4,14 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 const SOUNDS = {
   repair: 'https://cdn.freesound.org/previews/352/352659_6565101-lq.mp3',
   repairComplete: 'https://cdn.freesound.org/previews/320/320181_5260872-lq.mp3',
+  repairFail: 'https://cdn.freesound.org/previews/415/415079_7863133-lq.mp3',
   customerCall: 'https://cdn.freesound.org/previews/352/352432_6565101-lq.mp3',
   cashRegister: 'https://cdn.freesound.org/previews/352/352310_6565101-lq.mp3',
   buttonClick: 'https://cdn.freesound.org/previews/220/220206_4100637-lq.mp3',
   purchase: 'https://cdn.freesound.org/previews/131/131660_2398403-lq.mp3',
+  levelUp: 'https://cdn.freesound.org/previews/270/270404_5123851-lq.mp3',
+  achievement: 'https://cdn.freesound.org/previews/270/270319_5123851-lq.mp3',
+  energyBonus: 'https://cdn.freesound.org/previews/341/341695_5858296-lq.mp3',
 };
 
 type SoundType = keyof typeof SOUNDS;

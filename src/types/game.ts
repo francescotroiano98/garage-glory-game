@@ -21,9 +21,10 @@ export interface PartDamage {
   visible: boolean;
   repaired: boolean;
   energyCost: number;
+  moneyCost: number; // NEW: Money cost for repairs
   repairTime: number;
   valueImpact: number;
-  diyAttempts?: number; // Track DIY attempts
+  diyAttempts?: number;
 }
 
 export type CarCategory = 'economy' | 'sedan' | 'suv' | 'sports' | 'luxury';
@@ -33,9 +34,12 @@ export interface Car {
   name: string;
   category: CarCategory;
   image: string;
+  imageVariant?: number; // NEW: Image variant for variety
   baseValue: number;
   askingPrice: number;
+  purchasePrice?: number; // NEW: Track what we paid for the car
   damages: PartDamage[];
+  totalRepairCost?: number; // NEW: Track total repair costs
   purchased: boolean;
   currentValue: number;
   isInGarage: boolean;
@@ -57,6 +61,9 @@ export interface Skills {
   negotiation: number; // 1-20
 }
 
+// Part-specific upgrade levels (10 levels each)
+export type PartUpgrades = Record<PartType, number>;
+
 export interface GarageUpgrades {
   carBays: number; // 1-5
   hasPaintBooth: boolean;
@@ -73,6 +80,7 @@ export interface RepairJob {
   startTime: number;
   duration: number;
   energyCost: number;
+  moneyCost: number; // NEW: Track money cost
   isDiy: boolean;
 }
 
@@ -86,6 +94,24 @@ export interface SaleState {
   negotiationRound: number;
 }
 
+// Achievement types
+export type AchievementId = 
+  | 'first_sale' | 'profit_1k' | 'profit_10k' | 'profit_100k'
+  | 'cars_sold_10' | 'cars_sold_50' | 'cars_sold_100'
+  | 'level_5' | 'level_10' | 'level_20'
+  | 'perfect_flip' | 'diy_master' | 'negotiator'
+  | 'luxury_dealer' | 'speed_demon' | 'collector';
+
+export interface Achievement {
+  id: AchievementId;
+  name: string;
+  description: string;
+  icon: string;
+  reward: number; // Money reward
+  unlocked: boolean;
+  unlockedAt?: number;
+}
+
 export interface GameState {
   money: number;
   energy: number;
@@ -93,17 +119,21 @@ export interface GameState {
   reputation: number;
   xp: number;
   level: number;
-  skillPoints: number; // Points to spend on skills
+  skillPoints: number;
   toolLevel: ToolLevel;
   diagnosticLevel: DiagnosticLevel;
   skills: Skills;
+  partUpgrades: PartUpgrades; // NEW: Part-specific upgrades
   garageUpgrades: GarageUpgrades;
   carsInGarage: Car[];
   totalCarsSold: number;
   totalProfit: number;
   lastEnergyUpdate: number;
+  lastEnergyBonus: number; // NEW: Last time bonus energy was collected
   repairQueue: RepairJob[];
   activeSales: SaleState[];
+  achievements: Achievement[]; // NEW: Achievements
+  negotiationAttempts: number; // NEW: Track negotiation attempts for buying
 }
 
 // Customer Types - 20 different types
@@ -141,4 +171,29 @@ export interface RepairProgress {
   partType: PartType;
   progress: number;
   startTime: number;
+}
+
+// XP calculation based on profit margin
+export const MAX_LEVEL = 20;
+
+export function calculateXpFromSale(purchasePrice: number, totalRepairCost: number, salePrice: number): number {
+  const totalInvestment = purchasePrice + totalRepairCost;
+  const profit = salePrice - totalInvestment;
+  const profitMargin = totalInvestment > 0 ? (profit / totalInvestment) * 100 : 0;
+  
+  if (profitMargin >= 50) return 100;
+  if (profitMargin >= 30) return 50;
+  if (profitMargin > 0) return 25;
+  if (profitMargin === 0) return 0;
+  
+  // Negative profit = lose XP
+  if (profitMargin <= -50) return -100;
+  if (profitMargin <= -30) return -50;
+  return -25;
+}
+
+// XP required for each level (exponential, harder each level)
+export function getXpForLevel(level: number): number {
+  // Level 1->2: 100 XP, Level 19->20: ~3700 XP
+  return Math.floor(100 * Math.pow(1.2, level - 1));
 }

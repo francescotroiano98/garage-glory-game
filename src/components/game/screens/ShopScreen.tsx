@@ -1,17 +1,31 @@
+import { useState } from 'react';
 import { useGame } from '@/contexts/GameContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { ShoppingBag, Wrench, Search, Zap, Building, Check, Star, Plus } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { ShoppingBag, Wrench, Search, Zap, Building, Check, Star, Plus, Settings } from 'lucide-react';
 import { toast } from 'sonner';
-import { TOOL_UPGRADES, DIAGNOSTIC_UPGRADES, GARAGE_UPGRADES, ENERGY_UPGRADES } from '@/data/upgrades';
+import { TOOL_UPGRADES, DIAGNOSTIC_UPGRADES, GARAGE_UPGRADES, ENERGY_UPGRADES, getXpForLevel } from '@/data/upgrades';
+import { PART_DEFINITIONS, PART_ICONS, CATEGORY_LABELS, getPartUpgradeCost } from '@/data/parts';
+import { PartType, PartCategory, MAX_LEVEL } from '@/types/game';
 
 const GARAGE_BAYS = GARAGE_UPGRADES.carBays;
 const GARAGE_EQUIPMENT = GARAGE_UPGRADES.specialEquipment;
 
+const PARTS_BY_CATEGORY: Record<PartCategory, PartType[]> = {
+  mechanical: ['engine', 'transmission', 'brakes', 'suspension', 'exhaust', 'fuel_system'],
+  body: ['paint', 'dents', 'rust', 'windows', 'lights', 'bumpers'],
+  tires: ['front_tires', 'rear_tires', 'wheels', 'alignment', 'tire_pressure', 'wheel_bearings'],
+  interior: ['seats', 'dashboard', 'electronics', 'cleaning', 'air_conditioning', 'audio_system'],
+};
+
+const MAX_PART_LEVEL = 10;
+
 export function ShopScreen() {
   const { state, dispatch, canAfford, getToolLevelIndex, getNegotiationBonus, getDiySuccessChance } = useGame();
+  const [selectedPartCategory, setSelectedPartCategory] = useState<PartCategory>('mechanical');
 
   const buyToolUpgrade = (upgrade: typeof TOOL_UPGRADES[0]) => {
     if (!canAfford(upgrade.cost)) {
@@ -72,17 +86,33 @@ export function ShopScreen() {
     toast.success(`${skill.charAt(0).toUpperCase() + skill.slice(1)} skill increased!`);
   };
 
+  const upgradePartLevel = (partType: PartType) => {
+    const currentLevel = state.partUpgrades[partType] || 0;
+    if (currentLevel >= MAX_PART_LEVEL) {
+      toast.error("Part already at max level!");
+      return;
+    }
+    const cost = getPartUpgradeCost(partType, currentLevel);
+    if (!canAfford(cost)) {
+      toast.error("Not enough money!");
+      return;
+    }
+    dispatch({ type: 'SPEND_MONEY', payload: cost });
+    dispatch({ type: 'UPGRADE_PART', payload: { partType } });
+    toast.success(`${partType.replace(/_/g, ' ')} upgrade purchased!`);
+  };
+
   const toolLevelIndex = getToolLevelIndex();
   const diagnosticLevelIndex = ['visual', 'basic_scanner', 'intermediate', 'pro_diagnostic', 'advanced', 'master'].indexOf(state.diagnosticLevel);
 
-  // Calculate actual stat bonuses
   const negotiationBonus = Math.round((getNegotiationBonus() - 1) * 100);
   const avgRepairSkill = (state.skills.mechanical + state.skills.bodywork + state.skills.electrical + state.skills.tires) / 4;
   const energyReduction = Math.round((avgRepairSkill - 1) * 2);
+  
+  const xpForNextLevel = state.level >= MAX_LEVEL ? 0 : getXpForLevel(state.level);
 
   return (
     <div className="flex flex-col min-h-full pb-20">
-      {/* Header */}
       <div className="p-4 border-b border-border bg-card">
         <h1 className="text-xl font-bold flex items-center gap-2">
           <ShoppingBag className="w-5 h-5 text-primary" />
@@ -94,7 +124,7 @@ export function ShopScreen() {
       </div>
 
       <div className="flex-1 p-4 space-y-4 bg-background">
-        {/* Skills Section - NEW */}
+        {/* Skills Section */}
         <Card className="border-2 border-primary/30 bg-gradient-to-br from-primary/5 to-transparent">
           <CardHeader className="pb-2">
             <CardTitle className="text-base flex items-center gap-2">
@@ -102,9 +132,9 @@ export function ShopScreen() {
               Skills
             </CardTitle>
             <CardDescription className="flex items-center gap-2">
-              <span>Level {state.level}</span>
+              <span>Level {state.level}/{MAX_LEVEL}</span>
               <span className="text-xs">•</span>
-              <span>{state.xp}/{state.level * 100} XP</span>
+              <span>{state.xp}/{xpForNextLevel || '∞'} XP</span>
               {state.skillPoints > 0 && (
                 <Badge variant="default" className="ml-2 animate-pulse">
                   {state.skillPoints} point{state.skillPoints !== 1 ? 's' : ''} to spend!
@@ -113,7 +143,7 @@ export function ShopScreen() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Progress value={(state.xp / (state.level * 100)) * 100} className="h-2 mb-4" />
+            <Progress value={state.level >= MAX_LEVEL ? 100 : (state.xp / xpForNextLevel) * 100} className="h-2 mb-4" />
             <div className="space-y-3">
               {/* Mechanical */}
               <div className="flex items-center justify-between p-2 bg-secondary/30 rounded-lg">
@@ -123,7 +153,7 @@ export function ShopScreen() {
                     <Badge variant="secondary">Lv.{state.skills.mechanical}</Badge>
                   </div>
                   <p className="text-xs text-muted-foreground mt-0.5">
-                    DIY success: ~{getDiySuccessChance('engine')}% on engine
+                    DIY success: ~{Math.round(getDiySuccessChance('engine'))}% on engine
                   </p>
                 </div>
                 <Button 
@@ -144,7 +174,7 @@ export function ShopScreen() {
                     <Badge variant="secondary">Lv.{state.skills.bodywork}</Badge>
                   </div>
                   <p className="text-xs text-muted-foreground mt-0.5">
-                    DIY success: ~{getDiySuccessChance('paint')}% on paint
+                    DIY success: ~{Math.round(getDiySuccessChance('paint'))}% on paint
                   </p>
                 </div>
                 <Button 
@@ -165,7 +195,7 @@ export function ShopScreen() {
                     <Badge variant="secondary">Lv.{state.skills.electrical}</Badge>
                   </div>
                   <p className="text-xs text-muted-foreground mt-0.5">
-                    DIY success: ~{getDiySuccessChance('electronics')}% on electronics
+                    DIY success: ~{Math.round(getDiySuccessChance('electronics'))}% on electronics
                   </p>
                 </div>
                 <Button 
@@ -186,7 +216,7 @@ export function ShopScreen() {
                     <Badge variant="secondary">Lv.{state.skills.tires}</Badge>
                   </div>
                   <p className="text-xs text-muted-foreground mt-0.5">
-                    DIY success: ~{getDiySuccessChance('front_tires')}% on tires
+                    DIY success: ~{Math.round(getDiySuccessChance('front_tires'))}% on tires
                   </p>
                 </div>
                 <Button 
@@ -241,12 +271,73 @@ export function ShopScreen() {
                 </Button>
               </div>
 
-              {/* Overall Stats Summary */}
               <div className="mt-3 p-2 bg-primary/10 rounded-lg text-xs text-center">
                 <span className="font-medium">Overall: </span>
                 Energy cost -{energyReduction}% • Negotiation +{negotiationBonus}%
               </div>
             </div>
+          </CardContent>
+        </Card>
+
+        {/* Part Upgrades Section - 10 levels each */}
+        <Card className="border-2 border-accent/30">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base flex items-center gap-2">
+              <Settings className="w-4 h-4 text-accent" />
+              Part Specializations
+            </CardTitle>
+            <CardDescription>
+              10 levels per part • +3% DIY success each level
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Tabs value={selectedPartCategory} onValueChange={(v) => setSelectedPartCategory(v as PartCategory)}>
+              <TabsList className="grid w-full grid-cols-4 mb-4">
+                <TabsTrigger value="mechanical" className="text-xs">⚙️ Mech</TabsTrigger>
+                <TabsTrigger value="body" className="text-xs">🚗 Body</TabsTrigger>
+                <TabsTrigger value="tires" className="text-xs">🛞 Tires</TabsTrigger>
+                <TabsTrigger value="interior" className="text-xs">🪑 Int</TabsTrigger>
+              </TabsList>
+              
+              {Object.entries(PARTS_BY_CATEGORY).map(([category, parts]) => (
+                <TabsContent key={category} value={category} className="space-y-2 mt-0">
+                  {parts.map((partType) => {
+                    const currentLevel = state.partUpgrades[partType] || 0;
+                    const cost = getPartUpgradeCost(partType, currentLevel);
+                    const isMaxed = currentLevel >= MAX_PART_LEVEL;
+                    const partDef = PART_DEFINITIONS[partType];
+                    
+                    return (
+                      <div key={partType} className="flex items-center justify-between p-2 bg-secondary/30 rounded-lg">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2">
+                            <span className="text-lg">{PART_ICONS[partType]}</span>
+                            <span className="font-medium capitalize text-sm">{partType.replace(/_/g, ' ')}</span>
+                            <Badge variant={isMaxed ? "default" : "secondary"} className="text-xs">
+                              {currentLevel}/{MAX_PART_LEVEL}
+                            </Badge>
+                          </div>
+                          <div className="flex items-center gap-2 mt-1">
+                            <Progress value={(currentLevel / MAX_PART_LEVEL) * 100} className="h-1.5 flex-1" />
+                            <span className="text-xs text-muted-foreground">
+                              +{currentLevel * 3}% DIY
+                            </span>
+                          </div>
+                        </div>
+                        <Button 
+                          size="sm" 
+                          onClick={() => upgradePartLevel(partType)}
+                          disabled={isMaxed || !canAfford(cost)}
+                          className="ml-2"
+                        >
+                          {isMaxed ? <Check className="w-4 h-4" /> : `$${cost.toLocaleString()}`}
+                        </Button>
+                      </div>
+                    );
+                  })}
+                </TabsContent>
+              ))}
+            </Tabs>
           </CardContent>
         </Card>
 
@@ -259,7 +350,6 @@ export function ShopScreen() {
             </CardTitle>
             <CardDescription>
               Current: <Badge variant="secondary" className="capitalize">{state.toolLevel}</Badge>
-              <span className="ml-2 text-xs">(-{(1 - (0.95 ** toolLevelIndex)) * 100 | 0}% energy, +{toolLevelIndex * 4}% DIY)</span>
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-2">
@@ -341,7 +431,6 @@ export function ShopScreen() {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-2">
-            {/* Car Bays */}
             {GARAGE_BAYS.map((upgrade) => {
               const owned = state.garageUpgrades.carBays >= upgrade.value;
               const nextUp = state.garageUpgrades.carBays === upgrade.value - 1;
@@ -366,7 +455,6 @@ export function ShopScreen() {
               );
             })}
             
-            {/* Specialized Equipment */}
             <div className="pt-2 border-t border-border mt-3">
               <p className="text-xs font-medium text-muted-foreground mb-2">Specialized Equipment (+10% DIY for category)</p>
               {GARAGE_EQUIPMENT.map((equip) => {
