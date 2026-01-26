@@ -1,4 +1,4 @@
-import { ToolLevel, DiagnosticLevel } from '@/types/game';
+import { ToolLevel, DiagnosticLevel, MAX_LEVEL } from '@/types/game';
 
 // Tool upgrades - 6 levels, harder progression
 export const TOOL_UPGRADES: Array<{
@@ -64,9 +64,20 @@ export function getSkillUpgradeCost(currentLevel: number): number {
   return Math.floor(100 * Math.pow(1.5, currentLevel - 1));
 }
 
-// XP required for next level (exponential curve)
+// XP required for next level (exponential curve, 20 levels max)
 export function getXpForLevel(level: number): number {
-  return Math.floor(100 * Math.pow(1.3, level - 1));
+  if (level >= MAX_LEVEL) return Infinity; // Can't level past max
+  // Level 1->2: 100 XP, Level 19->20: ~3700 XP
+  return Math.floor(100 * Math.pow(1.2, level - 1));
+}
+
+// Skill points per level
+export function getSkillPointsForLevel(level: number): number {
+  // 1 point at levels 1-5, 2 points at 6-10, 3 points at 11-15, 4 points at 16-20
+  if (level <= 5) return 1;
+  if (level <= 10) return 2;
+  if (level <= 15) return 3;
+  return 4;
 }
 
 // Tool level index helper

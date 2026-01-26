@@ -5,9 +5,8 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Slider } from '@/components/ui/slider';
 import { generateCar } from '@/data/cars';
-import { CUSTOMER_NAMES } from '@/data/customers';
 import { NewspaperAd, Car } from '@/types/game';
-import { Newspaper, RefreshCw, DollarSign } from 'lucide-react';
+import { Newspaper, RefreshCw, DollarSign, Zap } from 'lucide-react';
 import { toast } from 'sonner';
 import { useSound } from '@/hooks/useSound';
 
@@ -15,15 +14,17 @@ interface NewspaperScreenProps {
   onCarBought: () => void;
 }
 
+const NEGOTIATION_ENERGY_COST = 2;
+
 export function NewspaperScreen({ onCarBought }: NewspaperScreenProps) {
-  const { state, dispatch, canAfford, getVisibilityChance, getNegotiationBonus } = useGame();
+  const { state, dispatch, canAfford, hasEnergy, getVisibilityChance, getNegotiationBonus } = useGame();
   const [ads, setAds] = useState<NewspaperAd[]>([]);
   const [selectedAd, setSelectedAd] = useState<NewspaperAd | null>(null);
   const [negotiatePrice, setNegotiatePrice] = useState(0);
   const [isNegotiating, setIsNegotiating] = useState(false);
+  const [negotiationCount, setNegotiationCount] = useState(0);
   const { playSound } = useSound();
 
-  // Generate initial ads
   useEffect(() => {
     refreshAds();
   }, [state.reputation]);
@@ -32,17 +33,19 @@ export function NewspaperScreen({ onCarBought }: NewspaperScreenProps) {
     const newAds: NewspaperAd[] = Array.from({ length: 5 }, () => ({
       id: `ad_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       car: generateCar(state.reputation),
-      seller: CUSTOMER_NAMES[Math.floor(Math.random() * CUSTOMER_NAMES.length)],
+      seller: '',
       daysListed: Math.floor(Math.random() * 7) + 1,
       negotiable: Math.random() > 0.3,
     }));
     setAds(newAds);
+    setNegotiationCount(0);
   };
 
   const handleSelectAd = (ad: NewspaperAd) => {
     setSelectedAd(ad);
     setNegotiatePrice(ad.car.askingPrice);
     setIsNegotiating(false);
+    setNegotiationCount(0);
     playSound('buttonClick');
   };
 
@@ -60,12 +63,11 @@ export function NewspaperScreen({ onCarBought }: NewspaperScreenProps) {
       return;
     }
 
-    const car: Car = { ...selectedAd.car, askingPrice: price };
+    const car: Car = { ...selectedAd.car, askingPrice: price, purchasePrice: price, totalRepairCost: 0 };
     dispatch({ type: 'BUY_CAR', payload: car });
     playSound('purchase');
     toast.success(`Bought ${car.name} for $${price.toLocaleString()}!`);
     
-    // Remove ad from list
     setAds(prev => prev.filter(a => a.id !== selectedAd.id));
     setSelectedAd(null);
     onCarBought();
@@ -73,6 +75,16 @@ export function NewspaperScreen({ onCarBought }: NewspaperScreenProps) {
 
   const handleNegotiate = () => {
     if (!selectedAd) return;
+    
+    // Check energy cost
+    if (!hasEnergy(NEGOTIATION_ENERGY_COST)) {
+      toast.error(`Not enough energy! Need ${NEGOTIATION_ENERGY_COST} energy to negotiate.`);
+      return;
+    }
+    
+    // Spend energy for negotiation
+    dispatch({ type: 'SPEND_ENERGY', payload: NEGOTIATION_ENERGY_COST });
+    setNegotiationCount(prev => prev + 1);
     
     const minPrice = Math.round(selectedAd.car.askingPrice * 0.7);
     const negotiationBonus = getNegotiationBonus();
@@ -102,7 +114,6 @@ export function NewspaperScreen({ onCarBought }: NewspaperScreenProps) {
 
   return (
     <div className="flex flex-col min-h-full pb-20">
-      {/* Header */}
       <div className="p-4 border-b-2 border-border bg-gradient-to-b from-secondary/30 to-transparent">
         <div className="flex items-center justify-between">
           <div>
@@ -129,7 +140,6 @@ export function NewspaperScreen({ onCarBought }: NewspaperScreenProps) {
         </div>
       )}
 
-      {/* Ads List */}
       <div className="flex-1 p-4 space-y-3">
         {ads.map((ad) => (
           <div key={ad.id} className="relative">
@@ -138,15 +148,15 @@ export function NewspaperScreen({ onCarBought }: NewspaperScreenProps) {
               onClick={() => handleSelectAd(ad)}
               visibilityChance={getVisibilityChance()}
             />
-            <div className="absolute top-2 right-2 flex items-center gap-1 text-xs text-muted-foreground bg-background/90 px-2 py-1 rounded-md border">
-              <span>by {ad.seller}</span>
-              {ad.negotiable && <span className="text-primary font-medium">• Negotiable</span>}
-            </div>
+            {ad.negotiable && (
+              <div className="absolute top-2 right-2 flex items-center gap-1 text-xs text-primary bg-background/90 px-2 py-1 rounded-md border font-medium">
+                Negotiable
+              </div>
+            )}
           </div>
         ))}
       </div>
 
-      {/* Buy Dialog */}
       <Dialog open={!!selectedAd} onOpenChange={(open) => !open && setSelectedAd(null)}>
         <DialogContent className="max-w-sm">
           <DialogHeader>
@@ -176,6 +186,11 @@ export function NewspaperScreen({ onCarBought }: NewspaperScreenProps) {
                       max={selectedAd.car.askingPrice}
                       step={10}
                     />
+                    {negotiationCount > 0 && (
+                      <div className="text-xs text-muted-foreground text-center">
+                        Negotiations: {negotiationCount} (cost: {negotiationCount * NEGOTIATION_ENERGY_COST} energy)
+                      </div>
+                    )}
                   </>
                 )}
 
@@ -191,9 +206,17 @@ export function NewspaperScreen({ onCarBought }: NewspaperScreenProps) {
 
           <DialogFooter className="flex gap-2">
             {selectedAd?.negotiable && (
-              <Button variant="outline" onClick={handleNegotiate} className="flex-1 border-2">
+              <Button 
+                variant="outline" 
+                onClick={handleNegotiate} 
+                className="flex-1 border-2"
+                disabled={!hasEnergy(NEGOTIATION_ENERGY_COST)}
+              >
                 <DollarSign className="w-4 h-4 mr-1" />
                 Negotiate
+                <span className="ml-1 text-xs flex items-center">
+                  (<Zap className="w-3 h-3" />{NEGOTIATION_ENERGY_COST})
+                </span>
               </Button>
             )}
             <Button 

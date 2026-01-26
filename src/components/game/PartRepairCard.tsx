@@ -2,7 +2,7 @@ import { PartDamage } from '@/types/game';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { Zap, Check, AlertTriangle, Clock, Wrench } from 'lucide-react';
+import { Zap, Check, AlertTriangle, Clock, Wrench, DollarSign } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useEffect, useState } from 'react';
 import { PART_ICONS } from '@/data/parts';
@@ -43,7 +43,6 @@ export function PartRepairCard({
   
   const partIcon = PART_ICONS[damage.part] || '🔧';
 
-  // Animate progress smoothly
   useEffect(() => {
     if (isRepairing) {
       const interval = setInterval(() => {
@@ -93,10 +92,14 @@ export function PartRepairCard({
               </span>
             )}
           </div>
-          <div className="flex items-center gap-3 text-xs text-muted-foreground mt-0.5">
+          <div className="flex items-center gap-3 text-xs text-muted-foreground mt-0.5 flex-wrap">
             <span className="flex items-center gap-1">
               <Zap className="w-3 h-3 text-yellow-500" />
               {actualEnergyCost}
+            </span>
+            <span className="flex items-center gap-1">
+              <DollarSign className="w-3 h-3 text-primary" />
+              {damage.moneyCost}
             </span>
             <span className="flex items-center gap-1">
               <Clock className="w-3 h-3" />
@@ -119,7 +122,7 @@ export function PartRepairCard({
             disabled={!canRepair}
             className="retro-button text-xs"
           >
-            {isRepairing ? 'Working...' : 'Repair'}
+            {isRepairing ? 'Working...' : `$${damage.moneyCost}`}
           </Button>
           <Button
             size="sm"
@@ -127,7 +130,7 @@ export function PartRepairCard({
             onClick={onDiyRepair}
             disabled={!canDiy}
             className="text-xs"
-            title={`DIY: ${Math.round(diySuccessChance)}% success, ${diyEnergyCost} energy`}
+            title={`DIY: ${Math.round(diySuccessChance)}% success, ${diyEnergyCost} energy, FREE`}
           >
             <Wrench className="w-3 h-3 mr-1" />
             DIY {Math.round(diySuccessChance)}%
