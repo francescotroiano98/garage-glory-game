@@ -61,12 +61,12 @@ export function GarageScreen({ onNavigateToNewspaper, onSelectCar }: GarageScree
   return (
     <div className="flex flex-col min-h-full pb-20 relative">
       <div 
-        className="absolute inset-0 opacity-20 bg-cover bg-center"
+        className="absolute inset-0 bg-cover bg-center"
         style={{ backgroundImage: `url(${garageBg})` }}
       />
       
       <div className="relative z-10">
-        <div className="p-4 border-b-2 border-border bg-background/80 backdrop-blur-sm">
+        <div className="p-4 border-b-2 border-border bg-card/90 backdrop-blur-sm">
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-xl font-bold flex items-center gap-2">

@@ -9,6 +9,7 @@ import { NewspaperAd, Car } from '@/types/game';
 import { Newspaper, RefreshCw, DollarSign, Zap } from 'lucide-react';
 import { toast } from 'sonner';
 import { useSound } from '@/hooks/useSound';
+import newspaperBg from '@/assets/newspaper-bg.jpg';
 
 interface NewspaperScreenProps {
   onCarBought: () => void;
@@ -113,48 +114,55 @@ export function NewspaperScreen({ onCarBought }: NewspaperScreenProps) {
   const garageFull = state.carsInGarage.length >= state.garageUpgrades.carBays;
 
   return (
-    <div className="flex flex-col min-h-full pb-20">
-      <div className="p-4 border-b-2 border-border bg-gradient-to-b from-secondary/30 to-transparent">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-xl font-bold flex items-center gap-2">
-              <Newspaper className="w-5 h-5 text-primary" />
-              Newspaper Ads
-            </h1>
-            <p className="text-sm text-muted-foreground">
-              Find your next project car
+    <div className="flex flex-col min-h-full pb-20 relative">
+      <div 
+        className="absolute inset-0 bg-cover bg-center"
+        style={{ backgroundImage: `url(${newspaperBg})` }}
+      />
+      
+      <div className="relative z-10">
+        <div className="p-4 border-b-2 border-border bg-card/90 backdrop-blur-sm">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-xl font-bold flex items-center gap-2">
+                <Newspaper className="w-5 h-5 text-primary" />
+                Newspaper Ads
+              </h1>
+              <p className="text-sm text-muted-foreground">
+                Find your next project car
+              </p>
+            </div>
+            <Button variant="outline" size="sm" onClick={refreshAds} className="border-2">
+              <RefreshCw className="w-4 h-4 mr-1" />
+              Refresh
+            </Button>
+          </div>
+        </div>
+
+        {garageFull && (
+          <div className="mx-4 mt-4 p-3 bg-destructive/10 border-2 border-destructive/30 rounded-lg">
+            <p className="text-sm text-destructive font-medium">
+              Your garage is full! Sell a car or upgrade your garage to buy more.
             </p>
           </div>
-          <Button variant="outline" size="sm" onClick={refreshAds} className="border-2">
-            <RefreshCw className="w-4 h-4 mr-1" />
-            Refresh
-          </Button>
-        </div>
-      </div>
+        )}
 
-      {garageFull && (
-        <div className="mx-4 mt-4 p-3 bg-destructive/10 border-2 border-destructive/30 rounded-lg">
-          <p className="text-sm text-destructive font-medium">
-            Your garage is full! Sell a car or upgrade your garage to buy more.
-          </p>
+        <div className="flex-1 p-4 space-y-3">
+          {ads.map((ad) => (
+            <div key={ad.id} className="relative">
+              <CarCard
+                car={ad.car}
+                onClick={() => handleSelectAd(ad)}
+                visibilityChance={getVisibilityChance()}
+              />
+              {ad.negotiable && (
+                <div className="absolute top-2 right-2 flex items-center gap-1 text-xs text-primary bg-background/90 px-2 py-1 rounded-md border font-medium">
+                  Negotiable
+                </div>
+              )}
+            </div>
+          ))}
         </div>
-      )}
-
-      <div className="flex-1 p-4 space-y-3">
-        {ads.map((ad) => (
-          <div key={ad.id} className="relative">
-            <CarCard
-              car={ad.car}
-              onClick={() => handleSelectAd(ad)}
-              visibilityChance={getVisibilityChance()}
-            />
-            {ad.negotiable && (
-              <div className="absolute top-2 right-2 flex items-center gap-1 text-xs text-primary bg-background/90 px-2 py-1 rounded-md border font-medium">
-                Negotiable
-              </div>
-            )}
-          </div>
-        ))}
       </div>
 
       <Dialog open={!!selectedAd} onOpenChange={(open) => !open && setSelectedAd(null)}>

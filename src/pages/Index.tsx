@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { GameProvider } from '@/contexts/GameContext';
 import { StatsBar } from '@/components/game/StatsBar';
 import { BottomNav, Screen } from '@/components/game/BottomNav';
@@ -7,10 +7,14 @@ import { NewspaperScreen } from '@/components/game/screens/NewspaperScreen';
 import { RepairScreen } from '@/components/game/screens/RepairScreen';
 import { ShopScreen } from '@/components/game/screens/ShopScreen';
 import { SettingsScreen } from '@/components/game/screens/SettingsScreen';
+import { useBackgroundMusic } from '@/hooks/useSound';
 
 function GameContent() {
   const [currentScreen, setCurrentScreen] = useState<Screen>('garage');
   const [selectedCarId, setSelectedCarId] = useState<string | null>(null);
+  
+  // Initialize background music
+  useBackgroundMusic();
 
   const handleSelectCar = (carId: string) => {
     setSelectedCarId(carId);
