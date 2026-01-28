@@ -1,10 +1,11 @@
-import React, { createContext, useContext, useReducer, useEffect, useCallback } from 'react';
+import React, { createContext, useContext, useReducer, useEffect, useCallback, useState } from 'react';
 import { GameState, Car, PartType, ToolLevel, DiagnosticLevel, RepairJob, SaleState, Customer, Skills, calculateXpFromSale, MAX_LEVEL } from '@/types/game';
 import { recalculateCarValue } from '@/data/cars';
 import { generateCustomer, calculateCustomerOffer } from '@/data/customers';
 import { PART_DEFINITIONS, calculateDiySuccessChance, getInitialPartUpgrades } from '@/data/parts';
 import { getXpForLevel, getSkillPointsForLevel } from '@/data/upgrades';
 import { getInitialAchievements, checkAchievements } from '@/data/achievements';
+import { DailyChallengeState, getInitialDailyChallengeState, getTodayDateString, generateDailyChallenges } from '@/data/dailyChallenges';
 import { toast } from 'sonner';
 
 const INITIAL_STATE: GameState = {
@@ -378,15 +379,20 @@ interface GameContextType {
   canCollectEnergyBonus: () => boolean;
   getEnergyBonusTimeRemaining: () => number;
   handleSaleComplete: (carId: string, salePrice: number) => void;
+  dailyChallenges: DailyChallengeState;
+  claimChallengeReward: (challengeId: string) => void;
+  updateChallengeProgress: (type: string, amount: number) => void;
 }
 
 const GameContext = createContext<GameContextType | undefined>(undefined);
 
 const SAVE_KEY = 'car_mechanic_save_v3';
+const CHALLENGES_KEY = 'car_mechanic_challenges';
 const ENERGY_BONUS_COOLDOWN = 10 * 60 * 1000; // 10 minutes
 
 export function GameProvider({ children }: { children: React.ReactNode }) {
   const [state, dispatch] = useReducer(gameReducer, INITIAL_STATE);
+  const [dailyChallenges, setDailyChallenges] = useState<DailyChallengeState>(getInitialDailyChallengeState);
 
   // Load saved game on mount
   useEffect(() => {
@@ -400,6 +406,32 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
       }
     }
   }, []);
+
+  // Load and reset daily challenges
+  useEffect(() => {
+    const today = getTodayDateString();
+    const saved = localStorage.getItem(CHALLENGES_KEY);
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved) as DailyChallengeState;
+        if (parsed.date === today) {
+          setDailyChallenges(parsed);
+        } else {
+          // New day, reset challenges
+          const newState = getInitialDailyChallengeState();
+          setDailyChallenges(newState);
+          localStorage.setItem(CHALLENGES_KEY, JSON.stringify(newState));
+        }
+      } catch (e) {
+        console.error('Failed to load challenges:', e);
+      }
+    }
+  }, []);
+
+  // Save challenges whenever they change
+  useEffect(() => {
+    localStorage.setItem(CHALLENGES_KEY, JSON.stringify(dailyChallenges));
+  }, [dailyChallenges]);
 
   // Save game whenever state changes
   useEffect(() => {
@@ -570,6 +602,21 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
     return state.activeSales.find(s => s.carId === carId);
   }, [state.activeSales]);
 
+  const updateChallengeProgress = useCallback((type: string, amount: number) => {
+    setDailyChallenges(prev => {
+      const updatedProgress = prev.progress.map(p => {
+        const challenge = prev.challenges.find(c => c.id === p.challengeId);
+        if (challenge?.type === type && !p.claimed) {
+          const newProgress = p.progress + amount;
+          const completed = newProgress >= challenge.target;
+          return { ...p, progress: newProgress, completed };
+        }
+        return p;
+      });
+      return { ...prev, progress: updatedProgress };
+    });
+  }, []);
+
   const handleSaleComplete = useCallback((carId: string, salePrice: number) => {
     const car = state.carsInGarage.find(c => c.id === carId);
     if (!car) return;
@@ -606,10 +653,45 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
     dispatch({ type: 'SELL_CAR', payload: { carId, salePrice } });
     
     // Add reputation for profitable sale
-    if (profitMargin > 0) {
+    const profit = salePrice - totalInvestment;
+    if (profit > 0) {
       dispatch({ type: 'ADD_REPUTATION', payload: Math.min(5, Math.ceil(profitMargin / 20)) });
     }
-  }, [state.carsInGarage, state.achievements, state]);
+    
+    // Update daily challenges
+    updateChallengeProgress('sell_cars', 1);
+    if (profit > 0) {
+      updateChallengeProgress('earn_profit', profit);
+    }
+  }, [state.carsInGarage, state.achievements, state, updateChallengeProgress]);
+
+  const claimChallengeReward = useCallback((challengeId: string) => {
+    const challenge = dailyChallenges.challenges.find(c => c.id === challengeId);
+    const progressData = dailyChallenges.progress.find(p => p.challengeId === challengeId);
+    
+    if (!challenge || !progressData?.completed || progressData.claimed) return;
+
+    // Give reward
+    switch (challenge.rewardType) {
+      case 'money':
+        dispatch({ type: 'ADD_MONEY', payload: challenge.reward });
+        break;
+      case 'energy':
+        dispatch({ type: 'SET_ENERGY', payload: state.energy + challenge.reward });
+        break;
+      case 'xp':
+        dispatch({ type: 'ADD_XP', payload: challenge.reward });
+        break;
+    }
+
+    // Mark as claimed
+    setDailyChallenges(prev => ({
+      ...prev,
+      progress: prev.progress.map(p =>
+        p.challengeId === challengeId ? { ...p, claimed: true } : p
+      ),
+    }));
+  }, [dailyChallenges, state.energy]);
 
   return (
     <GameContext.Provider
@@ -632,6 +714,9 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
         canCollectEnergyBonus,
         getEnergyBonusTimeRemaining,
         handleSaleComplete,
+        dailyChallenges,
+        claimChallengeReward,
+        updateChallengeProgress,
       }}
     >
       {children}

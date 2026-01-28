@@ -18,7 +18,7 @@ interface NewspaperScreenProps {
 const NEGOTIATION_ENERGY_COST = 2;
 
 export function NewspaperScreen({ onCarBought }: NewspaperScreenProps) {
-  const { state, dispatch, canAfford, hasEnergy, getVisibilityChance, getNegotiationBonus } = useGame();
+  const { state, dispatch, canAfford, hasEnergy, getVisibilityChance, getNegotiationBonus, updateChallengeProgress } = useGame();
   const [ads, setAds] = useState<NewspaperAd[]>([]);
   const [selectedAd, setSelectedAd] = useState<NewspaperAd | null>(null);
   const [negotiatePrice, setNegotiatePrice] = useState(0);
@@ -68,6 +68,9 @@ export function NewspaperScreen({ onCarBought }: NewspaperScreenProps) {
     dispatch({ type: 'BUY_CAR', payload: car });
     playSound('purchase');
     toast.success(`Bought ${car.name} for $${price.toLocaleString()}!`);
+    
+    // Track daily challenge
+    updateChallengeProgress('buy_cars', 1);
     
     setAds(prev => prev.filter(a => a.id !== selectedAd.id));
     setSelectedAd(null);
