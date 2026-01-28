@@ -81,13 +81,13 @@ export function CarCard({
           <div className="flex items-center gap-3">
             {/* Car Image */}
             <div className={cn(
-              'flex items-center justify-center bg-secondary/50 rounded-lg overflow-hidden shrink-0',
+              'flex items-center justify-center rounded-lg overflow-hidden shrink-0',
               compact ? 'w-14 h-14' : 'w-20 h-20'
             )}>
               <img 
                 src={car.image} 
                 alt={car.name}
-                className="w-full h-full object-contain p-1"
+                className="w-full h-full object-contain"
               />
             </div>
 

@@ -192,7 +192,6 @@ export function RepairScreen({ carId, onBack }: RepairScreenProps) {
         className="absolute inset-0 bg-cover bg-center"
         style={{ backgroundImage: `url(${garageBg})` }}
       />
-      <div className="absolute inset-0 bg-background/60" />
       
       <div className="relative z-10">
         <div className="relative p-4 border-b border-border bg-card/90 backdrop-blur-sm">

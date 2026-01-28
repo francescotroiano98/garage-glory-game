@@ -66,15 +66,25 @@ export function useSound() {
 }
 
 export function useBackgroundMusic() {
-  const [playing, setPlaying] = useState(false);
+  const [playing, setPlaying] = useState(() => {
+    const saved = localStorage.getItem('game_music_playing');
+    return saved === 'true';
+  });
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const hasStartedRef = useRef(false);
 
   useEffect(() => {
-    // Relaxing background music
-    const audio = new Audio('https://cdn.freesound.org/previews/612/612321_13724389-lq.mp3');
+    // Chill lofi-style background music
+    const audio = new Audio('https://cdn.freesound.org/previews/459/459814_5674468-lq.mp3');
     audio.loop = true;
-    audio.volume = 0.1;
+    audio.volume = 0.15;
     audioRef.current = audio;
+
+    // Auto-play if was playing before
+    if (playing && !hasStartedRef.current) {
+      hasStartedRef.current = true;
+      audio.play().catch(() => {});
+    }
 
     return () => {
       if (audioRef.current) {
@@ -84,16 +94,24 @@ export function useBackgroundMusic() {
     };
   }, []);
 
-  const toggleMusic = useCallback(() => {
+  // Handle play state changes
+  useEffect(() => {
     if (!audioRef.current) return;
     
     if (playing) {
-      audioRef.current.pause();
-    } else {
       audioRef.current.play().catch(() => {});
+    } else {
+      audioRef.current.pause();
     }
-    setPlaying(!playing);
   }, [playing]);
+
+  const toggleMusic = useCallback(() => {
+    setPlaying(prev => {
+      const newValue = !prev;
+      localStorage.setItem('game_music_playing', String(newValue));
+      return newValue;
+    });
+  }, []);
 
   return { playing, toggleMusic };
 }

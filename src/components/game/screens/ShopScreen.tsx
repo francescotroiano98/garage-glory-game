@@ -112,18 +112,27 @@ export function ShopScreen() {
   const xpForNextLevel = state.level >= MAX_LEVEL ? 0 : getXpForLevel(state.level);
 
   return (
-    <div className="flex flex-col min-h-full pb-20">
-      <div className="p-4 border-b border-border bg-card">
-        <h1 className="text-xl font-bold flex items-center gap-2">
-          <ShoppingBag className="w-5 h-5 text-primary" />
-          Upgrade Shop
-        </h1>
-        <p className="text-sm text-muted-foreground">
-          Improve your garage and tools
-        </p>
-      </div>
+    <div className="flex flex-col min-h-full pb-20 relative">
+      <div 
+        className="absolute inset-0 bg-cover bg-center"
+        style={{ 
+          backgroundImage: 'linear-gradient(135deg, hsl(var(--primary)/0.1), hsl(var(--accent)/0.1))',
+          backgroundColor: 'hsl(var(--background))'
+        }}
+      />
+      
+      <div className="relative z-10">
+        <div className="p-4 border-b border-border bg-card/90 backdrop-blur-sm">
+          <h1 className="text-xl font-bold flex items-center gap-2">
+            <ShoppingBag className="w-5 h-5 text-primary" />
+            Upgrade Shop
+          </h1>
+          <p className="text-sm text-muted-foreground">
+            Improve your garage and tools
+          </p>
+        </div>
 
-      <div className="flex-1 p-4 space-y-4 bg-background">
+        <div className="flex-1 p-4 space-y-4">
         {/* Skills Section */}
         <Card className="border-2 border-primary/30 bg-gradient-to-br from-primary/5 to-transparent">
           <CardHeader className="pb-2">
@@ -520,6 +529,7 @@ export function ShopScreen() {
             })}
           </CardContent>
         </Card>
+        </div>
       </div>
     </div>
   );
