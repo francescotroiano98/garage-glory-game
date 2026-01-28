@@ -55,6 +55,7 @@ export function RepairScreen({ carId, onBack }: RepairScreenProps) {
     getSaleState,
     getDiySuccessChance,
     handleSaleComplete,
+    updateChallengeProgress,
   } = useGame();
   
   const [selectedCategory, setSelectedCategory] = useState<PartCategory>('mechanical');
@@ -105,6 +106,8 @@ export function RepairScreen({ carId, onBack }: RepairScreenProps) {
     if (success) {
       playSound('repair');
       toast.info(`Repairing ${partType.replace(/_/g, ' ')}... (-$${moneyCost})`);
+      // Track repair challenge (will complete when repair finishes)
+      updateChallengeProgress('repair_parts', 1);
     }
   };
 
@@ -128,6 +131,8 @@ export function RepairScreen({ carId, onBack }: RepairScreenProps) {
     if (started) {
       playSound('repair');
       toast.info(`DIY repair started (${Math.round(successChance)}% success)...`);
+      // Track DIY challenge (will complete when repair finishes successfully)
+      updateChallengeProgress('diy_repairs', 1);
     }
   };
 

@@ -1,18 +1,30 @@
 import { useState, useEffect } from 'react';
 import { useGame } from '@/contexts/GameContext';
-import { Zap, DollarSign, Star, Gauge, Gift, Trophy } from 'lucide-react';
+import { Zap, DollarSign, Gift, Trophy, Target, ChevronDown } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { toast } from 'sonner';
 import { getXpForLevel } from '@/data/upgrades';
 import { MAX_LEVEL } from '@/types/game';
 import { useSound } from '@/hooks/useSound';
+import { DailyChallengesDialog } from './DailyChallengesDialog';
 
 export function StatsBar() {
-  const { state, dispatch, canCollectEnergyBonus, getEnergyBonusTimeRemaining } = useGame();
+  const { 
+    state, 
+    dispatch, 
+    canCollectEnergyBonus, 
+    getEnergyBonusTimeRemaining,
+    dailyChallenges,
+    claimChallengeReward,
+  } = useGame();
   const [timeRemaining, setTimeRemaining] = useState(0);
   const [showAchievements, setShowAchievements] = useState(false);
+  const [showChallenges, setShowChallenges] = useState(false);
+  const [showDetails, setShowDetails] = useState(false);
   const { playSound } = useSound();
 
   useEffect(() => {
@@ -25,9 +37,15 @@ export function StatsBar() {
   const handleCollectBonus = () => {
     if (canCollectEnergyBonus()) {
       dispatch({ type: 'COLLECT_ENERGY_BONUS' });
-      playSound('purchase');
+      playSound('energyBonus');
       toast.success('+30 Energy collected!');
     }
+  };
+
+  const handleClaimReward = (challengeId: string) => {
+    claimChallengeReward(challengeId);
+    playSound('achievement');
+    toast.success('Reward claimed!');
   };
 
   const formatTime = (ms: number) => {
@@ -39,63 +57,98 @@ export function StatsBar() {
   const xpForNextLevel = state.level >= MAX_LEVEL ? 0 : getXpForLevel(state.level);
   const xpProgress = state.level >= MAX_LEVEL ? 100 : (state.xp / xpForNextLevel) * 100;
   const unlockedAchievements = state.achievements.filter(a => a.unlocked).length;
+  
+  // Count claimable challenges
+  const claimableChallenges = dailyChallenges.progress.filter(p => p.completed && !p.claimed).length;
 
   return (
     <>
-      <div className="bg-card/95 backdrop-blur-sm border-b-2 border-border p-3 sticky top-0 z-10">
-        <div className="flex items-center justify-between gap-2">
-          {/* Money */}
-          <div className="flex items-center gap-1.5 bg-primary/15 px-3 py-1.5 rounded-full border-2 border-primary/20">
-            <DollarSign className="w-4 h-4 text-primary" />
-            <span className="font-bold text-primary">${state.money.toLocaleString()}</span>
+      <div className="bg-card/95 backdrop-blur-sm border-b-2 border-border p-2 sticky top-0 z-10">
+        {/* Compact single row */}
+        <div className="flex items-center justify-between gap-1">
+          {/* Money - most important, always visible */}
+          <div className="flex items-center gap-1 bg-primary/15 px-2 py-1 rounded-full border border-primary/30">
+            <DollarSign className="w-3.5 h-3.5 text-primary" />
+            <span className="font-bold text-sm text-primary">${state.money.toLocaleString()}</span>
           </div>
 
-          {/* Energy with Bonus Button */}
-          <div className="flex items-center gap-2">
-            <div className="flex-1">
-              <div className="flex items-center gap-1.5 mb-0.5">
-                <Zap className="w-4 h-4 text-yellow-500" />
-                <span className="text-xs font-bold">{state.energy}/{state.maxEnergy}</span>
-              </div>
-              <Progress 
-                value={(state.energy / state.maxEnergy) * 100} 
-                className="h-2 w-20 bg-secondary border border-border"
-              />
-            </div>
+          {/* Energy compact */}
+          <div className="flex items-center gap-1">
+            <Zap className="w-3.5 h-3.5 text-yellow-500" />
+            <span className="text-xs font-bold">{state.energy}</span>
             <Button
               size="sm"
-              variant={canCollectEnergyBonus() ? "default" : "outline"}
+              variant={canCollectEnergyBonus() ? "default" : "ghost"}
               onClick={handleCollectBonus}
               disabled={!canCollectEnergyBonus()}
-              className="h-8 px-2 text-xs"
+              className="h-6 px-1.5 text-xs"
             >
-              <Gift className="w-3 h-3 mr-1" />
-              {canCollectEnergyBonus() ? '+30' : formatTime(timeRemaining)}
+              <Gift className="w-3 h-3" />
+              {canCollectEnergyBonus() ? '' : <span className="ml-0.5 text-[10px]">{formatTime(timeRemaining)}</span>}
             </Button>
           </div>
+
+          {/* Daily Challenges */}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setShowChallenges(true)}
+            className="h-6 px-1.5 relative"
+          >
+            <Target className="w-3.5 h-3.5 text-accent" />
+            {claimableChallenges > 0 && (
+              <span className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-destructive text-[8px] rounded-full flex items-center justify-center text-white font-bold">
+                {claimableChallenges}
+              </span>
+            )}
+          </Button>
 
           {/* Achievements */}
           <Button
             variant="ghost"
             size="sm"
             onClick={() => setShowAchievements(true)}
-            className="h-8 px-2"
+            className="h-6 px-1.5"
           >
-            <Trophy className="w-4 h-4 text-yellow-500" />
-            <span className="ml-1 text-xs">{unlockedAchievements}</span>
+            <Trophy className="w-3.5 h-3.5 text-yellow-500" />
+            <span className="ml-0.5 text-xs">{unlockedAchievements}</span>
           </Button>
 
-          {/* Level with XP */}
-          <div className="flex flex-col items-end">
-            <div className="flex items-center gap-1 bg-secondary px-2 py-0.5 rounded-md border-2 border-border">
-              <Gauge className="w-3.5 h-3.5 text-muted-foreground" />
-              <span className="text-xs font-bold">Lv.{state.level}</span>
-              {state.skillPoints > 0 && (
-                <span className="text-xs text-primary font-bold">+{state.skillPoints}</span>
-              )}
-            </div>
-            <Progress value={xpProgress} className="h-1 w-12 mt-0.5" />
-          </div>
+          {/* Level with expandable details */}
+          <Popover open={showDetails} onOpenChange={setShowDetails}>
+            <PopoverTrigger asChild>
+              <Button variant="outline" size="sm" className="h-6 px-2 text-xs gap-1 border">
+                Lv.{state.level}
+                {state.skillPoints > 0 && (
+                  <Badge variant="default" className="h-4 px-1 text-[10px]">+{state.skillPoints}</Badge>
+                )}
+                <ChevronDown className="w-3 h-3" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-48 p-3" align="end">
+              <div className="space-y-2">
+                <div>
+                  <div className="flex justify-between text-xs mb-1">
+                    <span>XP Progress</span>
+                    <span className="font-bold">{state.xp}/{xpForNextLevel || '∞'}</span>
+                  </div>
+                  <Progress value={xpProgress} className="h-1.5" />
+                </div>
+                <div className="flex justify-between text-xs">
+                  <span>Energy</span>
+                  <span className="font-bold">{state.energy}/{state.maxEnergy}</span>
+                </div>
+                <div className="flex justify-between text-xs">
+                  <span>Reputation</span>
+                  <span className="font-bold">⭐ {state.reputation}</span>
+                </div>
+                <div className="flex justify-between text-xs">
+                  <span>Skill Points</span>
+                  <span className="font-bold text-primary">{state.skillPoints}</span>
+                </div>
+              </div>
+            </PopoverContent>
+          </Popover>
         </div>
       </div>
 
@@ -121,13 +174,13 @@ export function StatsBar() {
                 <div className="flex items-center gap-3">
                   <span className="text-2xl">{achievement.icon}</span>
                   <div className="flex-1">
-                    <div className="font-semibold">{achievement.name}</div>
+                    <div className="font-semibold text-sm">{achievement.name}</div>
                     <div className="text-xs text-muted-foreground">{achievement.description}</div>
                   </div>
                   <div className="text-right">
                     <div className="text-xs text-primary font-bold">+${achievement.reward}</div>
                     {achievement.unlocked && (
-                      <div className="text-xs text-muted-foreground">✓ Unlocked</div>
+                      <div className="text-xs text-muted-foreground">✓</div>
                     )}
                   </div>
                 </div>
@@ -136,6 +189,14 @@ export function StatsBar() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Daily Challenges Dialog */}
+      <DailyChallengesDialog
+        open={showChallenges}
+        onOpenChange={setShowChallenges}
+        challengeState={dailyChallenges}
+        onClaimReward={handleClaimReward}
+      />
     </>
   );
 }
