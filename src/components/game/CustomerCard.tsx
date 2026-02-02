@@ -2,6 +2,7 @@ import { Customer } from '@/types/game';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Zap } from 'lucide-react';
 import { CUSTOMER_PERSONALITIES, getPatienceRounds } from '@/data/customers';
 
 interface CustomerCardProps {
@@ -54,6 +55,11 @@ export function CustomerCard({
                   {roundsLeft} round{roundsLeft !== 1 ? 's' : ''} left
                 </Badge>
               )}
+              {(customer.patience === 'very_low' || customer.patience === 'low') && (
+                <Badge variant="destructive" className="text-xs animate-pulse">
+                  ⚠️ May leave early!
+                </Badge>
+              )}
             </div>
           </div>
         </div>
@@ -87,6 +93,9 @@ export function CustomerCard({
             disabled={roundsLeft <= 0}
           >
             Counter
+            <span className="ml-1 text-xs flex items-center">
+              (<Zap className="w-3 h-3" />2)
+            </span>
           </Button>
           <Button className="flex-1" onClick={onAccept}>
             Accept

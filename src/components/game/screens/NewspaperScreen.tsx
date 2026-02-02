@@ -28,12 +28,12 @@ export function NewspaperScreen({ onCarBought }: NewspaperScreenProps) {
 
   useEffect(() => {
     refreshAds();
-  }, [state.reputation]);
+  }, [state.level]);
 
   const refreshAds = () => {
     const newAds: NewspaperAd[] = Array.from({ length: 5 }, () => ({
       id: `ad_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-      car: generateCar(state.reputation),
+      car: generateCar(state.level),
       seller: '',
       daysListed: Math.floor(Math.random() * 7) + 1,
       negotiable: Math.random() > 0.3,
@@ -117,21 +117,21 @@ export function NewspaperScreen({ onCarBought }: NewspaperScreenProps) {
   const garageFull = state.carsInGarage.length >= state.garageUpgrades.carBays;
 
   return (
-    <div className="flex flex-col min-h-full pb-20 relative">
+    <div className="flex flex-col min-h-[100dvh] pb-20 relative">
       <div 
-        className="absolute inset-0 bg-cover bg-center"
+        className="fixed inset-0 bg-cover bg-center"
         style={{ backgroundImage: `url(${newspaperBg})` }}
       />
       
       <div className="relative z-10">
-        <div className="p-4 border-b-2 border-border bg-card/90 backdrop-blur-sm">
+        <div className="p-4 py-5 border-b-2 border-border bg-card/90 backdrop-blur-sm sticky top-0 z-40">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-xl font-bold flex items-center gap-2">
-                <Newspaper className="w-5 h-5 text-primary" />
+              <h1 className="text-2xl font-bold flex items-center gap-2">
+                <Newspaper className="w-6 h-6 text-primary" />
                 Newspaper Ads
               </h1>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-sm text-muted-foreground mt-1">
                 Find your next project car
               </p>
             </div>

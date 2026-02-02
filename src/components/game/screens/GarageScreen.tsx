@@ -59,25 +59,25 @@ export function GarageScreen({ onNavigateToNewspaper, onSelectCar }: GarageScree
   };
 
   return (
-    <div className="flex flex-col min-h-full pb-20 relative">
+    <div className="flex flex-col min-h-[100dvh] pb-20 relative">
       <div 
-        className="absolute inset-0 bg-cover bg-center"
+        className="fixed inset-0 bg-cover bg-center"
         style={{ backgroundImage: `url(${garageBg})` }}
       />
       
       <div className="relative z-10">
-        <div className="p-4 border-b-2 border-border bg-card/90 backdrop-blur-sm">
+        <div className="p-4 py-5 border-b-2 border-border bg-card/90 backdrop-blur-sm">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-xl font-bold flex items-center gap-2">
-                <Wrench className="w-5 h-5 text-primary" />
+              <h1 className="text-2xl font-bold flex items-center gap-2">
+                <Wrench className="w-6 h-6 text-primary" />
                 My Garage
               </h1>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-sm text-muted-foreground mt-1">
                 {carsInGarage.length}/{garageUpgrades.carBays} car{garageUpgrades.carBays !== 1 ? 's' : ''} in garage
               </p>
             </div>
-            <Button onClick={onNavigateToNewspaper} size="sm" disabled={emptySlots === 0}>
+            <Button onClick={onNavigateToNewspaper} size="default" disabled={emptySlots === 0}>
               <Plus className="w-4 h-4 mr-1" />
               Buy Car
             </Button>
