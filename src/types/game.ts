@@ -27,7 +27,60 @@ export interface PartDamage {
   diyAttempts?: number;
 }
 
-export type CarCategory = 'economy' | 'sedan' | 'suv' | 'sports' | 'luxury';
+// 20 car categories - one unlocked per level
+export type CarCategory = 
+  | 'junker' | 'beater' | 'economy' | 'compact' | 'hatchback'
+  | 'sedan' | 'wagon' | 'coupe' | 'suv_small' | 'suv_mid'
+  | 'suv_large' | 'crossover' | 'muscle' | 'sports' | 'sports_premium'
+  | 'luxury_entry' | 'luxury_mid' | 'luxury_full' | 'exotic' | 'supercar';
+
+// Map levels to categories
+export const CATEGORY_UNLOCK_LEVEL: Record<CarCategory, number> = {
+  junker: 1,
+  beater: 2,
+  economy: 3,
+  compact: 4,
+  hatchback: 5,
+  sedan: 6,
+  wagon: 7,
+  coupe: 8,
+  suv_small: 9,
+  suv_mid: 10,
+  suv_large: 11,
+  crossover: 12,
+  muscle: 13,
+  sports: 14,
+  sports_premium: 15,
+  luxury_entry: 16,
+  luxury_mid: 17,
+  luxury_full: 18,
+  exotic: 19,
+  supercar: 20,
+};
+
+// Category display names
+export const CATEGORY_NAMES: Record<CarCategory, string> = {
+  junker: 'Junker',
+  beater: 'Beater',
+  economy: 'Economy',
+  compact: 'Compact',
+  hatchback: 'Hatchback',
+  sedan: 'Sedan',
+  wagon: 'Wagon',
+  coupe: 'Coupe',
+  suv_small: 'Small SUV',
+  suv_mid: 'Mid SUV',
+  suv_large: 'Large SUV',
+  crossover: 'Crossover',
+  muscle: 'Muscle',
+  sports: 'Sports',
+  sports_premium: 'Premium Sports',
+  luxury_entry: 'Entry Luxury',
+  luxury_mid: 'Mid Luxury',
+  luxury_full: 'Full Luxury',
+  exotic: 'Exotic',
+  supercar: 'Supercar',
+};
 
 export interface Car {
   id: string;
@@ -192,8 +245,20 @@ export function calculateXpFromSale(purchasePrice: number, totalRepairCost: numb
   return -25;
 }
 
-// XP required for each level (exponential, harder each level)
+// XP required for each level: +1000 XP per level
 export function getXpForLevel(level: number): number {
-  // Level 1->2: 100 XP, Level 19->20: ~3700 XP
-  return Math.floor(100 * Math.pow(1.2, level - 1));
+  if (level >= MAX_LEVEL) return Infinity;
+  // Level 1->2: 1000 XP, Level 2->3: 2000 XP, etc.
+  return level * 1000;
+}
+
+// Get categories available at a given level
+export function getCategoriesForLevel(level: number): CarCategory[] {
+  const allCategories: CarCategory[] = [
+    'junker', 'beater', 'economy', 'compact', 'hatchback',
+    'sedan', 'wagon', 'coupe', 'suv_small', 'suv_mid',
+    'suv_large', 'crossover', 'muscle', 'sports', 'sports_premium',
+    'luxury_entry', 'luxury_mid', 'luxury_full', 'exotic', 'supercar'
+  ];
+  return allCategories.filter(cat => CATEGORY_UNLOCK_LEVEL[cat] <= level);
 }

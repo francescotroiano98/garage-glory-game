@@ -12,21 +12,9 @@ import { toast } from 'sonner';
 import { useSound } from '@/hooks/useSound';
 import { CATEGORY_ICONS, CATEGORY_LABELS } from '@/data/parts';
 import { getPatienceRounds } from '@/data/customers';
+import { getCategoryImage } from '@/data/cars';
 
-import economyHatch from '@/assets/cars/economy-hatch.png';
-import sedanImg from '@/assets/cars/sedan.png';
-import suvImg from '@/assets/cars/suv.png';
-import sportsImg from '@/assets/cars/sports.png';
-import luxuryImg from '@/assets/cars/luxury.png';
 import garageBg from '@/assets/garage-bg.jpg';
-
-const CAR_IMAGES: Record<string, string> = {
-  economy: economyHatch,
-  sedan: sedanImg,
-  suv: suvImg,
-  sports: sportsImg,
-  luxury: luxuryImg,
-};
 
 interface RepairScreenProps {
   carId: string;
@@ -72,6 +60,7 @@ export function RepairScreen({ carId, onBack }: RepairScreenProps) {
 
   useEffect(() => {
     if (car) {
+      // Max sale price is 50% above current value
       setSellPrice(Math.round(car.currentValue * 1.2));
     }
   }, [car?.currentValue]);
@@ -157,6 +146,24 @@ export function RepairScreen({ carId, onBack }: RepairScreenProps) {
     if (!customer || !saleState) return;
 
     const maxRounds = getPatienceRounds(customer.patience);
+    
+    // Spend 2 energy for counter
+    if (!hasEnergy(2)) {
+      toast.error("Not enough energy to negotiate!");
+      return;
+    }
+    dispatch({ type: 'SPEND_ENERGY', payload: 2 });
+    
+    // Impatient customers may leave early even if rounds available
+    if (customer.patience === 'very_low' || customer.patience === 'low') {
+      const leaveChance = customer.patience === 'very_low' ? 0.5 : 0.3;
+      if (Math.random() < leaveChance) {
+        toast.error("Customer got frustrated and left!");
+        dispatch({ type: 'CANCEL_SALE', payload: carId });
+        return;
+      }
+    }
+    
     if (negotiationRound >= maxRounds) {
       toast.error("Customer is losing patience and leaving!");
       dispatch({ type: 'CANCEL_SALE', payload: carId });
@@ -166,7 +173,7 @@ export function RepairScreen({ carId, onBack }: RepairScreenProps) {
     const increase = (saleState.askingPrice - customerOffer) * (0.2 + Math.random() * 0.3) * (1 - customer.bargainSkill * 0.05);
     const newOffer = Math.round(customerOffer + Math.max(increase, 50));
     dispatch({ type: 'UPDATE_SALE_OFFER', payload: { carId, offer: Math.min(newOffer, customer.maxBudget), round: negotiationRound + 1 } });
-    toast.info("Customer increased their offer.");
+    toast.info("Customer increased their offer. (-2 energy)");
   };
 
   const handleRejectOffer = () => {
@@ -186,26 +193,26 @@ export function RepairScreen({ carId, onBack }: RepairScreenProps) {
   const unrepaired = car.damages.filter(d => !d.repaired).length;
   const repaired = car.damages.filter(d => d.repaired).length;
   const allRepaired = unrepaired === 0;
-  const carImage = CAR_IMAGES[car.category] || economyHatch;
+  const carImage = getCategoryImage(car.category);
   
   // Calculate total investment and potential profit
   const totalInvestment = (car.purchasePrice || car.askingPrice) + (car.totalRepairCost || 0);
 
   return (
-    <div className="flex flex-col min-h-full pb-20 relative">
+    <div className="flex flex-col min-h-[100dvh] pb-20 relative">
       <div 
-        className="absolute inset-0 bg-cover bg-center"
+        className="fixed inset-0 bg-cover bg-center"
         style={{ backgroundImage: `url(${garageBg})` }}
       />
       
       <div className="relative z-10">
-        <div className="relative p-4 border-b border-border bg-card/90 backdrop-blur-sm">
+        <div className="relative p-4 py-5 border-b border-border bg-card/90 backdrop-blur-sm">
           <div className="flex items-start gap-3">
             <Button variant="ghost" size="icon" onClick={onBack} className="shrink-0">
               <ArrowLeft className="w-5 h-5" />
             </Button>
             <div className="flex-1 min-w-0">
-              <h1 className="text-lg font-bold truncate">{car.name}</h1>
+              <h1 className="text-xl font-bold truncate">{car.name}</h1>
               <div className="flex items-center gap-2 text-sm flex-wrap">
                 <Badge variant="secondary">{repaired}/{repaired + unrepaired} fixed</Badge>
                 <span className="text-muted-foreground">
@@ -342,8 +349,9 @@ export function RepairScreen({ carId, onBack }: RepairScreenProps) {
                 step={50}
               />
               <div className="flex justify-between text-xs text-muted-foreground">
-                <span>Low price = fast sale</span>
-                <span>High price = slower sale</span>
+                <span>80% value</span>
+                <span className="text-center text-primary font-medium">Max: 150% value</span>
+                <span>Fast sale</span>
               </div>
             </div>
 

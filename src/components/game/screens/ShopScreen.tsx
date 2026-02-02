@@ -112,9 +112,9 @@ export function ShopScreen() {
   const xpForNextLevel = state.level >= MAX_LEVEL ? 0 : getXpForLevel(state.level);
 
   return (
-    <div className="flex flex-col min-h-full pb-20 relative">
+    <div className="flex flex-col min-h-[100dvh] pb-20 relative">
       <div 
-        className="absolute inset-0 bg-cover bg-center"
+        className="fixed inset-0 bg-cover bg-center"
         style={{ 
           backgroundImage: 'linear-gradient(135deg, hsl(var(--primary)/0.1), hsl(var(--accent)/0.1))',
           backgroundColor: 'hsl(var(--background))'
@@ -122,12 +122,12 @@ export function ShopScreen() {
       />
       
       <div className="relative z-10">
-        <div className="p-4 border-b border-border bg-card/90 backdrop-blur-sm">
-          <h1 className="text-xl font-bold flex items-center gap-2">
-            <ShoppingBag className="w-5 h-5 text-primary" />
+        <div className="p-4 py-5 border-b border-border bg-card/90 backdrop-blur-sm">
+          <h1 className="text-2xl font-bold flex items-center gap-2">
+            <ShoppingBag className="w-6 h-6 text-primary" />
             Upgrade Shop
           </h1>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm text-muted-foreground mt-1">
             Improve your garage and tools
           </p>
         </div>

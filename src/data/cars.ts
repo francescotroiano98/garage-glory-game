@@ -1,21 +1,43 @@
-import { Car, CarCategory, PartDamage, DamageLevel, PartType, PartCategory } from '@/types/game';
+import { Car, CarCategory, PartDamage, DamageLevel, PartType, PartCategory, getCategoriesForLevel, CATEGORY_UNLOCK_LEVEL } from '@/types/game';
 import { PART_DEFINITIONS } from './parts';
 
-// Import car images - 3 variants per category
+// Import car images - using existing images for different categories
 import economyHatch from '@/assets/cars/economy-hatch.png';
 import sedanImg from '@/assets/cars/sedan.png';
 import suvImg from '@/assets/cars/suv.png';
 import sportsImg from '@/assets/cars/sports.png';
 import luxuryImg from '@/assets/cars/luxury.png';
 
-// Multiple images per category for variety (using same images with CSS transforms for now)
-export const CAR_IMAGES: Record<CarCategory, string[]> = {
-  economy: [economyHatch, economyHatch, economyHatch],
-  sedan: [sedanImg, sedanImg, sedanImg],
-  suv: [suvImg, suvImg, suvImg],
-  sports: [sportsImg, sportsImg, sportsImg],
-  luxury: [luxuryImg, luxuryImg, luxuryImg],
+// Map categories to base images (will use CSS transforms for variety)
+const CATEGORY_BASE_IMAGES: Record<CarCategory, string> = {
+  junker: economyHatch,
+  beater: economyHatch,
+  economy: economyHatch,
+  compact: economyHatch,
+  hatchback: economyHatch,
+  sedan: sedanImg,
+  wagon: sedanImg,
+  coupe: sedanImg,
+  suv_small: suvImg,
+  suv_mid: suvImg,
+  suv_large: suvImg,
+  crossover: suvImg,
+  muscle: sportsImg,
+  sports: sportsImg,
+  sports_premium: sportsImg,
+  luxury_entry: luxuryImg,
+  luxury_mid: luxuryImg,
+  luxury_full: luxuryImg,
+  exotic: sportsImg,
+  supercar: luxuryImg,
 };
+
+// 3 image variants per category (using CSS transforms)
+export const CAR_IMAGES: Record<CarCategory, string[]> = Object.keys(CATEGORY_BASE_IMAGES).reduce((acc, cat) => {
+  const baseImg = CATEGORY_BASE_IMAGES[cat as CarCategory];
+  acc[cat as CarCategory] = [baseImg, baseImg, baseImg];
+  return acc;
+}, {} as Record<CarCategory, string[]>);
 
 // Damage level multipliers - balanced for profitability
 export const DAMAGE_MULTIPLIERS: Record<DamageLevel, { energy: number; time: number; money: number; value: number }> = {
@@ -26,57 +48,107 @@ export const DAMAGE_MULTIPLIERS: Record<DamageLevel, { energy: number; time: num
   critical: { energy: 1.3, time: 1.25, money: 1.3, value: 1.4 },
 };
 
-// More variety of cars - multiple images per category would be ideal
+// Car templates for each category (2-3 per category for variety)
 export const CAR_TEMPLATES: Array<{ name: string; category: CarCategory; baseValue: number }> = [
-  // Economy (8 varieties)
+  // Level 1 - Junker
+  { name: 'Rusty Beater', category: 'junker', baseValue: 300 },
+  { name: 'Old Clunker', category: 'junker', baseValue: 350 },
+  { name: 'Worn Jalopy', category: 'junker', baseValue: 280 },
+  
+  // Level 2 - Beater
+  { name: 'Tired Runabout', category: 'beater', baseValue: 500 },
+  { name: 'Faded Runner', category: 'beater', baseValue: 550 },
+  { name: 'Rough Daily', category: 'beater', baseValue: 480 },
+  
+  // Level 3 - Economy
   { name: 'Compact Hatch', category: 'economy', baseValue: 800 },
   { name: 'City Runner', category: 'economy', baseValue: 950 },
   { name: 'Budget Wagon', category: 'economy', baseValue: 750 },
-  { name: 'Mini Coupe', category: 'economy', baseValue: 1100 },
-  { name: 'Urban Hatch', category: 'economy', baseValue: 850 },
-  { name: 'Eco Sprint', category: 'economy', baseValue: 700 },
-  { name: 'Metro Cruiser', category: 'economy', baseValue: 900 },
-  { name: 'Penny Saver', category: 'economy', baseValue: 650 },
   
-  // Sedan (8 varieties)
+  // Level 4 - Compact
+  { name: 'Mini Coupe', category: 'compact', baseValue: 1100 },
+  { name: 'Urban Hatch', category: 'compact', baseValue: 1050 },
+  { name: 'Eco Sprint', category: 'compact', baseValue: 1000 },
+  
+  // Level 5 - Hatchback
+  { name: 'Metro Cruiser', category: 'hatchback', baseValue: 1300 },
+  { name: 'Penny Saver', category: 'hatchback', baseValue: 1250 },
+  { name: 'Quick Hatch', category: 'hatchback', baseValue: 1400 },
+  
+  // Level 6 - Sedan
   { name: 'Family Sedan', category: 'sedan', baseValue: 1800 },
-  { name: 'Executive Sedan', category: 'sedan', baseValue: 2400 },
   { name: 'Classic Sedan', category: 'sedan', baseValue: 2000 },
-  { name: 'Sport Sedan', category: 'sedan', baseValue: 2800 },
   { name: 'Touring Sedan', category: 'sedan', baseValue: 2200 },
-  { name: 'Business Sedan', category: 'sedan', baseValue: 2600 },
-  { name: 'Luxury Sedan', category: 'sedan', baseValue: 3200 },
-  { name: 'Comfort Cruiser', category: 'sedan', baseValue: 1900 },
   
-  // SUV (8 varieties)
-  { name: 'Urban SUV', category: 'suv', baseValue: 3500 },
-  { name: 'Off-Road SUV', category: 'suv', baseValue: 4200 },
-  { name: 'Family SUV', category: 'suv', baseValue: 3800 },
-  { name: 'Compact SUV', category: 'suv', baseValue: 3000 },
-  { name: 'Adventure SUV', category: 'suv', baseValue: 4500 },
-  { name: 'Premium SUV', category: 'suv', baseValue: 5000 },
-  { name: 'Trail Blazer', category: 'suv', baseValue: 4000 },
-  { name: 'City Explorer', category: 'suv', baseValue: 3200 },
+  // Level 7 - Wagon
+  { name: 'Estate Wagon', category: 'wagon', baseValue: 2400 },
+  { name: 'Family Wagon', category: 'wagon', baseValue: 2600 },
+  { name: 'Touring Wagon', category: 'wagon', baseValue: 2800 },
   
-  // Sports (8 varieties)
-  { name: 'Sports Coupe', category: 'sports', baseValue: 6000 },
-  { name: 'Muscle Car', category: 'sports', baseValue: 7500 },
-  { name: 'GT Racer', category: 'sports', baseValue: 8500 },
-  { name: 'Turbo Coupe', category: 'sports', baseValue: 7000 },
-  { name: 'Street Rocket', category: 'sports', baseValue: 6500 },
-  { name: 'Track Monster', category: 'sports', baseValue: 9000 },
-  { name: 'Drift King', category: 'sports', baseValue: 7800 },
-  { name: 'Speed Demon', category: 'sports', baseValue: 8000 },
+  // Level 8 - Coupe
+  { name: 'Sport Coupe', category: 'coupe', baseValue: 3000 },
+  { name: 'Grand Coupe', category: 'coupe', baseValue: 3200 },
+  { name: 'Turbo Coupe', category: 'coupe', baseValue: 3500 },
   
-  // Luxury (8 varieties)
-  { name: 'Luxury Limousine', category: 'luxury', baseValue: 12000 },
-  { name: 'Premium Convertible', category: 'luxury', baseValue: 15000 },
-  { name: 'Executive Class', category: 'luxury', baseValue: 18000 },
-  { name: 'Grand Tourer', category: 'luxury', baseValue: 20000 },
-  { name: 'Royal Sedan', category: 'luxury', baseValue: 16000 },
-  { name: 'Prestige Coupe', category: 'luxury', baseValue: 22000 },
-  { name: 'Elite Roadster', category: 'luxury', baseValue: 25000 },
-  { name: 'Platinum Edition', category: 'luxury', baseValue: 28000 },
+  // Level 9 - Small SUV
+  { name: 'Compact SUV', category: 'suv_small', baseValue: 3500 },
+  { name: 'Urban Crossover', category: 'suv_small', baseValue: 3800 },
+  { name: 'City Explorer', category: 'suv_small', baseValue: 3600 },
+  
+  // Level 10 - Mid SUV
+  { name: 'Family SUV', category: 'suv_mid', baseValue: 4500 },
+  { name: 'Trail Blazer', category: 'suv_mid', baseValue: 4800 },
+  { name: 'Adventure SUV', category: 'suv_mid', baseValue: 5000 },
+  
+  // Level 11 - Large SUV
+  { name: 'Premium SUV', category: 'suv_large', baseValue: 6000 },
+  { name: 'Expedition SUV', category: 'suv_large', baseValue: 6500 },
+  { name: 'Grand Explorer', category: 'suv_large', baseValue: 7000 },
+  
+  // Level 12 - Crossover
+  { name: 'Luxury Crossover', category: 'crossover', baseValue: 7500 },
+  { name: 'Sport Crossover', category: 'crossover', baseValue: 8000 },
+  { name: 'Elite Crossover', category: 'crossover', baseValue: 8500 },
+  
+  // Level 13 - Muscle
+  { name: 'Muscle Classic', category: 'muscle', baseValue: 9000 },
+  { name: 'Power Runner', category: 'muscle', baseValue: 9500 },
+  { name: 'Street Beast', category: 'muscle', baseValue: 10000 },
+  
+  // Level 14 - Sports
+  { name: 'Sports Coupe', category: 'sports', baseValue: 12000 },
+  { name: 'Track Monster', category: 'sports', baseValue: 13000 },
+  { name: 'Speed Demon', category: 'sports', baseValue: 14000 },
+  
+  // Level 15 - Premium Sports
+  { name: 'GT Racer', category: 'sports_premium', baseValue: 18000 },
+  { name: 'Drift King', category: 'sports_premium', baseValue: 19000 },
+  { name: 'Street Rocket', category: 'sports_premium', baseValue: 20000 },
+  
+  // Level 16 - Entry Luxury
+  { name: 'Entry Luxury', category: 'luxury_entry', baseValue: 25000 },
+  { name: 'Business Class', category: 'luxury_entry', baseValue: 27000 },
+  { name: 'Executive Sedan', category: 'luxury_entry', baseValue: 28000 },
+  
+  // Level 17 - Mid Luxury
+  { name: 'Grand Tourer', category: 'luxury_mid', baseValue: 35000 },
+  { name: 'Royal Sedan', category: 'luxury_mid', baseValue: 38000 },
+  { name: 'Prestige Coupe', category: 'luxury_mid', baseValue: 40000 },
+  
+  // Level 18 - Full Luxury
+  { name: 'Elite Roadster', category: 'luxury_full', baseValue: 50000 },
+  { name: 'Platinum Edition', category: 'luxury_full', baseValue: 55000 },
+  { name: 'Premium Convertible', category: 'luxury_full', baseValue: 60000 },
+  
+  // Level 19 - Exotic
+  { name: 'Exotic Racer', category: 'exotic', baseValue: 80000 },
+  { name: 'Limited Edition', category: 'exotic', baseValue: 90000 },
+  { name: 'Rare Import', category: 'exotic', baseValue: 100000 },
+  
+  // Level 20 - Supercar
+  { name: 'Hypercar', category: 'supercar', baseValue: 150000 },
+  { name: 'Ultimate Machine', category: 'supercar', baseValue: 180000 },
+  { name: 'Legend Edition', category: 'supercar', baseValue: 200000 },
 ];
 
 // Parts by category for damage generation
@@ -137,18 +209,22 @@ function calculateCurrentValue(baseValue: number, damages: PartDamage[]): number
   return Math.max(baseValue * 0.1, baseValue - totalDamageValue);
 }
 
-// Generate a car for the newspaper
-export function generateCar(reputation: number): Car {
-  let availableTemplates = CAR_TEMPLATES.filter(t => {
-    if (reputation < 15) return t.category === 'economy';
-    if (reputation < 30) return ['economy', 'sedan'].includes(t.category);
-    if (reputation < 50) return ['economy', 'sedan', 'suv'].includes(t.category);
-    if (reputation < 70) return t.category !== 'luxury';
-    return true;
-  });
+// Generate a car for the newspaper based on player level
+export function generateCar(level: number): Car {
+  // Get available categories for this level
+  const availableCategories = getCategoriesForLevel(level);
+  
+  // Weight towards higher level categories (70% chance for top 3 categories if available)
+  let selectedCategories = availableCategories;
+  if (availableCategories.length > 3 && Math.random() < 0.7) {
+    selectedCategories = availableCategories.slice(-3);
+  }
+  
+  // Get templates for selected categories
+  let availableTemplates = CAR_TEMPLATES.filter(t => selectedCategories.includes(t.category));
   
   if (availableTemplates.length === 0) {
-    availableTemplates = CAR_TEMPLATES.filter(t => t.category === 'economy');
+    availableTemplates = CAR_TEMPLATES.filter(t => t.category === 'junker');
   }
   
   const template = availableTemplates[Math.floor(Math.random() * availableTemplates.length)];
@@ -183,4 +259,9 @@ export function generateCar(reputation: number): Car {
 // Recalculate car value after repairs
 export function recalculateCarValue(car: Car): number {
   return calculateCurrentValue(car.baseValue, car.damages);
+}
+
+// Get image for a category
+export function getCategoryImage(category: CarCategory): string {
+  return CATEGORY_BASE_IMAGES[category];
 }
