@@ -1,43 +1,97 @@
 import { Car, CarCategory, PartDamage, DamageLevel, PartType, PartCategory, getCategoriesForLevel, CATEGORY_UNLOCK_LEVEL } from '@/types/game';
 import { PART_DEFINITIONS } from './parts';
 
-// Import car images - using existing images for different categories
-import economyHatch from '@/assets/cars/economy-hatch.png';
-import sedanImg from '@/assets/cars/sedan.png';
-import suvImg from '@/assets/cars/suv.png';
-import sportsImg from '@/assets/cars/sports.png';
-import luxuryImg from '@/assets/cars/luxury.png';
+// Import car images - 10 per category for variety
+// Economy images (junker, beater, economy, compact, hatchback)
+import economy1 from '@/assets/cars/economy-1.png';
+import economy2 from '@/assets/cars/economy-2.png';
+import economy3 from '@/assets/cars/economy-3.png';
+import economy4 from '@/assets/cars/economy-4.png';
+import economy5 from '@/assets/cars/economy-5.png';
+import economy6 from '@/assets/cars/economy-6.png';
+import economy7 from '@/assets/cars/economy-7.png';
+import economy8 from '@/assets/cars/economy-8.png';
+import economy9 from '@/assets/cars/economy-9.png';
+import economy10 from '@/assets/cars/economy-10.png';
 
-// Map categories to base images (will use CSS transforms for variety)
-const CATEGORY_BASE_IMAGES: Record<CarCategory, string> = {
-  junker: economyHatch,
-  beater: economyHatch,
-  economy: economyHatch,
-  compact: economyHatch,
-  hatchback: economyHatch,
-  sedan: sedanImg,
-  wagon: sedanImg,
-  coupe: sedanImg,
-  suv_small: suvImg,
-  suv_mid: suvImg,
-  suv_large: suvImg,
-  crossover: suvImg,
-  muscle: sportsImg,
-  sports: sportsImg,
-  sports_premium: sportsImg,
-  luxury_entry: luxuryImg,
-  luxury_mid: luxuryImg,
-  luxury_full: luxuryImg,
-  exotic: sportsImg,
-  supercar: luxuryImg,
+// Sedan images (sedan, wagon, coupe)
+import sedan1 from '@/assets/cars/sedan-1.png';
+import sedan2 from '@/assets/cars/sedan-2.png';
+import sedan3 from '@/assets/cars/sedan-3.png';
+import sedan4 from '@/assets/cars/sedan-4.png';
+import sedan5 from '@/assets/cars/sedan-5.png';
+import sedan6 from '@/assets/cars/sedan-6.png';
+import sedan7 from '@/assets/cars/sedan-7.png';
+import sedan8 from '@/assets/cars/sedan-8.png';
+import sedan9 from '@/assets/cars/sedan-9.png';
+import sedan10 from '@/assets/cars/sedan-10.png';
+
+// SUV images (suv_small, suv_mid, suv_large, crossover)
+import suv1 from '@/assets/cars/suv-1.png';
+import suv2 from '@/assets/cars/suv-2.png';
+import suv3 from '@/assets/cars/suv-3.png';
+import suv4 from '@/assets/cars/suv-4.png';
+import suv5 from '@/assets/cars/suv-5.png';
+import suv6 from '@/assets/cars/suv-6.png';
+import suv7 from '@/assets/cars/suv-7.png';
+import suv8 from '@/assets/cars/suv-8.png';
+import suv9 from '@/assets/cars/suv-9.png';
+import suv10 from '@/assets/cars/suv-10.png';
+
+// Sports images (muscle, sports, sports_premium, exotic)
+import sports1 from '@/assets/cars/sports-1.png';
+import sports2 from '@/assets/cars/sports-2.png';
+import sports3 from '@/assets/cars/sports-3.png';
+import sports4 from '@/assets/cars/sports-4.png';
+import sports5 from '@/assets/cars/sports-5.png';
+import sports6 from '@/assets/cars/sports-6.png';
+import sports7 from '@/assets/cars/sports-7.png';
+import sports8 from '@/assets/cars/sports-8.png';
+import sports9 from '@/assets/cars/sports-9.png';
+import sports10 from '@/assets/cars/sports-10.png';
+
+// Luxury images (luxury_entry, luxury_mid, luxury_full, supercar)
+import luxury1 from '@/assets/cars/luxury-1.png';
+import luxury2 from '@/assets/cars/luxury-2.png';
+import luxury3 from '@/assets/cars/luxury-3.png';
+import luxury4 from '@/assets/cars/luxury-4.png';
+import luxury5 from '@/assets/cars/luxury-5.png';
+import luxury6 from '@/assets/cars/luxury-6.png';
+import luxury7 from '@/assets/cars/luxury-7.png';
+import luxury8 from '@/assets/cars/luxury-8.png';
+import luxury9 from '@/assets/cars/luxury-9.png';
+import luxury10 from '@/assets/cars/luxury-10.png';
+
+// Image arrays by category type
+const ECONOMY_IMAGES = [economy1, economy2, economy3, economy4, economy5, economy6, economy7, economy8, economy9, economy10];
+const SEDAN_IMAGES = [sedan1, sedan2, sedan3, sedan4, sedan5, sedan6, sedan7, sedan8, sedan9, sedan10];
+const SUV_IMAGES = [suv1, suv2, suv3, suv4, suv5, suv6, suv7, suv8, suv9, suv10];
+const SPORTS_IMAGES = [sports1, sports2, sports3, sports4, sports5, sports6, sports7, sports8, sports9, sports10];
+const LUXURY_IMAGES = [luxury1, luxury2, luxury3, luxury4, luxury5, luxury6, luxury7, luxury8, luxury9, luxury10];
+
+// 10 image variants per category
+export const CAR_IMAGES: Record<CarCategory, string[]> = {
+  junker: ECONOMY_IMAGES,
+  beater: ECONOMY_IMAGES,
+  economy: ECONOMY_IMAGES,
+  compact: ECONOMY_IMAGES,
+  hatchback: ECONOMY_IMAGES,
+  sedan: SEDAN_IMAGES,
+  wagon: SEDAN_IMAGES,
+  coupe: SEDAN_IMAGES,
+  suv_small: SUV_IMAGES,
+  suv_mid: SUV_IMAGES,
+  suv_large: SUV_IMAGES,
+  crossover: SUV_IMAGES,
+  muscle: SPORTS_IMAGES,
+  sports: SPORTS_IMAGES,
+  sports_premium: SPORTS_IMAGES,
+  exotic: SPORTS_IMAGES,
+  luxury_entry: LUXURY_IMAGES,
+  luxury_mid: LUXURY_IMAGES,
+  luxury_full: LUXURY_IMAGES,
+  supercar: LUXURY_IMAGES,
 };
-
-// 3 image variants per category (using CSS transforms)
-export const CAR_IMAGES: Record<CarCategory, string[]> = Object.keys(CATEGORY_BASE_IMAGES).reduce((acc, cat) => {
-  const baseImg = CATEGORY_BASE_IMAGES[cat as CarCategory];
-  acc[cat as CarCategory] = [baseImg, baseImg, baseImg];
-  return acc;
-}, {} as Record<CarCategory, string[]>);
 
 // Damage level multipliers - balanced for profitability
 export const DAMAGE_MULTIPLIERS: Record<DamageLevel, { energy: number; time: number; money: number; value: number }> = {
@@ -232,8 +286,8 @@ export function generateCar(level: number): Car {
   const damages = generateDamage(template.baseValue, damageIntensity);
   const currentValue = calculateCurrentValue(template.baseValue, damages);
   
-  // Random image variant
-  const imageVariant = Math.floor(Math.random() * 3);
+  // Random image variant (10 variants per category)
+  const imageVariant = Math.floor(Math.random() * 10);
   const images = CAR_IMAGES[template.category];
   
   // Asking price varies
@@ -263,5 +317,5 @@ export function recalculateCarValue(car: Car): number {
 
 // Get image for a category
 export function getCategoryImage(category: CarCategory): string {
-  return CATEGORY_BASE_IMAGES[category];
+  return CAR_IMAGES[category][0];
 }
