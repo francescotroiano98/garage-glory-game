@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Component, ReactNode } from 'react';
 import { GameProvider, useGame } from '@/contexts/GameContext';
 import { StatsBar } from '@/components/game/StatsBar';
 import { BottomNav, Screen } from '@/components/game/BottomNav';
@@ -9,6 +9,41 @@ import { ShopScreen } from '@/components/game/screens/ShopScreen';
 import { SettingsScreen } from '@/components/game/screens/SettingsScreen';
 import { TutorialOverlay } from '@/components/game/TutorialOverlay';
 import { useBackgroundMusic } from '@/hooks/useSound';
+
+// Error Boundary to handle context errors gracefully
+class GameErrorBoundary extends Component<{ children: ReactNode }, { hasError: boolean }> {
+  constructor(props: { children: ReactNode }) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error: Error) {
+    console.error('Game Error:', error);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="min-h-screen flex items-center justify-center bg-background">
+          <div className="text-center p-4">
+            <h2 className="text-xl font-bold mb-2">Something went wrong</h2>
+            <button 
+              onClick={() => window.location.reload()} 
+              className="bg-primary text-primary-foreground px-4 py-2 rounded"
+            >
+              Reload Game
+            </button>
+          </div>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
 
 const TUTORIAL_KEY = 'car_mechanic_tutorial_done';
 
@@ -82,9 +117,11 @@ function GameContent() {
 
 const Index = () => {
   return (
-    <GameProvider>
-      <GameContent />
-    </GameProvider>
+    <GameErrorBoundary>
+      <GameProvider>
+        <GameContent />
+      </GameProvider>
+    </GameErrorBoundary>
   );
 };
 
