@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Zap, Check, AlertTriangle, Clock, Wrench, DollarSign } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { PART_ICONS } from '@/data/parts';
 
 interface PartRepairCardProps {
@@ -40,18 +40,27 @@ export function PartRepairCard({
   const actualEnergyCost = Math.round(damage.energyCost * energyMultiplier);
   const diyEnergyCost = Math.round(actualEnergyCost * 0.5);
   const [displayProgress, setDisplayProgress] = useState(repairProgress);
+  const animationRef = useRef<number>();
   
   const partIcon = PART_ICONS[damage.part] || '🔧';
 
+  // Smooth animation using requestAnimationFrame
   useEffect(() => {
     if (isRepairing) {
-      const interval = setInterval(() => {
+      const animate = () => {
         setDisplayProgress(prev => {
           const diff = repairProgress - prev;
-          return prev + diff * 0.3;
+          if (Math.abs(diff) < 0.1) return repairProgress;
+          return prev + diff * 0.15;
         });
-      }, 50);
-      return () => clearInterval(interval);
+        animationRef.current = requestAnimationFrame(animate);
+      };
+      animationRef.current = requestAnimationFrame(animate);
+      return () => {
+        if (animationRef.current) {
+          cancelAnimationFrame(animationRef.current);
+        }
+      };
     } else {
       setDisplayProgress(repairProgress);
     }
@@ -73,7 +82,7 @@ export function PartRepairCard({
 
   return (
     <div className={cn(
-      'flex flex-col gap-2 p-3 rounded-lg border-2 transition-all bg-card/90 backdrop-blur-sm',
+      'flex flex-col gap-2 p-3 rounded-lg border-2 bg-card/95 backdrop-blur-sm',
       isRepairing ? 'border-accent shadow-md' : 'border-border'
     )}>
       <div className="flex items-center gap-3">
@@ -120,7 +129,7 @@ export function PartRepairCard({
             size="sm"
             onClick={onRepair}
             disabled={!canRepair}
-            className="retro-button text-xs"
+            className="text-xs"
           >
             {isRepairing ? 'Working...' : `$${damage.moneyCost}`}
           </Button>
@@ -139,7 +148,7 @@ export function PartRepairCard({
       </div>
 
       {isRepairing && (
-        <Progress value={displayProgress} className="h-2" />
+        <Progress value={displayProgress} className="h-2 transition-none" />
       )}
     </div>
   );

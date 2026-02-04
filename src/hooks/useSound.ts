@@ -65,31 +65,47 @@ export function useSound() {
   return { playSound, muted, toggleMute };
 }
 
+// Use a royalty-free looping music track that works
+const BACKGROUND_MUSIC_URL = 'https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=lofi-study-112191.mp3';
+
 export function useBackgroundMusic() {
   const [playing, setPlaying] = useState(() => {
     const saved = localStorage.getItem('game_music_playing');
     return saved === 'true';
   });
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const hasStartedRef = useRef(false);
+  const initializedRef = useRef(false);
 
+  // Initialize audio element once
   useEffect(() => {
-    // Chill lofi-style background music
-    const audio = new Audio('https://cdn.freesound.org/previews/459/459814_5674468-lq.mp3');
+    if (initializedRef.current) return;
+    initializedRef.current = true;
+
+    const audio = new Audio(BACKGROUND_MUSIC_URL);
     audio.loop = true;
-    audio.volume = 0.15;
+    audio.volume = 0.2;
+    audio.preload = 'auto';
     audioRef.current = audio;
 
-    // Auto-play if was playing before
-    if (playing && !hasStartedRef.current) {
-      hasStartedRef.current = true;
-      audio.play().catch(() => {});
-    }
+    // Handle user interaction to enable audio (browsers require interaction)
+    const enableAudio = () => {
+      if (audioRef.current && playing) {
+        audioRef.current.play().catch(() => {});
+      }
+      document.removeEventListener('click', enableAudio);
+      document.removeEventListener('touchstart', enableAudio);
+    };
+
+    document.addEventListener('click', enableAudio);
+    document.addEventListener('touchstart', enableAudio);
 
     return () => {
+      document.removeEventListener('click', enableAudio);
+      document.removeEventListener('touchstart', enableAudio);
       if (audioRef.current) {
         audioRef.current.pause();
         audioRef.current.src = '';
+        audioRef.current = null;
       }
     };
   }, []);

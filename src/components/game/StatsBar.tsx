@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useGame } from '@/contexts/GameContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { Zap, DollarSign, Gift, Trophy, Target, ChevronDown } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { toast } from 'sonner';
 import { getXpForLevel } from '@/data/upgrades';
 import { MAX_LEVEL } from '@/types/game';
 import { useSound } from '@/hooks/useSound';
@@ -21,6 +21,7 @@ export function StatsBar() {
     dailyChallenges,
     claimChallengeReward,
   } = useGame();
+  const { t } = useLanguage();
   const [timeRemaining, setTimeRemaining] = useState(0);
   const [showAchievements, setShowAchievements] = useState(false);
   const [showChallenges, setShowChallenges] = useState(false);
@@ -38,14 +39,12 @@ export function StatsBar() {
     if (canCollectEnergyBonus()) {
       dispatch({ type: 'COLLECT_ENERGY_BONUS' });
       playSound('energyBonus');
-      toast.success('+30 Energy collected!');
     }
   };
 
   const handleClaimReward = (challengeId: string) => {
     claimChallengeReward(challengeId);
     playSound('achievement');
-    toast.success('Reward claimed!');
   };
 
   const formatTime = (ms: number) => {
@@ -58,15 +57,13 @@ export function StatsBar() {
   const xpProgress = state.level >= MAX_LEVEL ? 100 : (state.xp / xpForNextLevel) * 100;
   const unlockedAchievements = state.achievements.filter(a => a.unlocked).length;
   
-  // Count claimable challenges
   const claimableChallenges = dailyChallenges.progress.filter(p => p.completed && !p.claimed).length;
 
   return (
     <>
       <div className="bg-card/95 backdrop-blur-sm border-b-2 border-border p-2 sticky top-0 z-50">
-        {/* Compact single row */}
         <div className="flex items-center justify-between gap-2">
-          {/* Left side: Money & Energy stacked in column */}
+          {/* Left side: Money & Energy stacked */}
           <div className="flex flex-col gap-1">
             {/* Money */}
             <div className="flex items-center gap-1 bg-primary/15 px-2 py-0.5 rounded-full border border-primary/30">
@@ -74,26 +71,27 @@ export function StatsBar() {
               <span className="font-bold text-sm text-primary">${state.money.toLocaleString()}</span>
             </div>
 
-            {/* Energy with recharge button */}
+            {/* Energy */}
             <div className="flex items-center gap-1 bg-yellow-500/15 px-2 py-0.5 rounded-full border border-yellow-500/30">
               <Zap className="w-3.5 h-3.5 text-yellow-500" />
               <span className="text-sm font-bold text-yellow-600">{state.energy}</span>
-              <Button
-                size="sm"
-                variant={canCollectEnergyBonus() ? "default" : "ghost"}
-                onClick={handleCollectBonus}
-                disabled={!canCollectEnergyBonus()}
-                className="h-5 px-1.5 text-[10px] ml-0.5"
-              >
-                <Gift className="w-3 h-3" />
-                {!canCollectEnergyBonus() && <span className="ml-0.5">{formatTime(timeRemaining)}</span>}
-              </Button>
             </div>
+            
+            {/* Recharge button below energy */}
+            <Button
+              size="sm"
+              variant={canCollectEnergyBonus() ? "default" : "secondary"}
+              onClick={handleCollectBonus}
+              disabled={!canCollectEnergyBonus()}
+              className="h-6 px-2 text-[10px]"
+            >
+              <Gift className="w-3 h-3 mr-1" />
+              {canCollectEnergyBonus() ? '+30' : formatTime(timeRemaining)}
+            </Button>
           </div>
 
           {/* Right side: Actions */}
           <div className="flex items-center gap-1">
-            {/* Daily Challenges */}
             <Button
               variant="ghost"
               size="sm"
@@ -108,7 +106,6 @@ export function StatsBar() {
               )}
             </Button>
 
-            {/* Achievements */}
             <Button
               variant="ghost"
               size="sm"
@@ -118,7 +115,6 @@ export function StatsBar() {
               <Trophy className="w-4 h-4 text-yellow-500" />
             </Button>
 
-            {/* Level with expandable details */}
             <Popover open={showDetails} onOpenChange={setShowDetails}>
               <PopoverTrigger asChild>
                 <Button variant="outline" size="sm" className="h-8 px-2 text-sm gap-1 border">
@@ -133,21 +129,21 @@ export function StatsBar() {
                 <div className="space-y-2">
                   <div>
                     <div className="flex justify-between text-xs mb-1">
-                      <span>XP Progress</span>
+                      <span>{t.xpProgress}</span>
                       <span className="font-bold">{state.xp}/{xpForNextLevel || '∞'}</span>
                     </div>
                     <Progress value={xpProgress} className="h-1.5" />
                   </div>
                   <div className="flex justify-between text-xs">
-                    <span>Energy</span>
+                    <span>{t.energy}</span>
                     <span className="font-bold">{state.energy}/{state.maxEnergy}</span>
                   </div>
                   <div className="flex justify-between text-xs">
-                    <span>Reputation</span>
+                    <span>{t.reputation}</span>
                     <span className="font-bold">⭐ {state.reputation}</span>
                   </div>
                   <div className="flex justify-between text-xs">
-                    <span>Skill Points</span>
+                    <span>{t.skillPoints}</span>
                     <span className="font-bold text-primary">{state.skillPoints}</span>
                   </div>
                 </div>
@@ -156,13 +152,13 @@ export function StatsBar() {
           </div>
         </div>
       </div>
-      {/* Achievements Dialog */}
+
       <Dialog open={showAchievements} onOpenChange={setShowAchievements}>
         <DialogContent className="max-w-sm max-h-[80vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Trophy className="w-5 h-5 text-yellow-500" />
-              Achievements ({unlockedAchievements}/{state.achievements.length})
+              {t.achievements} ({unlockedAchievements}/{state.achievements.length})
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-2">
@@ -194,7 +190,6 @@ export function StatsBar() {
         </DialogContent>
       </Dialog>
 
-      {/* Daily Challenges Dialog */}
       <DailyChallengesDialog
         open={showChallenges}
         onOpenChange={setShowChallenges}

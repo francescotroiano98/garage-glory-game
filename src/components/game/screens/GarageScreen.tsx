@@ -1,10 +1,10 @@
 import { useGame } from '@/contexts/GameContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { CarCard } from '@/components/game/CarCard';
 import { Button } from '@/components/ui/button';
 import { Car as CarIcon, Plus, Wrench, Loader2, DollarSign, Clock } from 'lucide-react';
 import { Newspaper } from 'lucide-react';
 import garageBg from '@/assets/garage-bg.jpg';
-import { toast } from 'sonner';
 import { useSound } from '@/hooks/useSound';
 
 interface GarageScreenProps {
@@ -14,6 +14,7 @@ interface GarageScreenProps {
 
 export function GarageScreen({ onNavigateToNewspaper, onSelectCar }: GarageScreenProps) {
   const { state, dispatch, getSaleState, handleSaleComplete } = useGame();
+  const { t } = useLanguage();
   const { carsInGarage, garageUpgrades, repairQueue } = state;
   const emptySlots = garageUpgrades.carBays - carsInGarage.length;
   const { playSound } = useSound();
@@ -24,13 +25,9 @@ export function GarageScreen({ onNavigateToNewspaper, onSelectCar }: GarageScree
     if (!car) return;
     
     const hasDamages = car.damages.some(d => !d.repaired);
-    if (hasDamages) {
-      toast.error("Repair all damages before selling!");
-      return;
-    }
+    if (hasDamages) return;
     
     dispatch({ type: 'LIST_CAR_FOR_SALE', payload: { carId, askingPrice: car.currentValue } });
-    toast.success("Car listed for sale! Waiting for customers...");
   };
 
   const handleAcceptOffer = (carId: string, e: React.MouseEvent) => {
@@ -43,69 +40,66 @@ export function GarageScreen({ onNavigateToNewspaper, onSelectCar }: GarageScree
     
     handleSaleComplete(carId, saleState.customerOffer);
     playSound('cashRegister');
-    toast.success(`Sold for $${saleState.customerOffer.toLocaleString()}!`);
   };
 
   const handleRejectOffer = (carId: string, e: React.MouseEvent) => {
     e.stopPropagation();
     dispatch({ type: 'CANCEL_SALE', payload: carId });
-    toast.info("Customer left. You can relist the car.");
   };
 
   const handleCancelSale = (carId: string, e: React.MouseEvent) => {
     e.stopPropagation();
     dispatch({ type: 'CANCEL_SALE', payload: carId });
-    toast.info("Sale cancelled");
   };
 
   return (
-    <div className="flex flex-col min-h-[100dvh] pb-20 relative">
+    <div className="flex flex-col min-h-[100dvh] pb-20 relative overflow-hidden">
       <div 
         className="fixed inset-0 bg-cover bg-center"
         style={{ backgroundImage: `url(${garageBg})` }}
       />
       
-      <div className="relative z-10">
-        <div className="p-4 py-5 border-b-2 border-border bg-card/90 backdrop-blur-sm">
+      <div className="relative z-10 flex flex-col min-h-full">
+        <div className="p-4 py-5 border-b-2 border-border bg-card/95 backdrop-blur-sm">
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-2xl font-bold flex items-center gap-2">
                 <Wrench className="w-6 h-6 text-primary" />
-                My Garage
+                {t.myGarage}
               </h1>
               <p className="text-sm text-muted-foreground mt-1">
-                {carsInGarage.length}/{garageUpgrades.carBays} car{garageUpgrades.carBays !== 1 ? 's' : ''} in garage
+                {carsInGarage.length}/{garageUpgrades.carBays} {t.carsInGarage}
               </p>
             </div>
             <Button onClick={onNavigateToNewspaper} size="default" disabled={emptySlots === 0}>
               <Plus className="w-4 h-4 mr-1" />
-              Buy Car
+              {t.buyCar}
             </Button>
           </div>
         </div>
 
         {repairQueue.length > 0 && (
-          <div className="mx-4 mt-4 p-3 bg-accent/20 border-2 border-accent/30 rounded-lg flex items-center gap-2">
-            <Loader2 className="w-4 h-4 animate-spin text-accent" />
+          <div className="mx-4 mt-4 p-3 bg-accent/30 border-2 border-accent/50 rounded-lg flex items-center gap-2 backdrop-blur-sm">
+            <Loader2 className="w-4 h-4 animate-spin text-accent-foreground" />
             <span className="text-sm font-medium">
-              {repairQueue.length} repair{repairQueue.length !== 1 ? 's' : ''} in progress
+              {repairQueue.length} {t.repairsInProgress}
             </span>
           </div>
         )}
 
         <div className="flex-1 p-4">
           {carsInGarage.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-64 text-center bg-card/80 backdrop-blur-sm rounded-xl border-2 border-dashed border-border">
+            <div className="flex flex-col items-center justify-center h-64 text-center bg-card/95 backdrop-blur-sm rounded-xl border-2 border-dashed border-border">
               <div className="w-16 h-16 rounded-full bg-secondary flex items-center justify-center mb-4">
                 <CarIcon className="w-8 h-8 text-muted-foreground" />
               </div>
-              <h2 className="text-lg font-bold mb-2">No Cars Yet</h2>
+              <h2 className="text-lg font-bold mb-2">{t.noCarsYet}</h2>
               <p className="text-sm text-muted-foreground mb-4">
-                Browse newspaper ads to find your first car to repair!
+                {t.browseAdsToFind}
               </p>
               <Button onClick={onNavigateToNewspaper}>
                 <Newspaper className="w-4 h-4 mr-2" />
-                Browse Ads
+                {t.browseAds}
               </Button>
             </div>
           ) : (
@@ -131,7 +125,7 @@ export function GarageScreen({ onNavigateToNewspaper, onSelectCar }: GarageScree
                         className="shadow-lg"
                       >
                         <DollarSign className="w-3 h-3 mr-1" />
-                        Sell
+                        {t.sell}
                       </Button>
                     );
                   }
@@ -140,7 +134,7 @@ export function GarageScreen({ onNavigateToNewspaper, onSelectCar }: GarageScree
                       <div className="flex gap-1">
                         <Button size="sm" variant="secondary" className="animate-pulse" disabled>
                           <Clock className="w-3 h-3 mr-1 animate-spin" />
-                          Waiting...
+                          {t.waiting}
                         </Button>
                         <Button size="sm" variant="outline" onClick={(e) => handleCancelSale(car.id, e)}>
                           ✕
@@ -155,7 +149,7 @@ export function GarageScreen({ onNavigateToNewspaper, onSelectCar }: GarageScree
                           size="sm"
                           variant="default"
                           onClick={(e) => handleAcceptOffer(car.id, e)}
-                          className="bg-green-600 hover:bg-green-700"
+                          className="bg-green-600 text-white"
                         >
                           ✓ ${saleState.customerOffer?.toLocaleString()}
                         </Button>
@@ -193,9 +187,9 @@ export function GarageScreen({ onNavigateToNewspaper, onSelectCar }: GarageScree
               {Array.from({ length: emptySlots }).map((_, i) => (
                 <div
                   key={`empty-${i}`}
-                  className="border-2 border-dashed border-border rounded-xl p-8 flex items-center justify-center bg-card/50"
+                  className="border-2 border-dashed border-border rounded-xl p-8 flex items-center justify-center bg-card/80 backdrop-blur-sm"
                 >
-                  <span className="text-muted-foreground text-sm font-medium">Empty Bay</span>
+                  <span className="text-muted-foreground text-sm font-medium">{t.emptyBay}</span>
                 </div>
               ))}
             </div>
