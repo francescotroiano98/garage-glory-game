@@ -96,8 +96,10 @@ function gameReducer(state: GameState, action: GameAction): GameState {
     case 'REGENERATE_ENERGY': {
       const now = Date.now();
       const minutesElapsed = (now - state.lastEnergyUpdate) / 60000;
+      // Cap at 30 minutes of offline regeneration
+      const cappedMinutes = Math.min(minutesElapsed, 30);
       const regenRate = state.repairQueue.length > 0 ? 3 : 20;
-      const energyToAdd = Math.floor(minutesElapsed * regenRate);
+      const energyToAdd = Math.floor(cappedMinutes * regenRate);
       if (energyToAdd > 0) {
         return {
           ...state,
@@ -105,7 +107,7 @@ function gameReducer(state: GameState, action: GameAction): GameState {
           lastEnergyUpdate: now,
         };
       }
-      return state;
+      return { ...state, lastEnergyUpdate: now };
     }
     case 'COLLECT_ENERGY_BONUS': {
       const now = Date.now();
@@ -334,11 +336,22 @@ function gameReducer(state: GameState, action: GameAction): GameState {
       return { ...state, negotiationAttempts: state.negotiationAttempts + 1 };
     case 'RESET_NEGOTIATION_ATTEMPTS':
       return { ...state, negotiationAttempts: 0 };
-    case 'LOAD_STATE':
+    case 'LOAD_STATE': {
+      // Calculate energy regeneration from time spent offline
+      const now = Date.now();
+      const lastUpdate = action.payload.lastEnergyUpdate || now;
+      const minutesElapsed = Math.min((now - lastUpdate) / 60000, 30); // Cap at 30 min
+      const regenRate = (action.payload.repairQueue?.length || 0) > 0 ? 3 : 20;
+      const offlineEnergy = Math.floor(minutesElapsed * regenRate);
+      const savedEnergy = action.payload.energy || INITIAL_STATE.energy;
+      const maxEnergy = action.payload.maxEnergy || INITIAL_STATE.maxEnergy;
+      const newEnergy = Math.min(maxEnergy, savedEnergy + offlineEnergy);
+      
       return { 
         ...INITIAL_STATE,
-        ...action.payload, 
-        lastEnergyUpdate: Date.now(),
+        ...action.payload,
+        energy: newEnergy,
+        lastEnergyUpdate: now,
         repairQueue: action.payload.repairQueue || [],
         activeSales: action.payload.activeSales || [],
         skillPoints: action.payload.skillPoints || 0,
@@ -355,6 +368,7 @@ function gameReducer(state: GameState, action: GameAction): GameState {
           ...action.payload.garageUpgrades,
         },
       };
+    }
     default:
       return state;
   }

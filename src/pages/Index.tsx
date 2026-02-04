@@ -1,5 +1,6 @@
 import { useState, useEffect, Component, ReactNode } from 'react';
-import { GameProvider, useGame } from '@/contexts/GameContext';
+import { GameProvider } from '@/contexts/GameContext';
+import { LanguageProvider } from '@/contexts/LanguageContext';
 import { StatsBar } from '@/components/game/StatsBar';
 import { BottomNav, Screen } from '@/components/game/BottomNav';
 import { GarageScreen } from '@/components/game/screens/GarageScreen';
@@ -118,9 +119,11 @@ function GameContent() {
 const Index = () => {
   return (
     <GameErrorBoundary>
-      <GameProvider>
-        <GameContent />
-      </GameProvider>
+      <LanguageProvider>
+        <GameProvider>
+          <GameContent />
+        </GameProvider>
+      </LanguageProvider>
     </GameErrorBoundary>
   );
 };

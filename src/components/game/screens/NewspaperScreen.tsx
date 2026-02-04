@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useGame } from '@/contexts/GameContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { CarCard } from '@/components/game/CarCard';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
@@ -7,7 +8,6 @@ import { Slider } from '@/components/ui/slider';
 import { generateCar } from '@/data/cars';
 import { NewspaperAd, Car } from '@/types/game';
 import { Newspaper, RefreshCw, DollarSign, Zap } from 'lucide-react';
-import { toast } from 'sonner';
 import { useSound } from '@/hooks/useSound';
 import newspaperBg from '@/assets/newspaper-bg.jpg';
 
@@ -19,6 +19,7 @@ const NEGOTIATION_ENERGY_COST = 2;
 
 export function NewspaperScreen({ onCarBought }: NewspaperScreenProps) {
   const { state, dispatch, canAfford, hasEnergy, getVisibilityChance, getNegotiationBonus, updateChallengeProgress } = useGame();
+  const { t } = useLanguage();
   const [ads, setAds] = useState<NewspaperAd[]>([]);
   const [selectedAd, setSelectedAd] = useState<NewspaperAd | null>(null);
   const [negotiatePrice, setNegotiatePrice] = useState(0);
@@ -53,23 +54,15 @@ export function NewspaperScreen({ onCarBought }: NewspaperScreenProps) {
   const handleBuy = (price: number) => {
     if (!selectedAd) return;
     
-    if (!canAfford(price)) {
-      toast.error("Not enough money!");
-      return;
-    }
+    if (!canAfford(price)) return;
 
     const garageFull = state.carsInGarage.length >= state.garageUpgrades.carBays;
-    if (garageFull) {
-      toast.error("Your garage is full!");
-      return;
-    }
+    if (garageFull) return;
 
     const car: Car = { ...selectedAd.car, askingPrice: price, purchasePrice: price, totalRepairCost: 0 };
     dispatch({ type: 'BUY_CAR', payload: car });
     playSound('purchase');
-    toast.success(`Bought ${car.name} for $${price.toLocaleString()}!`);
     
-    // Track daily challenge
     updateChallengeProgress('buy_cars', 1);
     
     setAds(prev => prev.filter(a => a.id !== selectedAd.id));
@@ -80,13 +73,8 @@ export function NewspaperScreen({ onCarBought }: NewspaperScreenProps) {
   const handleNegotiate = () => {
     if (!selectedAd) return;
     
-    // Check energy cost
-    if (!hasEnergy(NEGOTIATION_ENERGY_COST)) {
-      toast.error(`Not enough energy! Need ${NEGOTIATION_ENERGY_COST} energy to negotiate.`);
-      return;
-    }
+    if (!hasEnergy(NEGOTIATION_ENERGY_COST)) return;
     
-    // Spend energy for negotiation
     dispatch({ type: 'SPEND_ENERGY', payload: NEGOTIATION_ENERGY_COST });
     setNegotiationCount(prev => prev + 1);
     
@@ -94,22 +82,17 @@ export function NewspaperScreen({ onCarBought }: NewspaperScreenProps) {
     const negotiationBonus = getNegotiationBonus();
     const successChance = 0.3 + (negotiationBonus - 1) * 5;
     
-    if (negotiatePrice < minPrice) {
-      toast.error("That offer is too low!");
-      return;
-    }
+    if (negotiatePrice < minPrice) return;
 
     const discount = selectedAd.car.askingPrice - negotiatePrice;
     const discountPercent = discount / selectedAd.car.askingPrice;
     const adjustedChance = successChance - discountPercent;
     
     if (Math.random() < adjustedChance) {
-      toast.success("Seller accepted your offer!");
       handleBuy(negotiatePrice);
     } else {
       const counterPrice = Math.round(selectedAd.car.askingPrice * (0.9 + Math.random() * 0.1));
       setNegotiatePrice(counterPrice);
-      toast.info(`Seller counters with $${counterPrice.toLocaleString()}`);
       setIsNegotiating(true);
     }
   };
@@ -117,35 +100,35 @@ export function NewspaperScreen({ onCarBought }: NewspaperScreenProps) {
   const garageFull = state.carsInGarage.length >= state.garageUpgrades.carBays;
 
   return (
-    <div className="flex flex-col min-h-[100dvh] pb-20 relative">
+    <div className="flex flex-col min-h-[100dvh] pb-20 relative overflow-hidden">
       <div 
         className="fixed inset-0 bg-cover bg-center"
         style={{ backgroundImage: `url(${newspaperBg})` }}
       />
       
       <div className="relative z-10">
-        <div className="p-4 py-5 border-b-2 border-border bg-card/90 backdrop-blur-sm sticky top-0 z-40">
+        <div className="p-4 py-5 border-b-2 border-border bg-card/95 backdrop-blur-sm sticky top-0 z-40">
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-2xl font-bold flex items-center gap-2">
                 <Newspaper className="w-6 h-6 text-primary" />
-                Newspaper Ads
+                {t.newspaperAds}
               </h1>
               <p className="text-sm text-muted-foreground mt-1">
-                Find your next project car
+                {t.findNextProject}
               </p>
             </div>
             <Button variant="outline" size="sm" onClick={refreshAds} className="border-2">
               <RefreshCw className="w-4 h-4 mr-1" />
-              Refresh
+              {t.refresh}
             </Button>
           </div>
         </div>
 
         {garageFull && (
-          <div className="mx-4 mt-4 p-3 bg-destructive/10 border-2 border-destructive/30 rounded-lg">
+          <div className="mx-4 mt-4 p-3 bg-destructive/20 border-2 border-destructive/50 rounded-lg backdrop-blur-sm">
             <p className="text-sm text-destructive font-medium">
-              Your garage is full! Sell a car or upgrade your garage to buy more.
+              {t.garageFullMessage}
             </p>
           </div>
         )}
@@ -159,8 +142,8 @@ export function NewspaperScreen({ onCarBought }: NewspaperScreenProps) {
                 visibilityChance={getVisibilityChance()}
               />
               {ad.negotiable && (
-                <div className="absolute top-2 right-2 flex items-center gap-1 text-xs text-primary bg-background/90 px-2 py-1 rounded-md border font-medium">
-                  Negotiable
+                <div className="absolute top-2 right-2 flex items-center gap-1 text-xs text-primary bg-card/95 px-2 py-1 rounded-md border-2 font-medium">
+                  {t.negotiable}
                 </div>
               )}
             </div>
@@ -171,7 +154,7 @@ export function NewspaperScreen({ onCarBought }: NewspaperScreenProps) {
       <Dialog open={!!selectedAd} onOpenChange={(open) => !open && setSelectedAd(null)}>
         <DialogContent className="max-w-sm">
           <DialogHeader>
-            <DialogTitle>Buy {selectedAd?.car.name}?</DialogTitle>
+            <DialogTitle>{t.buy} {selectedAd?.car.name}?</DialogTitle>
           </DialogHeader>
 
           {selectedAd && (
@@ -180,14 +163,14 @@ export function NewspaperScreen({ onCarBought }: NewspaperScreenProps) {
 
               <div className="space-y-2">
                 <div className="flex justify-between text-sm">
-                  <span>Asking Price:</span>
+                  <span>{t.askingPrice}:</span>
                   <span className="font-bold">${selectedAd.car.askingPrice.toLocaleString()}</span>
                 </div>
                 
                 {selectedAd.negotiable && (
                   <>
                     <div className="flex justify-between text-sm">
-                      <span>Your Offer:</span>
+                      <span>{t.yourOffer}:</span>
                       <span className="font-bold text-primary">${negotiatePrice.toLocaleString()}</span>
                     </div>
                     <Slider
@@ -199,14 +182,14 @@ export function NewspaperScreen({ onCarBought }: NewspaperScreenProps) {
                     />
                     {negotiationCount > 0 && (
                       <div className="text-xs text-muted-foreground text-center">
-                        Negotiations: {negotiationCount} (cost: {negotiationCount * NEGOTIATION_ENERGY_COST} energy)
+                        {t.negotiations}: {negotiationCount} (cost: {negotiationCount * NEGOTIATION_ENERGY_COST} {t.energy.toLowerCase()})
                       </div>
                     )}
                   </>
                 )}
 
                 <div className="flex justify-between text-sm text-muted-foreground">
-                  <span>Your Balance:</span>
+                  <span>{t.yourBalance}:</span>
                   <span className={canAfford(negotiatePrice) ? 'text-primary font-bold' : 'text-destructive font-bold'}>
                     ${state.money.toLocaleString()}
                   </span>
@@ -224,7 +207,7 @@ export function NewspaperScreen({ onCarBought }: NewspaperScreenProps) {
                 disabled={!hasEnergy(NEGOTIATION_ENERGY_COST)}
               >
                 <DollarSign className="w-4 h-4 mr-1" />
-                Negotiate
+                {t.negotiate}
                 <span className="ml-1 text-xs flex items-center">
                   (<Zap className="w-3 h-3" />{NEGOTIATION_ENERGY_COST})
                 </span>
@@ -235,7 +218,7 @@ export function NewspaperScreen({ onCarBought }: NewspaperScreenProps) {
               disabled={!canAfford(negotiatePrice) || garageFull}
               className="flex-1"
             >
-              Buy Now
+              {t.buyNow}
             </Button>
           </DialogFooter>
         </DialogContent>
