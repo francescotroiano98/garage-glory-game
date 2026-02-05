@@ -157,6 +157,9 @@ export function RepairScreen({ carId, onBack }: RepairScreenProps) {
     return (
       <div className="flex items-center justify-center h-64">
         <p className="text-muted-foreground">Car not found</p>
+         <Button variant="outline" onClick={onBack} className="mt-4">
+           {t.goBack}
+         </Button>
       </div>
     );
   }

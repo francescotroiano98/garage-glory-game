@@ -455,10 +455,15 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
   // Energy regeneration timer
   useEffect(() => {
     const interval = setInterval(() => {
-      dispatch({ type: 'REGENERATE_ENERGY' });
-    }, 1000);
+       // Only regenerate if enough time has passed (at least 3 seconds)
+       const now = Date.now();
+       const lastUpdate = state.lastEnergyUpdate;
+       if (now - lastUpdate >= 3000) {
+         dispatch({ type: 'REGENERATE_ENERGY' });
+       }
+     }, 3000);
     return () => clearInterval(interval);
-  }, []);
+   }, [state.lastEnergyUpdate]);
 
   // Process repair queue and customer arrivals
   useEffect(() => {

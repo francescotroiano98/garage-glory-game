@@ -2,8 +2,7 @@ import { useGame } from '@/contexts/GameContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { CarCard } from '@/components/game/CarCard';
 import { Button } from '@/components/ui/button';
-import { Car as CarIcon, Plus, Wrench, Loader2, DollarSign, Clock } from 'lucide-react';
-import { Newspaper } from 'lucide-react';
+ import { Car as CarIcon, Wrench, Loader2, DollarSign, Clock, Newspaper } from 'lucide-react';
 import garageBg from '@/assets/garage-bg.jpg';
 import { useSound } from '@/hooks/useSound';
 
@@ -16,8 +15,8 @@ export function GarageScreen({ onNavigateToNewspaper, onSelectCar }: GarageScree
   const { state, dispatch, getSaleState, handleSaleComplete } = useGame();
   const { t } = useLanguage();
   const { carsInGarage, garageUpgrades, repairQueue } = state;
-  const emptySlots = garageUpgrades.carBays - carsInGarage.length;
   const { playSound } = useSound();
+   const emptySlots = garageUpgrades.carBays - carsInGarage.length;
 
   const handleStartSale = (carId: string, e: React.MouseEvent) => {
     e.stopPropagation();
@@ -28,6 +27,7 @@ export function GarageScreen({ onNavigateToNewspaper, onSelectCar }: GarageScree
     if (hasDamages) return;
     
     dispatch({ type: 'LIST_CAR_FOR_SALE', payload: { carId, askingPrice: car.currentValue } });
+     playSound('saleStart');
   };
 
   const handleAcceptOffer = (carId: string, e: React.MouseEvent) => {
@@ -71,10 +71,6 @@ export function GarageScreen({ onNavigateToNewspaper, onSelectCar }: GarageScree
                 {carsInGarage.length}/{garageUpgrades.carBays} {t.carsInGarage}
               </p>
             </div>
-            <Button onClick={onNavigateToNewspaper} size="default" disabled={emptySlots === 0}>
-              <Plus className="w-4 h-4 mr-1" />
-              {t.buyCar}
-            </Button>
           </div>
         </div>
 

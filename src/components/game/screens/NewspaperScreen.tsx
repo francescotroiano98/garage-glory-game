@@ -79,6 +79,7 @@ export function NewspaperScreen({ onCarBought }: NewspaperScreenProps) {
     setNegotiationCount(prev => prev + 1);
     
     const minPrice = Math.round(selectedAd.car.askingPrice * 0.7);
+       playSound('negotiate');
     const negotiationBonus = getNegotiationBonus();
     const successChance = 0.3 + (negotiationBonus - 1) * 5;
     
@@ -176,9 +177,9 @@ export function NewspaperScreen({ onCarBought }: NewspaperScreenProps) {
                     <Slider
                       value={[negotiatePrice]}
                       onValueChange={([v]) => setNegotiatePrice(v)}
-                      min={Math.round(selectedAd.car.askingPrice * 0.7)}
+                       min={Math.max(10, Math.round(selectedAd.car.askingPrice * 0.7))}
                       max={selectedAd.car.askingPrice}
-                      step={10}
+                       step={Math.max(1, Math.round(selectedAd.car.askingPrice * 0.01))}
                     />
                     {negotiationCount > 0 && (
                       <div className="text-xs text-muted-foreground text-center">

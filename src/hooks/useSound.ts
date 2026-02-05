@@ -12,6 +12,11 @@ const SOUNDS = {
   levelUp: 'https://cdn.freesound.org/previews/270/270404_5123851-lq.mp3',
   achievement: 'https://cdn.freesound.org/previews/270/270319_5123851-lq.mp3',
   energyBonus: 'https://cdn.freesound.org/previews/341/341695_5858296-lq.mp3',
+  negotiate: 'https://cdn.freesound.org/previews/256/256113_4772965-lq.mp3',
+  saleStart: 'https://cdn.freesound.org/previews/411/411462_5121236-lq.mp3',
+  pageChange: 'https://cdn.freesound.org/previews/220/220207_4100637-lq.mp3',
+  skillUp: 'https://cdn.freesound.org/previews/341/341695_5858296-lq.mp3',
+  error: 'https://cdn.freesound.org/previews/415/415079_7863133-lq.mp3',
 };
 
 type SoundType = keyof typeof SOUNDS;
@@ -66,31 +71,42 @@ export function useSound() {
 }
 
 // Use a royalty-free looping music track that works
-const BACKGROUND_MUSIC_URL = 'https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=lofi-study-112191.mp3';
+ const BACKGROUND_MUSIC_URL = 'https://cdn.pixabay.com/audio/2024/11/05/audio_98be0be48c.mp3';
+
+// Global audio instance for background music
+let globalMusicAudio: HTMLAudioElement | null = null;
+let globalMusicInitialized = false;
 
 export function useBackgroundMusic() {
   const [playing, setPlaying] = useState(() => {
     const saved = localStorage.getItem('game_music_playing');
     return saved === 'true';
   });
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-  const initializedRef = useRef(false);
 
   // Initialize audio element once
   useEffect(() => {
-    if (initializedRef.current) return;
-    initializedRef.current = true;
+     if (globalMusicInitialized) {
+       // If already initialized, just sync state
+       if (globalMusicAudio) {
+         if (playing) {
+           globalMusicAudio.play().catch(() => {});
+         } else {
+           globalMusicAudio.pause();
+         }
+       }
+       return;
+     }
+     globalMusicInitialized = true;
 
-    const audio = new Audio(BACKGROUND_MUSIC_URL);
-    audio.loop = true;
-    audio.volume = 0.2;
-    audio.preload = 'auto';
-    audioRef.current = audio;
+     globalMusicAudio = new Audio(BACKGROUND_MUSIC_URL);
+     globalMusicAudio.loop = true;
+     globalMusicAudio.volume = 0.15;
+     globalMusicAudio.preload = 'auto';
 
     // Handle user interaction to enable audio (browsers require interaction)
     const enableAudio = () => {
-      if (audioRef.current && playing) {
-        audioRef.current.play().catch(() => {});
+       if (globalMusicAudio && playing) {
+         globalMusicAudio.play().catch(() => {});
       }
       document.removeEventListener('click', enableAudio);
       document.removeEventListener('touchstart', enableAudio);
@@ -99,25 +115,17 @@ export function useBackgroundMusic() {
     document.addEventListener('click', enableAudio);
     document.addEventListener('touchstart', enableAudio);
 
-    return () => {
-      document.removeEventListener('click', enableAudio);
-      document.removeEventListener('touchstart', enableAudio);
-      if (audioRef.current) {
-        audioRef.current.pause();
-        audioRef.current.src = '';
-        audioRef.current = null;
-      }
-    };
+     // Don't cleanup on unmount - music should persist across pages
   }, []);
 
   // Handle play state changes
   useEffect(() => {
-    if (!audioRef.current) return;
+     if (!globalMusicAudio) return;
     
     if (playing) {
-      audioRef.current.play().catch(() => {});
+       globalMusicAudio.play().catch(() => {});
     } else {
-      audioRef.current.pause();
+       globalMusicAudio.pause();
     }
   }, [playing]);
 
