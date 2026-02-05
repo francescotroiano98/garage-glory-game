@@ -20,6 +20,7 @@ export function StatsBar() {
     getEnergyBonusTimeRemaining,
     dailyChallenges,
     claimChallengeReward,
+     claimWeeklyChallengeReward,
   } = useGame();
   const { t } = useLanguage();
   const [timeRemaining, setTimeRemaining] = useState(0);
@@ -46,6 +47,11 @@ export function StatsBar() {
     claimChallengeReward(challengeId);
     playSound('achievement');
   };
+ 
+   const handleClaimWeeklyReward = (challengeId: string) => {
+     claimWeeklyChallengeReward(challengeId);
+     playSound('achievement');
+   };
 
   const formatTime = (ms: number) => {
     const minutes = Math.floor(ms / 60000);
@@ -58,6 +64,7 @@ export function StatsBar() {
   const unlockedAchievements = state.achievements.filter(a => a.unlocked).length;
   
   const claimableChallenges = dailyChallenges.progress.filter(p => p.completed && !p.claimed).length;
+   const claimableWeeklyChallenges = (dailyChallenges.weeklyProgress || []).filter(p => p.completed && !p.claimed).length;
 
   return (
     <>
@@ -99,9 +106,9 @@ export function StatsBar() {
               className="h-8 w-8 p-0 relative"
             >
               <Target className="w-4 h-4 text-accent" />
-              {claimableChallenges > 0 && (
-                <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-destructive text-[9px] rounded-full flex items-center justify-center text-white font-bold">
-                  {claimableChallenges}
+              {(claimableChallenges + claimableWeeklyChallenges) > 0 && (
+                <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-destructive text-[9px] rounded-full flex items-center justify-center text-white font-bold animate-pulse">
+                  {claimableChallenges + claimableWeeklyChallenges}
                 </span>
               )}
             </Button>
@@ -196,6 +203,7 @@ export function StatsBar() {
         onOpenChange={setShowChallenges}
         challengeState={dailyChallenges}
         onClaimReward={handleClaimReward}
+         onClaimWeeklyReward={handleClaimWeeklyReward}
       />
     </>
   );

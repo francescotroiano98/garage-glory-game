@@ -71,71 +71,89 @@ export function useSound() {
 }
 
 // Use a royalty-free looping music track that works
- const BACKGROUND_MUSIC_URL = 'https://cdn.pixabay.com/audio/2024/11/05/audio_98be0be48c.mp3';
-
-// Global audio instance for background music
-let globalMusicAudio: HTMLAudioElement | null = null;
-let globalMusicInitialized = false;
-
-export function useBackgroundMusic() {
-  const [playing, setPlaying] = useState(() => {
-    const saved = localStorage.getItem('game_music_playing');
-    return saved === 'true';
-  });
-
-  // Initialize audio element once
-  useEffect(() => {
-     if (globalMusicInitialized) {
-       // If already initialized, just sync state
-       if (globalMusicAudio) {
-         if (playing) {
-           globalMusicAudio.play().catch(() => {});
-         } else {
-           globalMusicAudio.pause();
-         }
-       }
-       return;
+ const BACKGROUND_MUSIC_URL = 'https://cdn.pixabay.com/download/audio/2022/03/15/audio_942f70dcb5.mp3';
+ 
+ // Global audio instance for background music - singleton pattern
+ class BackgroundMusicManager {
+   private static instance: BackgroundMusicManager;
+   private audio: HTMLAudioElement | null = null;
+   private initialized = false;
+   private userInteracted = false;
+ 
+   static getInstance(): BackgroundMusicManager {
+     if (!BackgroundMusicManager.instance) {
+       BackgroundMusicManager.instance = new BackgroundMusicManager();
      }
-     globalMusicInitialized = true;
-
-     globalMusicAudio = new Audio(BACKGROUND_MUSIC_URL);
-     globalMusicAudio.loop = true;
-     globalMusicAudio.volume = 0.15;
-     globalMusicAudio.preload = 'auto';
-
-    // Handle user interaction to enable audio (browsers require interaction)
-    const enableAudio = () => {
-       if (globalMusicAudio && playing) {
-         globalMusicAudio.play().catch(() => {});
-      }
-      document.removeEventListener('click', enableAudio);
-      document.removeEventListener('touchstart', enableAudio);
-    };
-
-    document.addEventListener('click', enableAudio);
-    document.addEventListener('touchstart', enableAudio);
-
-     // Don't cleanup on unmount - music should persist across pages
-  }, []);
-
-  // Handle play state changes
-  useEffect(() => {
-     if (!globalMusicAudio) return;
-    
-    if (playing) {
-       globalMusicAudio.play().catch(() => {});
-    } else {
-       globalMusicAudio.pause();
-    }
-  }, [playing]);
-
-  const toggleMusic = useCallback(() => {
-    setPlaying(prev => {
-      const newValue = !prev;
-      localStorage.setItem('game_music_playing', String(newValue));
-      return newValue;
-    });
-  }, []);
-
-  return { playing, toggleMusic };
-}
+     return BackgroundMusicManager.instance;
+   }
+ 
+   init() {
+     if (this.initialized) return;
+     this.initialized = true;
+ 
+     this.audio = new Audio(BACKGROUND_MUSIC_URL);
+     this.audio.loop = true;
+     this.audio.volume = 0.15;
+     this.audio.preload = 'auto';
+ 
+     // Handle user interaction requirement
+     const enableAudio = () => {
+       this.userInteracted = true;
+       const shouldPlay = localStorage.getItem('game_music_playing') === 'true';
+       if (shouldPlay && this.audio) {
+         this.audio.play().catch(() => {});
+       }
+       document.removeEventListener('click', enableAudio);
+       document.removeEventListener('touchstart', enableAudio);
+     };
+ 
+     document.addEventListener('click', enableAudio);
+     document.addEventListener('touchstart', enableAudio);
+   }
+ 
+   play() {
+     if (this.audio && this.userInteracted) {
+       this.audio.play().catch(() => {});
+     }
+   }
+ 
+   pause() {
+     if (this.audio) {
+       this.audio.pause();
+     }
+   }
+ }
+ 
+ // Initialize on module load
+ const musicManager = BackgroundMusicManager.getInstance();
+ 
+ export function useBackgroundMusic() {
+   const [playing, setPlaying] = useState(() => {
+     const saved = localStorage.getItem('game_music_playing');
+     return saved === 'true';
+   });
+ 
+   // Initialize music manager once
+   useEffect(() => {
+     musicManager.init();
+   }, []);
+ 
+   // Sync play state
+   useEffect(() => {
+     if (playing) {
+       musicManager.play();
+     } else {
+       musicManager.pause();
+     }
+   }, [playing]);
+ 
+   const toggleMusic = useCallback(() => {
+     setPlaying(prev => {
+       const newValue = !prev;
+       localStorage.setItem('game_music_playing', String(newValue));
+       return newValue;
+     });
+   }, []);
+ 
+   return { playing, toggleMusic };
+ }

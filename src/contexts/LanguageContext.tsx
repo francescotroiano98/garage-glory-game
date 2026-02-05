@@ -127,6 +127,47 @@ interface Translations {
    notEnoughMoney: string;
    carNotFound: string;
    goBack: string;
+   
+   // Part names translations
+   partEngine: string;
+   partTransmission: string;
+   partBrakes: string;
+   partSuspension: string;
+   partExhaust: string;
+   partFuelSystem: string;
+   partPaint: string;
+   partDents: string;
+   partRust: string;
+   partWindows: string;
+   partLights: string;
+   partBumpers: string;
+   partFrontTires: string;
+   partRearTires: string;
+   partWheels: string;
+   partAlignment: string;
+   partTirePressure: string;
+   partWheelBearings: string;
+   partSeats: string;
+   partDashboard: string;
+   partElectronics: string;
+   partCleaning: string;
+   partAirConditioning: string;
+   partAudioSystem: string;
+   
+   // Damage levels
+   damageMinor: string;
+   damageModerate: string;
+   damageMajor: string;
+   damageCritical: string;
+   
+   // Shop page
+   mech: string;
+   int: string;
+   tiresShort: string;
+   
+   // Weekly challenges
+   weeklyChallenges: string;
+   resetsMonday: string;
 }
 
 const translations: Record<Language, Translations> = {
@@ -236,6 +277,47 @@ const translations: Record<Language, Translations> = {
      notEnoughMoney: 'Not enough money!',
      carNotFound: 'Car not found',
      goBack: 'Go Back',
+     
+     // Part names
+     partEngine: 'Engine',
+     partTransmission: 'Transmission',
+     partBrakes: 'Brakes',
+     partSuspension: 'Suspension',
+     partExhaust: 'Exhaust',
+     partFuelSystem: 'Fuel System',
+     partPaint: 'Paint',
+     partDents: 'Dents',
+     partRust: 'Rust',
+     partWindows: 'Windows',
+     partLights: 'Lights',
+     partBumpers: 'Bumpers',
+     partFrontTires: 'Front Tires',
+     partRearTires: 'Rear Tires',
+     partWheels: 'Wheels',
+     partAlignment: 'Alignment',
+     partTirePressure: 'Tire Pressure',
+     partWheelBearings: 'Wheel Bearings',
+     partSeats: 'Seats',
+     partDashboard: 'Dashboard',
+     partElectronics: 'Electronics',
+     partCleaning: 'Cleaning',
+     partAirConditioning: 'Air Conditioning',
+     partAudioSystem: 'Audio System',
+     
+     // Damage levels
+     damageMinor: 'Minor',
+     damageModerate: 'Moderate',
+     damageMajor: 'Major',
+     damageCritical: 'Critical',
+     
+     // Shop page
+     mech: 'Mech',
+     int: 'Int',
+     tiresShort: 'Tires',
+     
+     // Weekly challenges
+     weeklyChallenges: 'Weekly Challenges',
+     resetsMonday: 'Challenges reset Monday at midnight',
   },
   it: {
     settings: 'Impostazioni',
@@ -343,6 +425,47 @@ const translations: Record<Language, Translations> = {
      notEnoughMoney: 'Soldi insufficienti!',
      carNotFound: 'Auto non trovata',
      goBack: 'Torna Indietro',
+     
+     // Part names
+     partEngine: 'Motore',
+     partTransmission: 'Trasmissione',
+     partBrakes: 'Freni',
+     partSuspension: 'Sospensioni',
+     partExhaust: 'Scarico',
+     partFuelSystem: 'Impianto Carburante',
+     partPaint: 'Verniciatura',
+     partDents: 'Ammaccature',
+     partRust: 'Ruggine',
+     partWindows: 'Vetri',
+     partLights: 'Fari',
+     partBumpers: 'Paraurti',
+     partFrontTires: 'Pneumatici Anteriori',
+     partRearTires: 'Pneumatici Posteriori',
+     partWheels: 'Cerchioni',
+     partAlignment: 'Convergenza',
+     partTirePressure: 'Pressione Pneumatici',
+     partWheelBearings: 'Cuscinetti Ruota',
+     partSeats: 'Sedili',
+     partDashboard: 'Cruscotto',
+     partElectronics: 'Elettronica',
+     partCleaning: 'Pulizia',
+     partAirConditioning: 'Aria Condizionata',
+     partAudioSystem: 'Sistema Audio',
+     
+     // Damage levels
+     damageMinor: 'Lieve',
+     damageModerate: 'Moderato',
+     damageMajor: 'Grave',
+     damageCritical: 'Critico',
+     
+     // Shop page
+     mech: 'Mecc',
+     int: 'Int',
+     tiresShort: 'Gomme',
+     
+     // Weekly challenges
+     weeklyChallenges: 'Sfide Settimanali',
+     resetsMonday: 'Le sfide si resettano lunedì a mezzanotte',
   },
 };
 

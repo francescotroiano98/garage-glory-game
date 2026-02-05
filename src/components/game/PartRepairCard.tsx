@@ -6,6 +6,8 @@ import { Zap, Check, AlertTriangle, Clock, Wrench, DollarSign } from 'lucide-rea
 import { cn } from '@/lib/utils';
 import { useEffect, useState, useRef } from 'react';
 import { PART_ICONS } from '@/data/parts';
+ import { useLanguage } from '@/contexts/LanguageContext';
+ import { getPartName, getDamageLevelName } from '@/utils/partTranslations';
 
 interface PartRepairCardProps {
   damage: PartDamage;
@@ -37,6 +39,7 @@ export function PartRepairCard({
   energyMultiplier,
   diySuccessChance,
 }: PartRepairCardProps) {
+   const { t } = useLanguage();
   const actualEnergyCost = Math.round(damage.energyCost * energyMultiplier);
   const diyEnergyCost = Math.round(actualEnergyCost * 0.5);
   const [displayProgress, setDisplayProgress] = useState(repairProgress);
@@ -71,8 +74,8 @@ export function PartRepairCard({
        <div className="flex items-center gap-3 p-3 bg-card/95 backdrop-blur-sm rounded-lg border-2 border-primary/50">
         <span className="text-xl">{partIcon}</span>
         <div className="flex-1">
-          <span className="font-medium capitalize text-primary">
-            {damage.part.replace(/_/g, ' ')}
+          <span className="font-medium text-primary">
+            {getPartName(damage.part, t as unknown as Record<string, string>)}
           </span>
         </div>
         <Check className="w-5 h-5 text-primary" />
@@ -89,11 +92,11 @@ export function PartRepairCard({
         <span className="text-2xl">{partIcon}</span>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="font-semibold capitalize truncate">
-              {damage.part.replace(/_/g, ' ')}
+            <span className="font-semibold truncate">
+              {getPartName(damage.part, t as unknown as Record<string, string>)}
             </span>
-            <Badge variant="outline" className={cn('text-xs capitalize', levelColors[damage.level])}>
-              {damage.level}
+            <Badge variant="outline" className={cn('text-xs', levelColors[damage.level])}>
+              {getDamageLevelName(damage.level, t as unknown as Record<string, string>)}
             </Badge>
             {!damage.visible && (
               <span title="Hidden damage">
@@ -120,7 +123,7 @@ export function PartRepairCard({
           </div>
           {damage.diyAttempts && damage.diyAttempts > 0 && (
             <div className="text-xs text-destructive mt-0.5">
-              Failed DIY attempts: {damage.diyAttempts}
+              {t.failedDiyAttempts}: {damage.diyAttempts}
             </div>
           )}
         </div>
@@ -131,7 +134,7 @@ export function PartRepairCard({
             disabled={!canRepair}
             className="text-xs"
           >
-            {isRepairing ? 'Working...' : `$${damage.moneyCost}`}
+            {isRepairing ? t.working : `$${damage.moneyCost}`}
           </Button>
           <Button
             size="sm"
@@ -139,10 +142,10 @@ export function PartRepairCard({
             onClick={onDiyRepair}
             disabled={!canDiy}
             className="text-xs"
-            title={`DIY: ${Math.round(diySuccessChance)}% success, ${diyEnergyCost} energy, FREE`}
+            title={`${t.diy}: ${Math.round(diySuccessChance)}%`}
           >
             <Wrench className="w-3 h-3 mr-1" />
-            DIY {Math.round(diySuccessChance)}%
+            {t.diy} {Math.round(diySuccessChance)}%
           </Button>
         </div>
       </div>
