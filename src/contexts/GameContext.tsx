@@ -5,7 +5,7 @@ import { generateCustomer, calculateCustomerOffer } from '@/data/customers';
 import { PART_DEFINITIONS, calculateDiySuccessChance, getInitialPartUpgrades } from '@/data/parts';
 import { getXpForLevel, getSkillPointsForLevel } from '@/data/upgrades';
 import { getInitialAchievements, checkAchievements } from '@/data/achievements';
-import { DailyChallengeState, getInitialDailyChallengeState, getTodayDateString, generateDailyChallenges } from '@/data/dailyChallenges';
+import { DailyChallengeState, getInitialDailyChallengeState, getTodayDateString, generateDailyChallenges, getWeekStartDateString, generateWeeklyChallenges } from '@/data/dailyChallenges';
 import { toast } from 'sonner';
 
 const INITIAL_STATE: GameState = {
@@ -395,6 +395,7 @@ interface GameContextType {
   handleSaleComplete: (carId: string, salePrice: number) => void;
   dailyChallenges: DailyChallengeState;
   claimChallengeReward: (challengeId: string) => void;
+   claimWeeklyChallengeReward: (challengeId: string) => void;
   updateChallengeProgress: (type: string, amount: number) => void;
 }
 
@@ -424,18 +425,67 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
   // Load and reset daily challenges
   useEffect(() => {
     const today = getTodayDateString();
+     const weekStart = getWeekStartDateString();
     const saved = localStorage.getItem(CHALLENGES_KEY);
     if (saved) {
       try {
         const parsed = JSON.parse(saved) as DailyChallengeState;
-        if (parsed.date === today) {
-          setDailyChallenges(parsed);
-        } else {
-          // New day, reset challenges
-          const newState = getInitialDailyChallengeState();
-          setDailyChallenges(newState);
-          localStorage.setItem(CHALLENGES_KEY, JSON.stringify(newState));
+        // Check if we need to reset daily or weekly
+        let updatedState = parsed;
+        
+        if (parsed.date !== today) {
+          // New day - reset daily challenges but keep weekly
+          const newChallenges = generateDailyChallenges(today);
+          updatedState = {
+            ...updatedState,
+            date: today,
+            challenges: newChallenges,
+            progress: newChallenges.map(c => ({
+              challengeId: c.id,
+              progress: 0,
+              completed: false,
+              claimed: false,
+            })),
+          };
         }
+        
+        if (!parsed.weekStartDate || parsed.weekStartDate !== weekStart) {
+          // New week - reset weekly challenges
+          const newWeeklyChallenges = generateWeeklyChallenges(weekStart);
+          updatedState = {
+            ...updatedState,
+            weekStartDate: weekStart,
+            weeklyChallenges: newWeeklyChallenges,
+            weeklyProgress: newWeeklyChallenges.map(c => ({
+              challengeId: c.id,
+              progress: 0,
+              completed: false,
+              claimed: false,
+            })),
+          };
+        }
+        
+        // Ensure weekly fields exist
+        if (!updatedState.weeklyChallenges) {
+          const newWeeklyChallenges = generateWeeklyChallenges(weekStart);
+          updatedState = {
+            ...updatedState,
+            weekStartDate: weekStart,
+            weeklyChallenges: newWeeklyChallenges,
+            weeklyProgress: newWeeklyChallenges.map(c => ({
+              challengeId: c.id,
+              progress: 0,
+              completed: false,
+              claimed: false,
+            })),
+          };
+        }
+        
+        if (parsed.date !== today || parsed.weekStartDate !== weekStart) {
+          localStorage.setItem(CHALLENGES_KEY, JSON.stringify(updatedState));
+        }
+        
+        setDailyChallenges(updatedState);
       } catch (e) {
         console.error('Failed to load challenges:', e);
       }
@@ -623,6 +673,7 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
 
   const updateChallengeProgress = useCallback((type: string, amount: number) => {
     setDailyChallenges(prev => {
+       // Update daily progress
       const updatedProgress = prev.progress.map(p => {
         const challenge = prev.challenges.find(c => c.id === p.challengeId);
         if (challenge?.type === type && !p.claimed) {
@@ -632,7 +683,19 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
         }
         return p;
       });
-      return { ...prev, progress: updatedProgress };
+       
+       // Update weekly progress
+       const updatedWeeklyProgress = (prev.weeklyProgress || []).map(p => {
+         const challenge = (prev.weeklyChallenges || []).find(c => c.id === p.challengeId);
+         if (challenge?.type === type && !p.claimed) {
+           const newProgress = p.progress + amount;
+           const completed = newProgress >= challenge.target;
+           return { ...p, progress: newProgress, completed };
+         }
+         return p;
+       });
+       
+       return { ...prev, progress: updatedProgress, weeklyProgress: updatedWeeklyProgress };
     });
   }, []);
 
@@ -711,6 +774,34 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
       ),
     }));
   }, [dailyChallenges, state.energy]);
+ 
+   const claimWeeklyChallengeReward = useCallback((challengeId: string) => {
+     const challenge = dailyChallenges.weeklyChallenges?.find(c => c.id === challengeId);
+     const progressData = dailyChallenges.weeklyProgress?.find(p => p.challengeId === challengeId);
+     
+     if (!challenge || !progressData?.completed || progressData.claimed) return;
+ 
+     // Give reward
+     switch (challenge.rewardType) {
+       case 'money':
+         dispatch({ type: 'ADD_MONEY', payload: challenge.reward });
+         break;
+       case 'energy':
+         dispatch({ type: 'SET_ENERGY', payload: state.energy + challenge.reward });
+         break;
+       case 'xp':
+         dispatch({ type: 'ADD_XP', payload: challenge.reward });
+         break;
+     }
+ 
+     // Mark as claimed
+     setDailyChallenges(prev => ({
+       ...prev,
+       weeklyProgress: (prev.weeklyProgress || []).map(p =>
+         p.challengeId === challengeId ? { ...p, claimed: true } : p
+       ),
+     }));
+   }, [dailyChallenges, state.energy]);
 
   return (
     <GameContext.Provider
@@ -735,6 +826,7 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
         handleSaleComplete,
         dailyChallenges,
         claimChallengeReward,
+         claimWeeklyChallengeReward,
         updateChallengeProgress,
       }}
     >

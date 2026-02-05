@@ -12,6 +12,7 @@ import { toast } from 'sonner';
 import { TOOL_UPGRADES, DIAGNOSTIC_UPGRADES, GARAGE_UPGRADES, ENERGY_UPGRADES, getXpForLevel } from '@/data/upgrades';
 import { PART_DEFINITIONS, PART_ICONS, CATEGORY_LABELS, getPartUpgradeCost } from '@/data/parts';
 import { PartType, PartCategory, MAX_LEVEL } from '@/types/game';
+ import { getPartName } from '@/utils/partTranslations';
 
 const GARAGE_BAYS = GARAGE_UPGRADES.carBays;
 const GARAGE_EQUIPMENT = GARAGE_UPGRADES.specialEquipment;
@@ -166,7 +167,7 @@ export function ShopScreen() {
               <div className="flex items-center justify-between p-2 bg-secondary/30 rounded-lg">
                 <div className="flex-1">
                   <div className="flex items-center gap-2">
-                    <span className="font-medium">🔧 Mechanical</span>
+                    <span className="font-medium">🔧 {t.mechanical}</span>
                     <Badge variant="secondary">Lv.{state.skills.mechanical}</Badge>
                   </div>
                   <p className="text-xs text-muted-foreground mt-0.5">
@@ -187,7 +188,7 @@ export function ShopScreen() {
               <div className="flex items-center justify-between p-2 bg-secondary/30 rounded-lg">
                 <div className="flex-1">
                   <div className="flex items-center gap-2">
-                    <span className="font-medium">🚗 Bodywork</span>
+                    <span className="font-medium">🚗 {t.body}</span>
                     <Badge variant="secondary">Lv.{state.skills.bodywork}</Badge>
                   </div>
                   <p className="text-xs text-muted-foreground mt-0.5">
@@ -208,7 +209,7 @@ export function ShopScreen() {
               <div className="flex items-center justify-between p-2 bg-secondary/30 rounded-lg">
                 <div className="flex-1">
                   <div className="flex items-center gap-2">
-                    <span className="font-medium">⚡ Electrical</span>
+                    <span className="font-medium">⚡ {t.electrical}</span>
                     <Badge variant="secondary">Lv.{state.skills.electrical}</Badge>
                   </div>
                   <p className="text-xs text-muted-foreground mt-0.5">
@@ -229,7 +230,7 @@ export function ShopScreen() {
               <div className="flex items-center justify-between p-2 bg-secondary/30 rounded-lg">
                 <div className="flex-1">
                   <div className="flex items-center gap-2">
-                    <span className="font-medium">🛞 Tires</span>
+                    <span className="font-medium">🛞 {t.tires}</span>
                     <Badge variant="secondary">Lv.{state.skills.tires}</Badge>
                   </div>
                   <p className="text-xs text-muted-foreground mt-0.5">
@@ -250,7 +251,7 @@ export function ShopScreen() {
               <div className="flex items-center justify-between p-2 bg-secondary/30 rounded-lg">
                 <div className="flex-1">
                   <div className="flex items-center gap-2">
-                    <span className="font-medium">💬 Negotiation</span>
+                    <span className="font-medium">💬 {t.negotiation}</span>
                     <Badge variant="secondary">Lv.{state.skills.negotiation}</Badge>
                   </div>
                   <p className="text-xs text-muted-foreground mt-0.5">
@@ -271,7 +272,7 @@ export function ShopScreen() {
               <div className="flex items-center justify-between p-2 bg-secondary/30 rounded-lg">
                 <div className="flex-1">
                   <div className="flex items-center gap-2">
-                    <span className="font-medium">🔍 Diagnosis</span>
+                    <span className="font-medium">🔍 {t.diagnosis}</span>
                     <Badge variant="secondary">Lv.{state.skills.diagnosis}</Badge>
                   </div>
                   <p className="text-xs text-muted-foreground mt-0.5">
@@ -310,10 +311,10 @@ export function ShopScreen() {
           <CardContent>
             <Tabs value={selectedPartCategory} onValueChange={(v) => setSelectedPartCategory(v as PartCategory)}>
               <TabsList className="grid w-full grid-cols-4 mb-4">
-                <TabsTrigger value="mechanical" className="text-xs">⚙️ Mech</TabsTrigger>
-                <TabsTrigger value="body" className="text-xs">🚗 Body</TabsTrigger>
-                <TabsTrigger value="tires" className="text-xs">🛞 Tires</TabsTrigger>
-                <TabsTrigger value="interior" className="text-xs">🪑 Int</TabsTrigger>
+                <TabsTrigger value="mechanical" className="text-xs">⚙️ {t.mech}</TabsTrigger>
+                <TabsTrigger value="body" className="text-xs">🚗 {t.body}</TabsTrigger>
+                <TabsTrigger value="tires" className="text-xs">🛞 {t.tiresShort}</TabsTrigger>
+                <TabsTrigger value="interior" className="text-xs">🪑 {t.int}</TabsTrigger>
               </TabsList>
               
               {Object.entries(PARTS_BY_CATEGORY).map(([category, parts]) => (
@@ -329,7 +330,7 @@ export function ShopScreen() {
                         <div className="flex-1">
                           <div className="flex items-center gap-2">
                             <span className="text-lg">{PART_ICONS[partType]}</span>
-                            <span className="font-medium capitalize text-sm">{partType.replace(/_/g, ' ')}</span>
+                            <span className="font-medium text-sm">{getPartName(partType, t as unknown as Record<string, string>)}</span>
                             <Badge variant={isMaxed ? "default" : "secondary"} className="text-xs">
                               {currentLevel}/{MAX_PART_LEVEL}
                             </Badge>

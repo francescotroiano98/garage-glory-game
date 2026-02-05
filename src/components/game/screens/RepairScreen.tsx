@@ -12,6 +12,7 @@ import { ArrowLeft, DollarSign, Tag, Loader2 } from 'lucide-react';
 import { useSound } from '@/hooks/useSound';
 import { CATEGORY_ICONS, CATEGORY_LABELS } from '@/data/parts';
 import { getPatienceRounds } from '@/data/customers';
+ import { getCategoryName } from '@/utils/partTranslations';
 
 import garageBg from '@/assets/garage-bg.jpg';
 
@@ -20,11 +21,11 @@ interface RepairScreenProps {
   onBack: () => void;
 }
 
-const categories: { id: PartCategory; label: string; icon: string }[] = [
-  { id: 'mechanical', label: CATEGORY_LABELS.mechanical, icon: CATEGORY_ICONS.mechanical },
-  { id: 'body', label: CATEGORY_LABELS.body, icon: CATEGORY_ICONS.body },
-  { id: 'tires', label: CATEGORY_LABELS.tires, icon: CATEGORY_ICONS.tires },
-  { id: 'interior', label: CATEGORY_LABELS.interior, icon: CATEGORY_ICONS.interior },
+const categoryList: { id: PartCategory; icon: string }[] = [
+  { id: 'mechanical', icon: CATEGORY_ICONS.mechanical },
+  { id: 'body', icon: CATEGORY_ICONS.body },
+  { id: 'tires', icon: CATEGORY_ICONS.tires },
+  { id: 'interior', icon: CATEGORY_ICONS.interior },
 ];
 
 export function RepairScreen({ carId, onBack }: RepairScreenProps) {
@@ -244,7 +245,7 @@ export function RepairScreen({ carId, onBack }: RepairScreenProps) {
         )}
 
         <div className="flex gap-2 p-4 overflow-x-auto bg-card/95 backdrop-blur-sm">
-          {categories.map((cat) => {
+          {categoryList.map((cat) => {
             const catDamages = car.damages.filter(d => d.category === cat.id);
             const catUnrepaired = catDamages.filter(d => !d.repaired).length;
             return (
@@ -256,7 +257,7 @@ export function RepairScreen({ carId, onBack }: RepairScreenProps) {
                 className="shrink-0"
               >
                 <span className="mr-1">{cat.icon}</span>
-                {cat.label}
+                {getCategoryName(cat.id, t as unknown as Record<string, string>)}
                 {catUnrepaired > 0 && (
                   <Badge variant="destructive" className="ml-1 h-5 min-w-5 px-1">
                     {catUnrepaired}
