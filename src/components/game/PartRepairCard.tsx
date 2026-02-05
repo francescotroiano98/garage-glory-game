@@ -68,7 +68,7 @@ export function PartRepairCard({
 
   if (damage.repaired) {
     return (
-      <div className="flex items-center gap-3 p-3 bg-primary/10 rounded-lg border-2 border-primary/30">
+       <div className="flex items-center gap-3 p-3 bg-card/95 backdrop-blur-sm rounded-lg border-2 border-primary/50">
         <span className="text-xl">{partIcon}</span>
         <div className="flex-1">
           <span className="font-medium capitalize text-primary">

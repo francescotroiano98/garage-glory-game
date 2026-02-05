@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useGame } from '@/contexts/GameContext';
+ import { useLanguage } from '@/contexts/LanguageContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -7,6 +8,7 @@ import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ShoppingBag, Wrench, Search, Zap, Building, Check, Star, Plus, Settings } from 'lucide-react';
 import { toast } from 'sonner';
+ import { useSound } from '@/hooks/useSound';
 import { TOOL_UPGRADES, DIAGNOSTIC_UPGRADES, GARAGE_UPGRADES, ENERGY_UPGRADES, getXpForLevel } from '@/data/upgrades';
 import { PART_DEFINITIONS, PART_ICONS, CATEGORY_LABELS, getPartUpgradeCost } from '@/data/parts';
 import { PartType, PartCategory, MAX_LEVEL } from '@/types/game';
@@ -25,81 +27,87 @@ const MAX_PART_LEVEL = 10;
 
 export function ShopScreen() {
   const { state, dispatch, canAfford, getToolLevelIndex, getNegotiationBonus, getDiySuccessChance } = useGame();
+   const { t } = useLanguage();
+   const { playSound } = useSound();
   const [selectedPartCategory, setSelectedPartCategory] = useState<PartCategory>('mechanical');
 
   const buyToolUpgrade = (upgrade: typeof TOOL_UPGRADES[0]) => {
     if (!canAfford(upgrade.cost)) {
-      toast.error("Not enough money!");
+       toast.error(t.notEnoughMoney);
+       playSound('error');
       return;
     }
     dispatch({ type: 'SPEND_MONEY', payload: upgrade.cost });
     dispatch({ type: 'UPGRADE_TOOLS', payload: upgrade.level });
-    toast.success(`Upgraded to ${upgrade.name}!`);
+     playSound('skillUp');
   };
 
   const buyDiagnosticUpgrade = (upgrade: typeof DIAGNOSTIC_UPGRADES[0]) => {
     if (!canAfford(upgrade.cost)) {
-      toast.error("Not enough money!");
+       toast.error(t.notEnoughMoney);
+       playSound('error');
       return;
     }
     dispatch({ type: 'SPEND_MONEY', payload: upgrade.cost });
     dispatch({ type: 'UPGRADE_DIAGNOSTICS', payload: upgrade.level });
-    toast.success(`Upgraded to ${upgrade.name}!`);
+     playSound('skillUp');
   };
 
   const buyGarageBay = (upgrade: typeof GARAGE_BAYS[0]) => {
     if (!canAfford(upgrade.cost)) {
-      toast.error("Not enough money!");
+       toast.error(t.notEnoughMoney);
+       playSound('error');
       return;
     }
     dispatch({ type: 'SPEND_MONEY', payload: upgrade.cost });
     dispatch({ type: 'UPGRADE_GARAGE', payload: { carBays: upgrade.value } });
-    toast.success(`Unlocked ${upgrade.name}!`);
+     playSound('purchase');
   };
 
   const buyGarageEquipment = (upgrade: typeof GARAGE_EQUIPMENT[0]) => {
     if (!canAfford(upgrade.cost)) {
-      toast.error("Not enough money!");
+       toast.error(t.notEnoughMoney);
+       playSound('error');
       return;
     }
     dispatch({ type: 'SPEND_MONEY', payload: upgrade.cost });
     dispatch({ type: 'UPGRADE_GARAGE', payload: { [upgrade.key]: true } });
-    toast.success(`Installed ${upgrade.name}!`);
+     playSound('purchase');
   };
 
   const buyEnergyUpgrade = (upgrade: typeof ENERGY_UPGRADES[0]) => {
     if (!canAfford(upgrade.cost)) {
-      toast.error("Not enough money!");
+       toast.error(t.notEnoughMoney);
+       playSound('error');
       return;
     }
     dispatch({ type: 'SPEND_MONEY', payload: upgrade.cost });
     dispatch({ type: 'UPGRADE_MAX_ENERGY', payload: upgrade.maxEnergy });
-    toast.success(`Max energy increased to ${upgrade.maxEnergy}!`);
+     playSound('purchase');
   };
 
   const upgradeSkill = (skill: keyof typeof state.skills) => {
     if (state.skillPoints <= 0) {
-      toast.error("No skill points available! Level up to earn more.");
       return;
     }
     dispatch({ type: 'UPGRADE_SKILL', payload: { skill, level: state.skills[skill] + 1 } });
-    toast.success(`${skill.charAt(0).toUpperCase() + skill.slice(1)} skill increased!`);
+     playSound('skillUp');
   };
 
   const upgradePartLevel = (partType: PartType) => {
     const currentLevel = state.partUpgrades[partType] || 0;
     if (currentLevel >= MAX_PART_LEVEL) {
-      toast.error("Part already at max level!");
       return;
     }
     const cost = getPartUpgradeCost(partType, currentLevel);
     if (!canAfford(cost)) {
-      toast.error("Not enough money!");
+       toast.error(t.notEnoughMoney);
+       playSound('error');
       return;
     }
     dispatch({ type: 'SPEND_MONEY', payload: cost });
     dispatch({ type: 'UPGRADE_PART', payload: { partType } });
-    toast.success(`${partType.replace(/_/g, ' ')} upgrade purchased!`);
+     playSound('skillUp');
   };
 
   const toolLevelIndex = getToolLevelIndex();
@@ -125,10 +133,10 @@ export function ShopScreen() {
         <div className="p-4 py-5 border-b border-border bg-card/90 backdrop-blur-sm">
           <h1 className="text-2xl font-bold flex items-center gap-2">
             <ShoppingBag className="w-6 h-6 text-primary" />
-            Upgrade Shop
+             {t.upgradeShop}
           </h1>
           <p className="text-sm text-muted-foreground mt-1">
-            Improve your garage and tools
+             {t.improveGarage}
           </p>
         </div>
 
@@ -138,7 +146,7 @@ export function ShopScreen() {
           <CardHeader className="pb-2">
             <CardTitle className="text-base flex items-center gap-2">
               <Star className="w-4 h-4 text-primary" />
-              Skills
+               {t.skills}
             </CardTitle>
             <CardDescription className="flex items-center gap-2">
               <span>Level {state.level}/{MAX_LEVEL}</span>
@@ -293,7 +301,7 @@ export function ShopScreen() {
           <CardHeader className="pb-2">
             <CardTitle className="text-base flex items-center gap-2">
               <Settings className="w-4 h-4 text-accent" />
-              Part Specializations
+               {t.partSpecializations}
             </CardTitle>
             <CardDescription>
               10 levels per part • +3% DIY success each level
@@ -355,10 +363,10 @@ export function ShopScreen() {
           <CardHeader className="pb-2">
             <CardTitle className="text-base flex items-center gap-2">
               <Wrench className="w-4 h-4" />
-              Repair Tools
+               {t.repairTools}
             </CardTitle>
             <CardDescription>
-              Current: <Badge variant="secondary" className="capitalize">{state.toolLevel}</Badge>
+               {t.current}: <Badge variant="secondary" className="capitalize">{state.toolLevel}</Badge>
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-2">
@@ -373,7 +381,7 @@ export function ShopScreen() {
                     <p className="text-xs text-muted-foreground">{upgrade.desc}</p>
                   </div>
                   {owned ? (
-                    <Badge variant="secondary"><Check className="w-3 h-3 mr-1" /> Owned</Badge>
+                     <Badge variant="secondary"><Check className="w-3 h-3 mr-1" /> {t.owned}</Badge>
                   ) : (
                     <Button 
                       size="sm" 

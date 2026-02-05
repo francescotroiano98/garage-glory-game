@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useGame } from '@/contexts/GameContext';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { Zap, DollarSign, Gift, Trophy, Target, ChevronDown } from 'lucide-react';
+ import { Zap, DollarSign, Gift, Trophy, Target, Star, ChevronDown } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -61,33 +61,33 @@ export function StatsBar() {
 
   return (
     <>
-      <div className="bg-card/95 backdrop-blur-sm border-b-2 border-border p-2 sticky top-0 z-50">
-        <div className="flex items-center justify-between gap-2">
-          {/* Left side: Money & Energy stacked */}
-          <div className="flex flex-col gap-1">
+       <div className="bg-card/95 backdrop-blur-sm border-b-2 border-border p-3 sticky top-0 z-50">
+         <div className="flex items-center justify-between gap-3">
+           {/* Left side: Money & Energy in column */}
+           <div className="flex flex-col gap-1.5">
             {/* Money */}
-            <div className="flex items-center gap-1 bg-primary/15 px-2 py-0.5 rounded-full border border-primary/30">
-              <DollarSign className="w-3.5 h-3.5 text-primary" />
-              <span className="font-bold text-sm text-primary">${state.money.toLocaleString()}</span>
+             <div className="flex items-center gap-1.5 bg-primary/15 px-2.5 py-1 rounded-lg border border-primary/30">
+               <DollarSign className="w-4 h-4 text-primary" />
+               <span className="font-bold text-sm text-primary min-w-[60px]">${state.money.toLocaleString()}</span>
             </div>
 
-            {/* Energy */}
-            <div className="flex items-center gap-1 bg-yellow-500/15 px-2 py-0.5 rounded-full border border-yellow-500/30">
-              <Zap className="w-3.5 h-3.5 text-yellow-500" />
-              <span className="text-sm font-bold text-yellow-600">{state.energy}</span>
+             {/* Energy + Recharge */}
+             <div className="flex items-center gap-2">
+               <div className="flex items-center gap-1.5 bg-yellow-500/15 px-2.5 py-1 rounded-lg border border-yellow-500/30">
+                 <Zap className="w-4 h-4 text-yellow-500" />
+                 <span className="text-sm font-bold text-yellow-600 min-w-[40px]">{state.energy}</span>
+               </div>
+               <Button
+                 size="sm"
+                 variant={canCollectEnergyBonus() ? "default" : "secondary"}
+                 onClick={handleCollectBonus}
+                 disabled={!canCollectEnergyBonus()}
+                 className="h-7 px-2 text-xs"
+               >
+                 <Gift className="w-3.5 h-3.5 mr-1" />
+                 {canCollectEnergyBonus() ? '+30' : formatTime(timeRemaining)}
+               </Button>
             </div>
-            
-            {/* Recharge button below energy */}
-            <Button
-              size="sm"
-              variant={canCollectEnergyBonus() ? "default" : "secondary"}
-              onClick={handleCollectBonus}
-              disabled={!canCollectEnergyBonus()}
-              className="h-6 px-2 text-[10px]"
-            >
-              <Gift className="w-3 h-3 mr-1" />
-              {canCollectEnergyBonus() ? '+30' : formatTime(timeRemaining)}
-            </Button>
           </div>
 
           {/* Right side: Actions */}
@@ -117,7 +117,8 @@ export function StatsBar() {
 
             <Popover open={showDetails} onOpenChange={setShowDetails}>
               <PopoverTrigger asChild>
-                <Button variant="outline" size="sm" className="h-8 px-2 text-sm gap-1 border">
+                 <Button variant="outline" size="sm" className="h-8 px-2.5 text-sm gap-1.5 border-2">
+                   <Star className="w-3.5 h-3.5 text-primary" />
                   Lv.{state.level}
                   {state.skillPoints > 0 && (
                     <Badge variant="default" className="h-4 px-1 text-[9px]">+{state.skillPoints}</Badge>

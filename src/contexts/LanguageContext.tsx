@@ -104,6 +104,29 @@ interface Translations {
   counter: string;
   reject: string;
   customerOffer: string;
+   
+   // Additional translations
+   dailyChallenges: string;
+   claim: string;
+   completed: string;
+   progress: string;
+   reward: string;
+   electrical: string;
+   diagnosis: string;
+   negotiation: string;
+   upgradeShop: string;
+   improveGarage: string;
+   partSpecializations: string;
+   repairTools: string;
+   diagnosticTools: string;
+   garageBays: string;
+   garageEquipment: string;
+   energyCapacity: string;
+   owned: string;
+   installed: string;
+   notEnoughMoney: string;
+   carNotFound: string;
+   goBack: string;
 }
 
 const translations: Record<Language, Translations> = {
@@ -192,6 +215,27 @@ const translations: Record<Language, Translations> = {
     counter: 'Counter',
     reject: 'Reject',
     customerOffer: 'Customer Offer',
+     dailyChallenges: 'Daily Challenges',
+     claim: 'Claim',
+     completed: 'Completed',
+     progress: 'Progress',
+     reward: 'Reward',
+     electrical: 'Electrical',
+     diagnosis: 'Diagnosis',
+     negotiation: 'Negotiation',
+     upgradeShop: 'Upgrade Shop',
+     improveGarage: 'Improve your garage and tools',
+     partSpecializations: 'Part Specializations',
+     repairTools: 'Repair Tools',
+     diagnosticTools: 'Diagnostic Tools',
+     garageBays: 'Garage Bays',
+     garageEquipment: 'Garage Equipment',
+     energyCapacity: 'Energy Capacity',
+     owned: 'Owned',
+     installed: 'Installed',
+     notEnoughMoney: 'Not enough money!',
+     carNotFound: 'Car not found',
+     goBack: 'Go Back',
   },
   it: {
     settings: 'Impostazioni',
@@ -278,6 +322,27 @@ const translations: Record<Language, Translations> = {
     counter: 'Rilancia',
     reject: 'Rifiuta',
     customerOffer: 'Offerta Cliente',
+     dailyChallenges: 'Sfide Giornaliere',
+     claim: 'Riscuoti',
+     completed: 'Completato',
+     progress: 'Progresso',
+     reward: 'Ricompensa',
+     electrical: 'Elettrica',
+     diagnosis: 'Diagnosi',
+     negotiation: 'Trattativa',
+     upgradeShop: 'Negozio Upgrade',
+     improveGarage: 'Migliora il tuo garage e i tuoi strumenti',
+     partSpecializations: 'Specializzazioni Parti',
+     repairTools: 'Strumenti di Riparazione',
+     diagnosticTools: 'Strumenti Diagnostici',
+     garageBays: 'Box Garage',
+     garageEquipment: 'Attrezzature Garage',
+     energyCapacity: 'Capacità Energia',
+     owned: 'Posseduto',
+     installed: 'Installato',
+     notEnoughMoney: 'Soldi insufficienti!',
+     carNotFound: 'Auto non trovata',
+     goBack: 'Torna Indietro',
   },
 };
 
