@@ -70,8 +70,8 @@ export function useSound() {
   return { playSound, muted, toggleMute };
 }
 
-// Use a royalty-free looping music track that works
- const BACKGROUND_MUSIC_URL = 'https://cdn.pixabay.com/download/audio/2022/03/15/audio_942f70dcb5.mp3';
+// Use a royalty-free looping music track - using a reliable CDN source
+const BACKGROUND_MUSIC_URL = 'https://files.freemusicarchive.org/storage-freemusicarchive-org/music/no_curator/Lobo_Loco/Salsa_Blanca/Lobo_Loco_-_03_-_A_New_Day_ID_1085.mp3';
  
  // Global audio instance for background music - singleton pattern
  class BackgroundMusicManager {
