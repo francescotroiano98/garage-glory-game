@@ -70,8 +70,8 @@ export function useSound() {
   return { playSound, muted, toggleMute };
 }
 
-// Use a royalty-free looping music track - using a reliable CDN source
-const BACKGROUND_MUSIC_URL = 'https://files.freemusicarchive.org/storage-freemusicarchive-org/music/no_curator/Lobo_Loco/Salsa_Blanca/Lobo_Loco_-_03_-_A_New_Day_ID_1085.mp3';
+// Use a local audio file for reliable playback
+import backgroundMusicFile from '@/assets/audio/background-music.mp3';
  
  // Global audio instance for background music - singleton pattern
  class BackgroundMusicManager {
@@ -91,7 +91,7 @@ const BACKGROUND_MUSIC_URL = 'https://files.freemusicarchive.org/storage-freemus
      if (this.initialized) return;
      this.initialized = true;
  
-     this.audio = new Audio(BACKGROUND_MUSIC_URL);
+     this.audio = new Audio(backgroundMusicFile);
      this.audio.loop = true;
      this.audio.volume = 0.15;
      this.audio.preload = 'auto';
