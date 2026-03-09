@@ -204,7 +204,7 @@ export interface Customer {
   personality: CustomerPersonality;
   patience: 'very_low' | 'low' | 'medium' | 'high' | 'very_high';
   maxBudget: number;
-  preferredCategory?: CarCategory;
+  preferredCategory?: VehicleCategory;
   bargainSkill: number; // 1-10 how good they are at negotiating
   trustLevel: number; // 1-10 how much they trust the seller
   traits: string[]; // Visible traits to player
