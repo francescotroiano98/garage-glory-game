@@ -153,6 +153,23 @@ interface Translations {
    partCleaning: string;
    partAirConditioning: string;
    partAudioSystem: string;
+   // Motorcycle part names
+   partMotoEngine: string;
+   partMotoChain: string;
+   partMotoExhaust: string;
+   partMotoCarburetor: string;
+   partMotoFairing: string;
+   partMotoTank: string;
+   partMotoFender: string;
+   partMotoMirrors: string;
+   partMotoFrontTire: string;
+   partMotoRearTire: string;
+   partMotoFrontSuspension: string;
+   partMotoRearSuspension: string;
+   partMotoBattery: string;
+   partMotoWiring: string;
+   partMotoInstruments: string;
+   partMotoSeat: string;
    
    // Damage levels
    damageMinor: string;
