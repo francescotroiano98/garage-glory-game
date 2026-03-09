@@ -44,6 +44,14 @@ export type CarCategory =
   | 'suv_large' | 'crossover' | 'muscle' | 'sports' | 'sports_premium'
   | 'luxury_entry' | 'luxury_mid' | 'luxury_full' | 'exotic' | 'supercar';
 
+// 10 motorcycle categories - unlocked at odd levels
+export type MotorcycleCategory =
+  | 'moto_old_scooter' | 'moto_scooter' | 'moto_125'
+  | 'moto_naked' | 'moto_touring' | 'moto_adventure'
+  | 'moto_enduro' | 'moto_supersport' | 'moto_caferacer' | 'moto_superbike';
+
+export type VehicleCategory = CarCategory | MotorcycleCategory;
+
 // Map levels to categories
 export const CATEGORY_UNLOCK_LEVEL: Record<CarCategory, number> = {
   junker: 1,
