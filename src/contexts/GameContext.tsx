@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useReducer, useEffect, useCallback, useState } from 'react';
 import { GameState, Car, PartType, ToolLevel, DiagnosticLevel, RepairJob, SaleState, Customer, Skills, calculateXpFromSale, MAX_LEVEL, VehicleCategory } from '@/types/game';
 import { recalculateCarValue } from '@/data/cars';
+import { recalculateMotorcycleValue } from '@/data/motorcycles';
 import { generateCustomer, calculateCustomerOffer } from '@/data/customers';
 import { PART_DEFINITIONS, calculateDiySuccessChance, getInitialPartUpgrades } from '@/data/parts';
 import { getXpForLevel, getSkillPointsForLevel } from '@/data/upgrades';
