@@ -320,6 +320,13 @@ const translations: Record<Language, Translations> = {
      partCleaning: 'Cleaning',
      partAirConditioning: 'Air Conditioning',
      partAudioSystem: 'Audio System',
+     // Motorcycle parts
+     partMotoEngine: 'Engine', partMotoChain: 'Chain', partMotoExhaust: 'Exhaust',
+     partMotoCarburetor: 'Carburetor', partMotoFairing: 'Fairing', partMotoTank: 'Fuel Tank',
+     partMotoFender: 'Fender', partMotoMirrors: 'Mirrors', partMotoFrontTire: 'Front Tire',
+     partMotoRearTire: 'Rear Tire', partMotoFrontSuspension: 'Front Fork',
+     partMotoRearSuspension: 'Rear Shock', partMotoBattery: 'Battery',
+     partMotoWiring: 'Wiring', partMotoInstruments: 'Instruments', partMotoSeat: 'Seat',
      
      // Damage levels
      damageMinor: 'Minor',
