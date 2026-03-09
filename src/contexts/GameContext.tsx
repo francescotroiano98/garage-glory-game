@@ -3,6 +3,12 @@ import { GameState, Car, PartType, ToolLevel, DiagnosticLevel, RepairJob, SaleSt
 import { recalculateCarValue } from '@/data/cars';
 import { recalculateMotorcycleValue } from '@/data/motorcycles';
 import { generateCustomer, calculateCustomerOffer } from '@/data/customers';
+
+// Helper to recalculate value for both cars and motorcycles
+function recalculateVehicleValue(car: Car): number {
+  if (car.vehicleType === 'motorcycle') return recalculateMotorcycleValue(car);
+  return recalculateCarValue(car);
+}
 import { PART_DEFINITIONS, calculateDiySuccessChance, getInitialPartUpgrades } from '@/data/parts';
 import { getXpForLevel, getSkillPointsForLevel } from '@/data/upgrades';
 import { getInitialAchievements, checkAchievements } from '@/data/achievements';
