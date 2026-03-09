@@ -103,14 +103,15 @@ export const CATEGORY_NAMES: Record<CarCategory, string> = {
 export interface Car {
   id: string;
   name: string;
-  category: CarCategory;
+  vehicleType?: VehicleType; // 'car' | 'motorcycle', defaults to 'car'
+  category: CarCategory | MotorcycleCategory;
   image: string;
-  imageVariant?: number; // NEW: Image variant for variety
+  imageVariant?: number;
   baseValue: number;
   askingPrice: number;
-  purchasePrice?: number; // NEW: Track what we paid for the car
+  purchasePrice?: number;
   damages: PartDamage[];
-  totalRepairCost?: number; // NEW: Track total repair costs
+  totalRepairCost?: number;
   purchased: boolean;
   currentValue: number;
   isInGarage: boolean;
