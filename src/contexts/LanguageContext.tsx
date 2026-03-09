@@ -475,6 +475,13 @@ const translations: Record<Language, Translations> = {
      partCleaning: 'Pulizia',
      partAirConditioning: 'Aria Condizionata',
      partAudioSystem: 'Sistema Audio',
+     // Motorcycle parts
+     partMotoEngine: 'Motore', partMotoChain: 'Catena', partMotoExhaust: 'Scarico',
+     partMotoCarburetor: 'Carburatore', partMotoFairing: 'Carena', partMotoTank: 'Serbatoio',
+     partMotoFender: 'Parafango', partMotoMirrors: 'Specchietti', partMotoFrontTire: 'Gomma Anteriore',
+     partMotoRearTire: 'Gomma Posteriore', partMotoFrontSuspension: 'Forcella',
+     partMotoRearSuspension: 'Ammortizzatore', partMotoBattery: 'Batteria',
+     partMotoWiring: 'Impianto Elettrico', partMotoInstruments: 'Strumentazione', partMotoSeat: 'Sella',
      
      // Damage levels
      damageMinor: 'Lieve',

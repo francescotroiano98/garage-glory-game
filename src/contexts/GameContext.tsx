@@ -306,7 +306,7 @@ function gameReducer(state: GameState, action: GameAction): GameState {
             d.part === action.payload.partType ? { ...d, repaired: true } : d
           );
           const updatedCar = { ...car, damages: updatedDamages };
-          updatedCar.currentValue = recalculateCarValue(updatedCar);
+          updatedCar.currentValue = recalculateVehicleValue(updatedCar);
           return updatedCar;
         }
         return car;
