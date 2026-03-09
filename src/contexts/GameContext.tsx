@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useReducer, useEffect, useCallback, useState } from 'react';
-import { GameState, Car, PartType, ToolLevel, DiagnosticLevel, RepairJob, SaleState, Customer, Skills, calculateXpFromSale, MAX_LEVEL } from '@/types/game';
+import { GameState, Car, PartType, ToolLevel, DiagnosticLevel, RepairJob, SaleState, Customer, Skills, calculateXpFromSale, MAX_LEVEL, VehicleCategory } from '@/types/game';
 import { recalculateCarValue } from '@/data/cars';
 import { generateCustomer, calculateCustomerOffer } from '@/data/customers';
 import { PART_DEFINITIONS, calculateDiySuccessChance, getInitialPartUpgrades } from '@/data/parts';

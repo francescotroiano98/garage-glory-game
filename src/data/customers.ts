@@ -1,4 +1,4 @@
-import { Customer, CustomerPersonality, CarCategory, VehicleCategory } from '@/types/game';
+import { Customer, CustomerPersonality, CarCategory, VehicleCategory, VehicleCategory } from '@/types/game';
 
 // 20 Customer personality definitions
 export const CUSTOMER_PERSONALITIES: Record<CustomerPersonality, {
@@ -205,7 +205,7 @@ function pickRandom<T>(arr: T[]): T {
   return arr[Math.floor(Math.random() * arr.length)];
 }
 
-export function generateCustomer(askingPrice: number, carCategory?: CarCategory): Customer {
+export function generateCustomer(askingPrice: numbeVehiclecarCategory?: CarCategory): Customer {
   const personalities = Object.keys(CUSTOMER_PERSONALITIES) as CustomerPersonality[];
   
   // Weight personalities based on car category if provided
