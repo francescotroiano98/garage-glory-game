@@ -1,4 +1,4 @@
-import { Customer, CustomerPersonality, CarCategory } from '@/types/game';
+import { Customer, CustomerPersonality, CarCategory, VehicleCategory } from '@/types/game';
 
 // 20 Customer personality definitions
 export const CUSTOMER_PERSONALITIES: Record<CustomerPersonality, {
