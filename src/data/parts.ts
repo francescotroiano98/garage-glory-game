@@ -2,34 +2,22 @@ import { PartType, PartCategory } from '@/types/game';
 
 // Part icons for visual representation
 export const PART_ICONS: Record<PartType, string> = {
-  // Mechanical
-  engine: '🔧',
-  transmission: '⚙️',
-  brakes: '🛑',
-  suspension: '🔩',
-  exhaust: '💨',
-  fuel_system: '⛽',
-  // Body
-  paint: '🎨',
-  dents: '🔨',
-  rust: '🦠',
-  windows: '🪟',
-  lights: '💡',
-  bumpers: '🛡️',
-  // Tires
-  front_tires: '🛞',
-  rear_tires: '🛞',
-  wheels: '⭕',
-  alignment: '📐',
-  tire_pressure: '🎈',
-  wheel_bearings: '🔘',
-  // Interior
-  seats: '🪑',
-  dashboard: '🖥️',
-  electronics: '⚡',
-  cleaning: '🧹',
-  air_conditioning: '❄️',
-  audio_system: '🔊',
+  // Car Mechanical
+  engine: '🔧', transmission: '⚙️', brakes: '🛑', suspension: '🔩', exhaust: '💨', fuel_system: '⛽',
+  // Car Body
+  paint: '🎨', dents: '🔨', rust: '🦠', windows: '🪟', lights: '💡', bumpers: '🛡️',
+  // Car Tires
+  front_tires: '🛞', rear_tires: '🛞', wheels: '⭕', alignment: '📐', tire_pressure: '🎈', wheel_bearings: '🔘',
+  // Car Interior
+  seats: '🪑', dashboard: '🖥️', electronics: '⚡', cleaning: '🧹', air_conditioning: '❄️', audio_system: '🔊',
+  // Motorcycle Mechanical
+  moto_engine: '🔧', moto_chain: '⛓️', moto_exhaust: '💨', moto_carburetor: '⛽',
+  // Motorcycle Body
+  moto_fairing: '🛡️', moto_tank: '🛢️', moto_fender: '🏍️', moto_mirrors: '🪞',
+  // Motorcycle Tires
+  moto_front_tire: '🛞', moto_rear_tire: '🛞', moto_front_suspension: '🔩', moto_rear_suspension: '🔩',
+  // Motorcycle Electrical
+  moto_battery: '🔋', moto_wiring: '⚡', moto_instruments: '🖥️', moto_seat: '🪑',
 };
 
 // Part definitions with costs balanced for 3x value increase minimum
