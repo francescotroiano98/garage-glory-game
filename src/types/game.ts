@@ -52,52 +52,34 @@ export type MotorcycleCategory =
 
 export type VehicleCategory = CarCategory | MotorcycleCategory;
 
-// Map levels to categories
+// Map levels to car categories
 export const CATEGORY_UNLOCK_LEVEL: Record<CarCategory, number> = {
-  junker: 1,
-  beater: 2,
-  economy: 3,
-  compact: 4,
-  hatchback: 5,
-  sedan: 6,
-  wagon: 7,
-  coupe: 8,
-  suv_small: 9,
-  suv_mid: 10,
-  suv_large: 11,
-  crossover: 12,
-  muscle: 13,
-  sports: 14,
-  sports_premium: 15,
-  luxury_entry: 16,
-  luxury_mid: 17,
-  luxury_full: 18,
-  exotic: 19,
-  supercar: 20,
+  junker: 1, beater: 2, economy: 3, compact: 4, hatchback: 5,
+  sedan: 6, wagon: 7, coupe: 8, suv_small: 9, suv_mid: 10,
+  suv_large: 11, crossover: 12, muscle: 13, sports: 14, sports_premium: 15,
+  luxury_entry: 16, luxury_mid: 17, luxury_full: 18, exotic: 19, supercar: 20,
+};
+
+// Map levels to motorcycle categories
+export const MOTO_CATEGORY_UNLOCK_LEVEL: Record<MotorcycleCategory, number> = {
+  moto_old_scooter: 1, moto_scooter: 3, moto_125: 5,
+  moto_naked: 7, moto_touring: 9, moto_adventure: 11,
+  moto_enduro: 13, moto_supersport: 15, moto_caferacer: 17, moto_superbike: 19,
 };
 
 // Category display names
-export const CATEGORY_NAMES: Record<CarCategory, string> = {
-  junker: 'Junker',
-  beater: 'Beater',
-  economy: 'Economy',
-  compact: 'Compact',
-  hatchback: 'Hatchback',
-  sedan: 'Sedan',
-  wagon: 'Wagon',
-  coupe: 'Coupe',
-  suv_small: 'Small SUV',
-  suv_mid: 'Mid SUV',
-  suv_large: 'Large SUV',
-  crossover: 'Crossover',
-  muscle: 'Muscle',
-  sports: 'Sports',
-  sports_premium: 'Premium Sports',
-  luxury_entry: 'Entry Luxury',
-  luxury_mid: 'Mid Luxury',
-  luxury_full: 'Full Luxury',
-  exotic: 'Exotic',
-  supercar: 'Supercar',
+export const CATEGORY_NAMES: Record<VehicleCategory, string> = {
+  junker: 'Junker', beater: 'Beater', economy: 'Economy', compact: 'Compact',
+  hatchback: 'Hatchback', sedan: 'Sedan', wagon: 'Wagon', coupe: 'Coupe',
+  suv_small: 'Small SUV', suv_mid: 'Mid SUV', suv_large: 'Large SUV',
+  crossover: 'Crossover', muscle: 'Muscle', sports: 'Sports',
+  sports_premium: 'Premium Sports', luxury_entry: 'Entry Luxury',
+  luxury_mid: 'Mid Luxury', luxury_full: 'Full Luxury', exotic: 'Exotic', supercar: 'Supercar',
+  // Motorcycles
+  moto_old_scooter: 'Old Scooter', moto_scooter: 'Scooter', moto_125: '125cc',
+  moto_naked: 'Naked', moto_touring: 'Touring', moto_adventure: 'Adventure',
+  moto_enduro: 'Enduro', moto_supersport: 'Supersport', moto_caferacer: 'Cafe Racer',
+  moto_superbike: 'Superbike',
 };
 
 export interface Car {

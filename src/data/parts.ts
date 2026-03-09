@@ -143,6 +143,11 @@ export const ALL_PARTS: PartType[] = [
   'paint', 'dents', 'rust', 'windows', 'lights', 'bumpers',
   'front_tires', 'rear_tires', 'wheels', 'alignment', 'tire_pressure', 'wheel_bearings',
   'seats', 'dashboard', 'electronics', 'cleaning', 'air_conditioning', 'audio_system',
+  // Motorcycle parts
+  'moto_engine', 'moto_chain', 'moto_exhaust', 'moto_carburetor',
+  'moto_fairing', 'moto_tank', 'moto_fender', 'moto_mirrors',
+  'moto_front_tire', 'moto_rear_tire', 'moto_front_suspension', 'moto_rear_suspension',
+  'moto_battery', 'moto_wiring', 'moto_instruments', 'moto_seat',
 ];
 
 export function getInitialPartUpgrades(): Record<PartType, number> {
