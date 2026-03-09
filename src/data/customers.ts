@@ -205,7 +205,7 @@ function pickRandom<T>(arr: T[]): T {
   return arr[Math.floor(Math.random() * arr.length)];
 }
 
-export function generateCustomer(askingPrice: numbeVehiclecarCategory?: CarCategory): Customer {
+export function generateCustomer(askingPrice: number, carCategory?: VehicleCategory): Customer {
   const personalities = Object.keys(CUSTOMER_PERSONALITIES) as CustomerPersonality[];
   
   // Weight personalities based on car category if provided
