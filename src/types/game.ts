@@ -2,15 +2,25 @@
 export type PartCategory = 'mechanical' | 'body' | 'tires' | 'interior';
 
 // 6 parts per category = 24 total parts
+export type VehicleType = 'car' | 'motorcycle';
+
 export type PartType = 
-  // Mechanical (6)
+  // Car Mechanical (6)
   | 'engine' | 'transmission' | 'brakes' | 'suspension' | 'exhaust' | 'fuel_system'
-  // Body (6)
+  // Car Body (6)
   | 'paint' | 'dents' | 'rust' | 'windows' | 'lights' | 'bumpers'
-  // Tires (6)
+  // Car Tires (6)
   | 'front_tires' | 'rear_tires' | 'wheels' | 'alignment' | 'tire_pressure' | 'wheel_bearings'
-  // Interior (6)
-  | 'seats' | 'dashboard' | 'electronics' | 'cleaning' | 'air_conditioning' | 'audio_system';
+  // Car Interior (6)
+  | 'seats' | 'dashboard' | 'electronics' | 'cleaning' | 'air_conditioning' | 'audio_system'
+  // Motorcycle Mechanical (4)
+  | 'moto_engine' | 'moto_chain' | 'moto_exhaust' | 'moto_carburetor'
+  // Motorcycle Body (4)
+  | 'moto_fairing' | 'moto_tank' | 'moto_fender' | 'moto_mirrors'
+  // Motorcycle Tires (4)
+  | 'moto_front_tire' | 'moto_rear_tire' | 'moto_front_suspension' | 'moto_rear_suspension'
+  // Motorcycle Electrical (4)
+  | 'moto_battery' | 'moto_wiring' | 'moto_instruments' | 'moto_seat';
 
 export type DamageLevel = 'none' | 'minor' | 'moderate' | 'major' | 'critical';
 
