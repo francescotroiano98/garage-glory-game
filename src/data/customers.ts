@@ -213,7 +213,7 @@ export function generateCustomer(askingPrice: number, carCategory?: VehicleCateg
   if (carCategory) {
     weightedPersonalities = personalities.filter(p => {
       const pref = CUSTOMER_PERSONALITIES[p].preferredCategories;
-      return !pref || pref.includes(carCategory);
+      return !pref || pref.includes(carCategory as CarCategory);
     });
     // Add some randomness - 30% chance to get any personality
     if (Math.random() < 0.3 || weightedPersonalities.length === 0) {
