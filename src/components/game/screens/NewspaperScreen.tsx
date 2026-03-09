@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Slider } from '@/components/ui/slider';
 import { generateCar } from '@/data/cars';
+import { generateMotorcycle } from '@/data/motorcycles';
 import { NewspaperAd, Car } from '@/types/game';
 import { Newspaper, RefreshCw, DollarSign, Zap } from 'lucide-react';
 import { useSound } from '@/hooks/useSound';
