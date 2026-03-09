@@ -1,4 +1,4 @@
-import { Car, CarCategory, PartDamage, DamageLevel, PartType, PartCategory, getCategoriesForLevel, CATEGORY_UNLOCK_LEVEL } from '@/types/game';
+import { Car, CarCategory, PartDamage, DamageLevel, PartType, PartCategory, getCategoriesForLevel, CATEGORY_UNLOCK_LEVEL, VehicleType } from '@/types/game';
 import { PART_DEFINITIONS } from './parts';
 
 // Import car images - 10 per category for variety
