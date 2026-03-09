@@ -33,13 +33,18 @@ export function NewspaperScreen({ onCarBought }: NewspaperScreenProps) {
   }, [state.level]);
 
   const refreshAds = () => {
-    const newAds: NewspaperAd[] = Array.from({ length: 5 }, () => ({
-      id: `ad_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-      car: generateCar(state.level),
-      seller: '',
-      daysListed: Math.floor(Math.random() * 7) + 1,
-      negotiable: Math.random() > 0.3,
-    }));
+    const newAds: NewspaperAd[] = Array.from({ length: 6 }, (_, i) => {
+      // Mix: ~2 motorcycles and ~4 cars
+      const isMoto = i < 2 || Math.random() < 0.3;
+      const vehicle = isMoto ? generateMotorcycle(state.level) : generateCar(state.level);
+      return {
+        id: `ad_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        car: vehicle,
+        seller: '',
+        daysListed: Math.floor(Math.random() * 7) + 1,
+        negotiable: Math.random() > 0.3,
+      };
+    });
     setAds(newAds);
     setNegotiationCount(0);
   };

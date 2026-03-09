@@ -297,6 +297,7 @@ export function generateCar(level: number): Car {
   return {
     id: `car_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
     name: template.name,
+    vehicleType: 'car' as VehicleType,
     category: template.category,
     image: images[imageVariant],
     imageVariant,

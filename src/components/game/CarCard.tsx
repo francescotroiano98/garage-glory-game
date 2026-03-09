@@ -105,8 +105,8 @@ export function CarCard({
                 <h3 className={cn('font-bold truncate', compact ? 'text-sm' : 'text-base')}>
                   {car.name}
                 </h3>
-                <Badge variant="outline" className={cn('text-xs shrink-0 border', categoryColors[car.category])}>
-                  {car.category}
+                <Badge variant="outline" className={cn('text-xs shrink-0 border', categoryColors[getCategoryColorKey(car.category)])}>
+                  {car.vehicleType === 'motorcycle' ? '🏍️' : '🚗'} {car.category.replace('moto_', '').replace(/_/g, ' ')}
                 </Badge>
               </div>
 
