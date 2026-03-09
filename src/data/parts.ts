@@ -2,34 +2,22 @@ import { PartType, PartCategory } from '@/types/game';
 
 // Part icons for visual representation
 export const PART_ICONS: Record<PartType, string> = {
-  // Mechanical
-  engine: '🔧',
-  transmission: '⚙️',
-  brakes: '🛑',
-  suspension: '🔩',
-  exhaust: '💨',
-  fuel_system: '⛽',
-  // Body
-  paint: '🎨',
-  dents: '🔨',
-  rust: '🦠',
-  windows: '🪟',
-  lights: '💡',
-  bumpers: '🛡️',
-  // Tires
-  front_tires: '🛞',
-  rear_tires: '🛞',
-  wheels: '⭕',
-  alignment: '📐',
-  tire_pressure: '🎈',
-  wheel_bearings: '🔘',
-  // Interior
-  seats: '🪑',
-  dashboard: '🖥️',
-  electronics: '⚡',
-  cleaning: '🧹',
-  air_conditioning: '❄️',
-  audio_system: '🔊',
+  // Car Mechanical
+  engine: '🔧', transmission: '⚙️', brakes: '🛑', suspension: '🔩', exhaust: '💨', fuel_system: '⛽',
+  // Car Body
+  paint: '🎨', dents: '🔨', rust: '🦠', windows: '🪟', lights: '💡', bumpers: '🛡️',
+  // Car Tires
+  front_tires: '🛞', rear_tires: '🛞', wheels: '⭕', alignment: '📐', tire_pressure: '🎈', wheel_bearings: '🔘',
+  // Car Interior
+  seats: '🪑', dashboard: '🖥️', electronics: '⚡', cleaning: '🧹', air_conditioning: '❄️', audio_system: '🔊',
+  // Motorcycle Mechanical
+  moto_engine: '🔧', moto_chain: '⛓️', moto_exhaust: '💨', moto_carburetor: '⛽',
+  // Motorcycle Body
+  moto_fairing: '🛡️', moto_tank: '🛢️', moto_fender: '🏍️', moto_mirrors: '🪞',
+  // Motorcycle Tires
+  moto_front_tire: '🛞', moto_rear_tire: '🛞', moto_front_suspension: '🔩', moto_rear_suspension: '🔩',
+  // Motorcycle Electrical
+  moto_battery: '🔋', moto_wiring: '⚡', moto_instruments: '🖥️', moto_seat: '🪑',
 };
 
 // Part definitions with costs balanced for 3x value increase minimum
@@ -71,6 +59,26 @@ export const PART_DEFINITIONS: Record<PartType, {
   cleaning: { category: 'interior', baseEnergyCost: 15, baseMoneyCost: 10, baseRepairTime: 30, baseValueGain: 50, diyDifficulty: 1, skillRequired: 'bodywork' },
   air_conditioning: { category: 'interior', baseEnergyCost: 50, baseMoneyCost: 70, baseRepairTime: 80, baseValueGain: 280, diyDifficulty: 7, skillRequired: 'electrical' },
   audio_system: { category: 'interior', baseEnergyCost: 35, baseMoneyCost: 45, baseRepairTime: 50, baseValueGain: 180, diyDifficulty: 5, skillRequired: 'electrical' },
+  // Motorcycle Mechanical
+  moto_engine: { category: 'mechanical', baseEnergyCost: 60, baseMoneyCost: 100, baseRepairTime: 140, baseValueGain: 450, diyDifficulty: 8, skillRequired: 'mechanical' },
+  moto_chain: { category: 'mechanical', baseEnergyCost: 25, baseMoneyCost: 30, baseRepairTime: 35, baseValueGain: 120, diyDifficulty: 3, skillRequired: 'mechanical' },
+  moto_exhaust: { category: 'mechanical', baseEnergyCost: 30, baseMoneyCost: 35, baseRepairTime: 45, baseValueGain: 140, diyDifficulty: 4, skillRequired: 'mechanical' },
+  moto_carburetor: { category: 'mechanical', baseEnergyCost: 40, baseMoneyCost: 55, baseRepairTime: 70, baseValueGain: 220, diyDifficulty: 6, skillRequired: 'mechanical' },
+  // Motorcycle Body
+  moto_fairing: { category: 'body', baseEnergyCost: 45, baseMoneyCost: 70, baseRepairTime: 90, baseValueGain: 280, diyDifficulty: 6, skillRequired: 'bodywork' },
+  moto_tank: { category: 'body', baseEnergyCost: 35, baseMoneyCost: 50, baseRepairTime: 60, baseValueGain: 200, diyDifficulty: 5, skillRequired: 'bodywork' },
+  moto_fender: { category: 'body', baseEnergyCost: 20, baseMoneyCost: 25, baseRepairTime: 30, baseValueGain: 100, diyDifficulty: 3, skillRequired: 'bodywork' },
+  moto_mirrors: { category: 'body', baseEnergyCost: 10, baseMoneyCost: 15, baseRepairTime: 15, baseValueGain: 60, diyDifficulty: 2, skillRequired: 'bodywork' },
+  // Motorcycle Tires
+  moto_front_tire: { category: 'tires', baseEnergyCost: 25, baseMoneyCost: 35, baseRepairTime: 35, baseValueGain: 140, diyDifficulty: 3, skillRequired: 'tires' },
+  moto_rear_tire: { category: 'tires', baseEnergyCost: 25, baseMoneyCost: 35, baseRepairTime: 35, baseValueGain: 140, diyDifficulty: 3, skillRequired: 'tires' },
+  moto_front_suspension: { category: 'tires', baseEnergyCost: 45, baseMoneyCost: 65, baseRepairTime: 75, baseValueGain: 260, diyDifficulty: 7, skillRequired: 'tires' },
+  moto_rear_suspension: { category: 'tires', baseEnergyCost: 40, baseMoneyCost: 55, baseRepairTime: 65, baseValueGain: 220, diyDifficulty: 6, skillRequired: 'tires' },
+  // Motorcycle Electrical
+  moto_battery: { category: 'interior', baseEnergyCost: 20, baseMoneyCost: 30, baseRepairTime: 25, baseValueGain: 120, diyDifficulty: 3, skillRequired: 'electrical' },
+  moto_wiring: { category: 'interior', baseEnergyCost: 40, baseMoneyCost: 50, baseRepairTime: 60, baseValueGain: 200, diyDifficulty: 7, skillRequired: 'electrical' },
+  moto_instruments: { category: 'interior', baseEnergyCost: 35, baseMoneyCost: 45, baseRepairTime: 50, baseValueGain: 180, diyDifficulty: 6, skillRequired: 'electrical' },
+  moto_seat: { category: 'interior', baseEnergyCost: 15, baseMoneyCost: 20, baseRepairTime: 20, baseValueGain: 80, diyDifficulty: 2, skillRequired: 'bodywork' },
 };
 
 // Skill mapping for DIY repairs
@@ -135,6 +143,11 @@ export const ALL_PARTS: PartType[] = [
   'paint', 'dents', 'rust', 'windows', 'lights', 'bumpers',
   'front_tires', 'rear_tires', 'wheels', 'alignment', 'tire_pressure', 'wheel_bearings',
   'seats', 'dashboard', 'electronics', 'cleaning', 'air_conditioning', 'audio_system',
+  // Motorcycle parts
+  'moto_engine', 'moto_chain', 'moto_exhaust', 'moto_carburetor',
+  'moto_fairing', 'moto_tank', 'moto_fender', 'moto_mirrors',
+  'moto_front_tire', 'moto_rear_tire', 'moto_front_suspension', 'moto_rear_suspension',
+  'moto_battery', 'moto_wiring', 'moto_instruments', 'moto_seat',
 ];
 
 export function getInitialPartUpgrades(): Record<PartType, number> {

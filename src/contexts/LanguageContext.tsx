@@ -153,6 +153,23 @@ interface Translations {
    partCleaning: string;
    partAirConditioning: string;
    partAudioSystem: string;
+   // Motorcycle part names
+   partMotoEngine: string;
+   partMotoChain: string;
+   partMotoExhaust: string;
+   partMotoCarburetor: string;
+   partMotoFairing: string;
+   partMotoTank: string;
+   partMotoFender: string;
+   partMotoMirrors: string;
+   partMotoFrontTire: string;
+   partMotoRearTire: string;
+   partMotoFrontSuspension: string;
+   partMotoRearSuspension: string;
+   partMotoBattery: string;
+   partMotoWiring: string;
+   partMotoInstruments: string;
+   partMotoSeat: string;
    
    // Damage levels
    damageMinor: string;
@@ -303,6 +320,13 @@ const translations: Record<Language, Translations> = {
      partCleaning: 'Cleaning',
      partAirConditioning: 'Air Conditioning',
      partAudioSystem: 'Audio System',
+     // Motorcycle parts
+     partMotoEngine: 'Engine', partMotoChain: 'Chain', partMotoExhaust: 'Exhaust',
+     partMotoCarburetor: 'Carburetor', partMotoFairing: 'Fairing', partMotoTank: 'Fuel Tank',
+     partMotoFender: 'Fender', partMotoMirrors: 'Mirrors', partMotoFrontTire: 'Front Tire',
+     partMotoRearTire: 'Rear Tire', partMotoFrontSuspension: 'Front Fork',
+     partMotoRearSuspension: 'Rear Shock', partMotoBattery: 'Battery',
+     partMotoWiring: 'Wiring', partMotoInstruments: 'Instruments', partMotoSeat: 'Seat',
      
      // Damage levels
      damageMinor: 'Minor',
@@ -451,6 +475,13 @@ const translations: Record<Language, Translations> = {
      partCleaning: 'Pulizia',
      partAirConditioning: 'Aria Condizionata',
      partAudioSystem: 'Sistema Audio',
+     // Motorcycle parts
+     partMotoEngine: 'Motore', partMotoChain: 'Catena', partMotoExhaust: 'Scarico',
+     partMotoCarburetor: 'Carburatore', partMotoFairing: 'Carena', partMotoTank: 'Serbatoio',
+     partMotoFender: 'Parafango', partMotoMirrors: 'Specchietti', partMotoFrontTire: 'Gomma Anteriore',
+     partMotoRearTire: 'Gomma Posteriore', partMotoFrontSuspension: 'Forcella',
+     partMotoRearSuspension: 'Ammortizzatore', partMotoBattery: 'Batteria',
+     partMotoWiring: 'Impianto Elettrico', partMotoInstruments: 'Strumentazione', partMotoSeat: 'Sella',
      
      // Damage levels
      damageMinor: 'Lieve',

@@ -1,4 +1,4 @@
-import { Customer, CustomerPersonality, CarCategory } from '@/types/game';
+import { Customer, CustomerPersonality, CarCategory, VehicleCategory } from '@/types/game';
 
 // 20 Customer personality definitions
 export const CUSTOMER_PERSONALITIES: Record<CustomerPersonality, {
@@ -205,7 +205,7 @@ function pickRandom<T>(arr: T[]): T {
   return arr[Math.floor(Math.random() * arr.length)];
 }
 
-export function generateCustomer(askingPrice: number, carCategory?: CarCategory): Customer {
+export function generateCustomer(askingPrice: number, carCategory?: VehicleCategory): Customer {
   const personalities = Object.keys(CUSTOMER_PERSONALITIES) as CustomerPersonality[];
   
   // Weight personalities based on car category if provided
@@ -213,7 +213,7 @@ export function generateCustomer(askingPrice: number, carCategory?: CarCategory)
   if (carCategory) {
     weightedPersonalities = personalities.filter(p => {
       const pref = CUSTOMER_PERSONALITIES[p].preferredCategories;
-      return !pref || pref.includes(carCategory);
+      return !pref || pref.includes(carCategory as CarCategory);
     });
     // Add some randomness - 30% chance to get any personality
     if (Math.random() < 0.3 || weightedPersonalities.length === 0) {

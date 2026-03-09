@@ -1,7 +1,14 @@
 import React, { createContext, useContext, useReducer, useEffect, useCallback, useState } from 'react';
-import { GameState, Car, PartType, ToolLevel, DiagnosticLevel, RepairJob, SaleState, Customer, Skills, calculateXpFromSale, MAX_LEVEL } from '@/types/game';
+import { GameState, Car, PartType, ToolLevel, DiagnosticLevel, RepairJob, SaleState, Customer, Skills, calculateXpFromSale, MAX_LEVEL, VehicleCategory } from '@/types/game';
 import { recalculateCarValue } from '@/data/cars';
+import { recalculateMotorcycleValue } from '@/data/motorcycles';
 import { generateCustomer, calculateCustomerOffer } from '@/data/customers';
+
+// Helper to recalculate value for both cars and motorcycles
+function recalculateVehicleValue(car: Car): number {
+  if (car.vehicleType === 'motorcycle') return recalculateMotorcycleValue(car);
+  return recalculateCarValue(car);
+}
 import { PART_DEFINITIONS, calculateDiySuccessChance, getInitialPartUpgrades } from '@/data/parts';
 import { getXpForLevel, getSkillPointsForLevel } from '@/data/upgrades';
 import { getInitialAchievements, checkAchievements } from '@/data/achievements';
@@ -200,7 +207,7 @@ function gameReducer(state: GameState, action: GameAction): GameState {
             d.part === action.payload.partType ? { ...d, repaired: true } : d
           );
           const updatedCar = { ...car, damages: updatedDamages };
-          updatedCar.currentValue = recalculateCarValue(updatedCar);
+          updatedCar.currentValue = recalculateVehicleValue(updatedCar);
           return updatedCar;
         }
         return car;
@@ -299,7 +306,7 @@ function gameReducer(state: GameState, action: GameAction): GameState {
             d.part === action.payload.partType ? { ...d, repaired: true } : d
           );
           const updatedCar = { ...car, damages: updatedDamages };
-          updatedCar.currentValue = recalculateCarValue(updatedCar);
+          updatedCar.currentValue = recalculateVehicleValue(updatedCar);
           return updatedCar;
         }
         return car;

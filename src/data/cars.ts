@@ -1,4 +1,4 @@
-import { Car, CarCategory, PartDamage, DamageLevel, PartType, PartCategory, getCategoriesForLevel, CATEGORY_UNLOCK_LEVEL } from '@/types/game';
+import { Car, CarCategory, PartDamage, DamageLevel, PartType, PartCategory, getCategoriesForLevel, CATEGORY_UNLOCK_LEVEL, VehicleType } from '@/types/game';
 import { PART_DEFINITIONS } from './parts';
 
 // Import car images - 10 per category for variety
@@ -297,6 +297,7 @@ export function generateCar(level: number): Car {
   return {
     id: `car_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
     name: template.name,
+    vehicleType: 'car' as VehicleType,
     category: template.category,
     image: images[imageVariant],
     imageVariant,

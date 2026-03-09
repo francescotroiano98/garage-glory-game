@@ -29,7 +29,18 @@ const categoryColors: Record<string, string> = {
   suv: 'bg-orange-500/20 text-orange-700 dark:text-orange-400 border-orange-500/30',
   sports: 'bg-red-500/20 text-red-700 dark:text-red-400 border-red-500/30',
   luxury: 'bg-purple-500/20 text-purple-700 dark:text-purple-400 border-purple-500/30',
+  moto: 'bg-cyan-500/20 text-cyan-700 dark:text-cyan-400 border-cyan-500/30',
 };
+
+function getCategoryColorKey(category: string): string {
+  if (category.startsWith('moto_')) return 'moto';
+  if (['junker','beater','economy','compact','hatchback'].includes(category)) return 'economy';
+  if (['sedan','wagon','coupe'].includes(category)) return 'sedan';
+  if (['suv_small','suv_mid','suv_large','crossover'].includes(category)) return 'suv';
+  if (['muscle','sports','sports_premium','exotic'].includes(category)) return 'sports';
+  if (['luxury_entry','luxury_mid','luxury_full','supercar'].includes(category)) return 'luxury';
+  return 'economy';
+}
 
 export function CarCard({
   car,
@@ -94,8 +105,8 @@ export function CarCard({
                 <h3 className={cn('font-bold truncate', compact ? 'text-sm' : 'text-base')}>
                   {car.name}
                 </h3>
-                <Badge variant="outline" className={cn('text-xs shrink-0 border', categoryColors[car.category])}>
-                  {car.category}
+                <Badge variant="outline" className={cn('text-xs shrink-0 border', categoryColors[getCategoryColorKey(car.category)])}>
+                  {car.vehicleType === 'motorcycle' ? '🏍️' : '🚗'} {car.category.replace('moto_', '').replace(/_/g, ' ')}
                 </Badge>
               </div>
 

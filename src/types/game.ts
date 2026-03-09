@@ -2,15 +2,25 @@
 export type PartCategory = 'mechanical' | 'body' | 'tires' | 'interior';
 
 // 6 parts per category = 24 total parts
+export type VehicleType = 'car' | 'motorcycle';
+
 export type PartType = 
-  // Mechanical (6)
+  // Car Mechanical (6)
   | 'engine' | 'transmission' | 'brakes' | 'suspension' | 'exhaust' | 'fuel_system'
-  // Body (6)
+  // Car Body (6)
   | 'paint' | 'dents' | 'rust' | 'windows' | 'lights' | 'bumpers'
-  // Tires (6)
+  // Car Tires (6)
   | 'front_tires' | 'rear_tires' | 'wheels' | 'alignment' | 'tire_pressure' | 'wheel_bearings'
-  // Interior (6)
-  | 'seats' | 'dashboard' | 'electronics' | 'cleaning' | 'air_conditioning' | 'audio_system';
+  // Car Interior (6)
+  | 'seats' | 'dashboard' | 'electronics' | 'cleaning' | 'air_conditioning' | 'audio_system'
+  // Motorcycle Mechanical (4)
+  | 'moto_engine' | 'moto_chain' | 'moto_exhaust' | 'moto_carburetor'
+  // Motorcycle Body (4)
+  | 'moto_fairing' | 'moto_tank' | 'moto_fender' | 'moto_mirrors'
+  // Motorcycle Tires (4)
+  | 'moto_front_tire' | 'moto_rear_tire' | 'moto_front_suspension' | 'moto_rear_suspension'
+  // Motorcycle Electrical (4)
+  | 'moto_battery' | 'moto_wiring' | 'moto_instruments' | 'moto_seat';
 
 export type DamageLevel = 'none' | 'minor' | 'moderate' | 'major' | 'critical';
 
@@ -34,65 +44,56 @@ export type CarCategory =
   | 'suv_large' | 'crossover' | 'muscle' | 'sports' | 'sports_premium'
   | 'luxury_entry' | 'luxury_mid' | 'luxury_full' | 'exotic' | 'supercar';
 
-// Map levels to categories
+// 10 motorcycle categories - unlocked at odd levels
+export type MotorcycleCategory =
+  | 'moto_old_scooter' | 'moto_scooter' | 'moto_125'
+  | 'moto_naked' | 'moto_touring' | 'moto_adventure'
+  | 'moto_enduro' | 'moto_supersport' | 'moto_caferacer' | 'moto_superbike';
+
+export type VehicleCategory = CarCategory | MotorcycleCategory;
+
+// Map levels to car categories
 export const CATEGORY_UNLOCK_LEVEL: Record<CarCategory, number> = {
-  junker: 1,
-  beater: 2,
-  economy: 3,
-  compact: 4,
-  hatchback: 5,
-  sedan: 6,
-  wagon: 7,
-  coupe: 8,
-  suv_small: 9,
-  suv_mid: 10,
-  suv_large: 11,
-  crossover: 12,
-  muscle: 13,
-  sports: 14,
-  sports_premium: 15,
-  luxury_entry: 16,
-  luxury_mid: 17,
-  luxury_full: 18,
-  exotic: 19,
-  supercar: 20,
+  junker: 1, beater: 2, economy: 3, compact: 4, hatchback: 5,
+  sedan: 6, wagon: 7, coupe: 8, suv_small: 9, suv_mid: 10,
+  suv_large: 11, crossover: 12, muscle: 13, sports: 14, sports_premium: 15,
+  luxury_entry: 16, luxury_mid: 17, luxury_full: 18, exotic: 19, supercar: 20,
+};
+
+// Map levels to motorcycle categories
+export const MOTO_CATEGORY_UNLOCK_LEVEL: Record<MotorcycleCategory, number> = {
+  moto_old_scooter: 1, moto_scooter: 3, moto_125: 5,
+  moto_naked: 7, moto_touring: 9, moto_adventure: 11,
+  moto_enduro: 13, moto_supersport: 15, moto_caferacer: 17, moto_superbike: 19,
 };
 
 // Category display names
-export const CATEGORY_NAMES: Record<CarCategory, string> = {
-  junker: 'Junker',
-  beater: 'Beater',
-  economy: 'Economy',
-  compact: 'Compact',
-  hatchback: 'Hatchback',
-  sedan: 'Sedan',
-  wagon: 'Wagon',
-  coupe: 'Coupe',
-  suv_small: 'Small SUV',
-  suv_mid: 'Mid SUV',
-  suv_large: 'Large SUV',
-  crossover: 'Crossover',
-  muscle: 'Muscle',
-  sports: 'Sports',
-  sports_premium: 'Premium Sports',
-  luxury_entry: 'Entry Luxury',
-  luxury_mid: 'Mid Luxury',
-  luxury_full: 'Full Luxury',
-  exotic: 'Exotic',
-  supercar: 'Supercar',
+export const CATEGORY_NAMES: Record<VehicleCategory, string> = {
+  junker: 'Junker', beater: 'Beater', economy: 'Economy', compact: 'Compact',
+  hatchback: 'Hatchback', sedan: 'Sedan', wagon: 'Wagon', coupe: 'Coupe',
+  suv_small: 'Small SUV', suv_mid: 'Mid SUV', suv_large: 'Large SUV',
+  crossover: 'Crossover', muscle: 'Muscle', sports: 'Sports',
+  sports_premium: 'Premium Sports', luxury_entry: 'Entry Luxury',
+  luxury_mid: 'Mid Luxury', luxury_full: 'Full Luxury', exotic: 'Exotic', supercar: 'Supercar',
+  // Motorcycles
+  moto_old_scooter: 'Old Scooter', moto_scooter: 'Scooter', moto_125: '125cc',
+  moto_naked: 'Naked', moto_touring: 'Touring', moto_adventure: 'Adventure',
+  moto_enduro: 'Enduro', moto_supersport: 'Supersport', moto_caferacer: 'Cafe Racer',
+  moto_superbike: 'Superbike',
 };
 
 export interface Car {
   id: string;
   name: string;
-  category: CarCategory;
+  vehicleType?: VehicleType; // 'car' | 'motorcycle', defaults to 'car'
+  category: CarCategory | MotorcycleCategory;
   image: string;
-  imageVariant?: number; // NEW: Image variant for variety
+  imageVariant?: number;
   baseValue: number;
   askingPrice: number;
-  purchasePrice?: number; // NEW: Track what we paid for the car
+  purchasePrice?: number;
   damages: PartDamage[];
-  totalRepairCost?: number; // NEW: Track total repair costs
+  totalRepairCost?: number;
   purchased: boolean;
   currentValue: number;
   isInGarage: boolean;
@@ -203,7 +204,7 @@ export interface Customer {
   personality: CustomerPersonality;
   patience: 'very_low' | 'low' | 'medium' | 'high' | 'very_high';
   maxBudget: number;
-  preferredCategory?: CarCategory;
+  preferredCategory?: VehicleCategory;
   bargainSkill: number; // 1-10 how good they are at negotiating
   trustLevel: number; // 1-10 how much they trust the seller
   traits: string[]; // Visible traits to player
