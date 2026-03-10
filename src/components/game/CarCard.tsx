@@ -30,16 +30,24 @@ const categoryColors: Record<string, string> = {
   sports: 'bg-red-500/20 text-red-700 dark:text-red-400 border-red-500/30',
   luxury: 'bg-purple-500/20 text-purple-700 dark:text-purple-400 border-purple-500/30',
   moto: 'bg-cyan-500/20 text-cyan-700 dark:text-cyan-400 border-cyan-500/30',
+  truck: 'bg-amber-500/20 text-amber-700 dark:text-amber-400 border-amber-500/30',
 };
 
 function getCategoryColorKey(category: string): string {
   if (category.startsWith('moto_')) return 'moto';
+  if (category.startsWith('truck_')) return 'truck';
   if (['junker','beater','economy','compact','hatchback'].includes(category)) return 'economy';
   if (['sedan','wagon','coupe'].includes(category)) return 'sedan';
   if (['suv_small','suv_mid','suv_large','crossover'].includes(category)) return 'suv';
   if (['muscle','sports','sports_premium','exotic'].includes(category)) return 'sports';
   if (['luxury_entry','luxury_mid','luxury_full','supercar'].includes(category)) return 'luxury';
   return 'economy';
+}
+
+function getVehicleIcon(vehicleType?: string): string {
+  if (vehicleType === 'motorcycle') return '🏍️';
+  if (vehicleType === 'truck') return '🚛';
+  return '🚗';
 }
 
 export function CarCard({
