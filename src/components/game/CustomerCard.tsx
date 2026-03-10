@@ -41,8 +41,12 @@ export function CustomerCard({
     <Card className="bg-gradient-to-br from-primary/5 to-secondary/20 border-primary/20">
       <CardContent className="p-4">
         <div className="flex items-center gap-3 mb-3">
-          <div className="w-14 h-14 rounded-full bg-secondary flex items-center justify-center text-3xl">
-            {customer.avatar}
+          <div className="w-14 h-14 rounded-full bg-secondary overflow-hidden flex items-center justify-center">
+            <img 
+              src={CUSTOMER_AVATAR_IMAGES[customer.personality]} 
+              alt={personalityInfo.name}
+              className="w-full h-full object-cover"
+            />
           </div>
           <div className="flex-1">
             <h3 className="font-semibold">{customer.name}</h3>

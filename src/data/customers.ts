@@ -234,7 +234,7 @@ export function generateCustomer(askingPrice: number, carCategory?: VehicleCateg
   return {
     id: `customer_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
     name: pickRandom(CUSTOMER_NAMES),
-    avatar: pickRandom(CUSTOMER_AVATARS),
+    avatar: personality, // Used as key for CUSTOMER_AVATAR_IMAGES
     personality,
     patience: patienceOptions[patIdx],
     maxBudget: Math.round(askingPrice * budgetMult),
