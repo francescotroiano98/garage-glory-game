@@ -98,6 +98,11 @@ export const CATEGORY_NAMES: Record<VehicleCategory, string> = {
   moto_naked: 'Naked', moto_touring: 'Touring', moto_adventure: 'Adventure',
   moto_enduro: 'Enduro', moto_supersport: 'Supersport', moto_caferacer: 'Cafe Racer',
   moto_superbike: 'Superbike',
+  // Trucks
+  truck_old_pickup: 'Old Pickup', truck_pickup: 'Pickup', truck_van: 'Van',
+  truck_delivery: 'Delivery', truck_flatbed: 'Flatbed', truck_box: 'Box Truck',
+  truck_tow: 'Tow Truck', truck_semi_light: 'Light Semi', truck_semi: 'Semi',
+  truck_heavy: 'Heavy Duty',
 };
 
 export interface Car {
