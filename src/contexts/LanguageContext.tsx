@@ -169,8 +169,31 @@ interface Translations {
    partMotoBattery: string;
    partMotoWiring: string;
    partMotoInstruments: string;
-   partMotoSeat: string;
-   
+    partMotoSeat: string;
+    // Truck part names
+    partTruckEngine: string;
+    partTruckTransmission: string;
+    partTruckBrakes: string;
+    partTruckHydraulics: string;
+    partTruckCabin: string;
+    partTruckBed: string;
+    partTruckFrame: string;
+    partTruckLights: string;
+    partTruckFrontAxle: string;
+    partTruckRearAxle: string;
+    partTruckTires: string;
+    partTruckSuspension: string;
+    partTruckDashboard: string;
+    partTruckWiring: string;
+    partTruckAC: string;
+    partTruckSeat: string;
+    
+    // Filters
+    allVehicles: string;
+    cars: string;
+    motorcycles: string;
+    trucks: string;
+    allCategories: string;
    // Damage levels
    damageMinor: string;
    damageModerate: string;
