@@ -87,6 +87,26 @@ export const PART_DEFINITIONS: Record<PartType, {
   moto_wiring: { category: 'interior', baseEnergyCost: 40, baseMoneyCost: 50, baseRepairTime: 60, baseValueGain: 200, diyDifficulty: 7, skillRequired: 'electrical' },
   moto_instruments: { category: 'interior', baseEnergyCost: 35, baseMoneyCost: 45, baseRepairTime: 50, baseValueGain: 180, diyDifficulty: 6, skillRequired: 'electrical' },
   moto_seat: { category: 'interior', baseEnergyCost: 15, baseMoneyCost: 20, baseRepairTime: 20, baseValueGain: 80, diyDifficulty: 2, skillRequired: 'bodywork' },
+  // Truck Mechanical
+  truck_engine: { category: 'mechanical', baseEnergyCost: 100, baseMoneyCost: 200, baseRepairTime: 200, baseValueGain: 800, diyDifficulty: 9, skillRequired: 'mechanical' },
+  truck_transmission: { category: 'mechanical', baseEnergyCost: 85, baseMoneyCost: 160, baseRepairTime: 170, baseValueGain: 640, diyDifficulty: 8, skillRequired: 'mechanical' },
+  truck_brakes: { category: 'mechanical', baseEnergyCost: 50, baseMoneyCost: 70, baseRepairTime: 80, baseValueGain: 280, diyDifficulty: 6, skillRequired: 'mechanical' },
+  truck_hydraulics: { category: 'mechanical', baseEnergyCost: 70, baseMoneyCost: 120, baseRepairTime: 110, baseValueGain: 480, diyDifficulty: 8, skillRequired: 'mechanical' },
+  // Truck Body
+  truck_cabin: { category: 'body', baseEnergyCost: 60, baseMoneyCost: 90, baseRepairTime: 100, baseValueGain: 360, diyDifficulty: 6, skillRequired: 'bodywork' },
+  truck_bed: { category: 'body', baseEnergyCost: 45, baseMoneyCost: 60, baseRepairTime: 80, baseValueGain: 240, diyDifficulty: 5, skillRequired: 'bodywork' },
+  truck_frame: { category: 'body', baseEnergyCost: 80, baseMoneyCost: 130, baseRepairTime: 140, baseValueGain: 520, diyDifficulty: 9, skillRequired: 'bodywork' },
+  truck_lights: { category: 'body', baseEnergyCost: 25, baseMoneyCost: 30, baseRepairTime: 30, baseValueGain: 120, diyDifficulty: 3, skillRequired: 'electrical' },
+  // Truck Tires
+  truck_front_axle: { category: 'tires', baseEnergyCost: 60, baseMoneyCost: 80, baseRepairTime: 90, baseValueGain: 320, diyDifficulty: 7, skillRequired: 'tires' },
+  truck_rear_axle: { category: 'tires', baseEnergyCost: 65, baseMoneyCost: 85, baseRepairTime: 95, baseValueGain: 340, diyDifficulty: 7, skillRequired: 'tires' },
+  truck_tires: { category: 'tires', baseEnergyCost: 40, baseMoneyCost: 55, baseRepairTime: 50, baseValueGain: 220, diyDifficulty: 4, skillRequired: 'tires' },
+  truck_suspension: { category: 'tires', baseEnergyCost: 55, baseMoneyCost: 75, baseRepairTime: 85, baseValueGain: 300, diyDifficulty: 7, skillRequired: 'tires' },
+  // Truck Interior
+  truck_dashboard: { category: 'interior', baseEnergyCost: 45, baseMoneyCost: 60, baseRepairTime: 65, baseValueGain: 240, diyDifficulty: 5, skillRequired: 'electrical' },
+  truck_wiring: { category: 'interior', baseEnergyCost: 50, baseMoneyCost: 65, baseRepairTime: 75, baseValueGain: 260, diyDifficulty: 7, skillRequired: 'electrical' },
+  truck_ac: { category: 'interior', baseEnergyCost: 55, baseMoneyCost: 75, baseRepairTime: 85, baseValueGain: 300, diyDifficulty: 7, skillRequired: 'electrical' },
+  truck_seat: { category: 'interior', baseEnergyCost: 20, baseMoneyCost: 25, baseRepairTime: 25, baseValueGain: 100, diyDifficulty: 2, skillRequired: 'bodywork' },
 };
 
 // Skill mapping for DIY repairs
