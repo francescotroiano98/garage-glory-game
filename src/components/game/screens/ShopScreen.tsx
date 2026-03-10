@@ -47,6 +47,7 @@ export function ShopScreen() {
    const { t } = useLanguage();
    const { playSound } = useSound();
   const [selectedPartCategory, setSelectedPartCategory] = useState<PartCategory>('mechanical');
+  const [vehiclePartTab, setVehiclePartTab] = useState<VehiclePartTab>('car');
 
   const buyToolUpgrade = (upgrade: typeof TOOL_UPGRADES[0]) => {
     if (!canAfford(upgrade.cost)) {
