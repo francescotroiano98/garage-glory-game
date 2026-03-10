@@ -516,7 +516,19 @@ const translations: Record<Language, Translations> = {
      partMotoFender: 'Parafango', partMotoMirrors: 'Specchietti', partMotoFrontTire: 'Gomma Anteriore',
      partMotoRearTire: 'Gomma Posteriore', partMotoFrontSuspension: 'Forcella',
      partMotoRearSuspension: 'Ammortizzatore', partMotoBattery: 'Batteria',
-     partMotoWiring: 'Impianto Elettrico', partMotoInstruments: 'Strumentazione', partMotoSeat: 'Sella',
+      partMotoWiring: 'Impianto Elettrico', partMotoInstruments: 'Strumentazione', partMotoSeat: 'Sella',
+      // Truck parts
+      partTruckEngine: 'Motore', partTruckTransmission: 'Cambio',
+      partTruckBrakes: 'Freni', partTruckHydraulics: 'Idraulica',
+      partTruckCabin: 'Cabina', partTruckBed: 'Cassone',
+      partTruckFrame: 'Telaio', partTruckLights: 'Fari',
+      partTruckFrontAxle: 'Asse Anteriore', partTruckRearAxle: 'Asse Posteriore',
+      partTruckTires: 'Pneumatici', partTruckSuspension: 'Sospensioni',
+      partTruckDashboard: 'Cruscotto', partTruckWiring: 'Impianto Elettrico',
+      partTruckAC: 'Aria Condizionata', partTruckSeat: 'Sedile',
+      // Filters
+      allVehicles: 'Tutti', cars: 'Auto', motorcycles: 'Moto', trucks: 'Camion',
+      allCategories: 'Tutte le Categorie',
      
      // Damage levels
      damageMinor: 'Lieve',
