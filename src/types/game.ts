@@ -79,6 +79,12 @@ export const MOTO_CATEGORY_UNLOCK_LEVEL: Record<MotorcycleCategory, number> = {
   moto_enduro: 13, moto_supersport: 15, moto_caferacer: 17, moto_superbike: 19,
 };
 
+// Map levels to truck categories (even levels)
+export const TRUCK_CATEGORY_UNLOCK_LEVEL: Record<TruckCategory, number> = {
+  truck_old_pickup: 2, truck_pickup: 4, truck_van: 6, truck_delivery: 8, truck_flatbed: 10,
+  truck_box: 12, truck_tow: 14, truck_semi_light: 16, truck_semi: 18, truck_heavy: 20,
+};
+
 // Category display names
 export const CATEGORY_NAMES: Record<VehicleCategory, string> = {
   junker: 'Junker', beater: 'Beater', economy: 'Economy', compact: 'Compact',
