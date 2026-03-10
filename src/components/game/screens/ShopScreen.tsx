@@ -17,12 +17,28 @@ import { PartType, PartCategory, MAX_LEVEL } from '@/types/game';
 const GARAGE_BAYS = GARAGE_UPGRADES.carBays;
 const GARAGE_EQUIPMENT = GARAGE_UPGRADES.specialEquipment;
 
-const PARTS_BY_CATEGORY: Record<PartCategory, PartType[]> = {
+const CAR_PARTS: Record<PartCategory, PartType[]> = {
   mechanical: ['engine', 'transmission', 'brakes', 'suspension', 'exhaust', 'fuel_system'],
   body: ['paint', 'dents', 'rust', 'windows', 'lights', 'bumpers'],
   tires: ['front_tires', 'rear_tires', 'wheels', 'alignment', 'tire_pressure', 'wheel_bearings'],
   interior: ['seats', 'dashboard', 'electronics', 'cleaning', 'air_conditioning', 'audio_system'],
 };
+
+const MOTO_PARTS: Record<PartCategory, PartType[]> = {
+  mechanical: ['moto_engine', 'moto_chain', 'moto_exhaust', 'moto_carburetor'],
+  body: ['moto_fairing', 'moto_tank', 'moto_fender', 'moto_mirrors'],
+  tires: ['moto_front_tire', 'moto_rear_tire', 'moto_front_suspension', 'moto_rear_suspension'],
+  interior: ['moto_battery', 'moto_wiring', 'moto_instruments', 'moto_seat'],
+};
+
+const TRUCK_PARTS: Record<PartCategory, PartType[]> = {
+  mechanical: ['truck_engine', 'truck_transmission', 'truck_brakes', 'truck_hydraulics'],
+  body: ['truck_cabin', 'truck_bed', 'truck_frame', 'truck_lights'],
+  tires: ['truck_front_axle', 'truck_rear_axle', 'truck_tires', 'truck_suspension'],
+  interior: ['truck_dashboard', 'truck_wiring', 'truck_ac', 'truck_seat'],
+};
+
+type VehiclePartTab = 'car' | 'moto' | 'truck';
 
 const MAX_PART_LEVEL = 10;
 
