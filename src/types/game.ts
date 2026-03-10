@@ -20,7 +20,15 @@ export type PartType =
   // Motorcycle Tires (4)
   | 'moto_front_tire' | 'moto_rear_tire' | 'moto_front_suspension' | 'moto_rear_suspension'
   // Motorcycle Electrical (4)
-  | 'moto_battery' | 'moto_wiring' | 'moto_instruments' | 'moto_seat';
+  | 'moto_battery' | 'moto_wiring' | 'moto_instruments' | 'moto_seat'
+  // Truck Mechanical (4)
+  | 'truck_engine' | 'truck_transmission' | 'truck_brakes' | 'truck_hydraulics'
+  // Truck Body (4)
+  | 'truck_cabin' | 'truck_bed' | 'truck_frame' | 'truck_lights'
+  // Truck Tires (4)
+  | 'truck_front_axle' | 'truck_rear_axle' | 'truck_tires' | 'truck_suspension'
+  // Truck Interior (4)
+  | 'truck_dashboard' | 'truck_wiring' | 'truck_ac' | 'truck_seat';
 
 export type DamageLevel = 'none' | 'minor' | 'moderate' | 'major' | 'critical';
 
