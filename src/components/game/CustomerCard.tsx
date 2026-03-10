@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Zap } from 'lucide-react';
 import { CUSTOMER_PERSONALITIES, getPatienceRounds } from '@/data/customers';
+import { CUSTOMER_AVATAR_IMAGES } from '@/data/customerAvatars';
 
 interface CustomerCardProps {
   customer: Customer;
