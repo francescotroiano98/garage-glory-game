@@ -114,7 +114,7 @@ export function CarCard({
                   {car.name}
                 </h3>
                 <Badge variant="outline" className={cn('text-xs shrink-0 border', categoryColors[getCategoryColorKey(car.category)])}>
-                  {car.vehicleType === 'motorcycle' ? '🏍️' : '🚗'} {car.category.replace('moto_', '').replace(/_/g, ' ')}
+                  {getVehicleIcon(car.vehicleType)} {car.category.replace('moto_', '').replace('truck_', '').replace(/_/g, ' ')}
                 </Badge>
               </div>
 
