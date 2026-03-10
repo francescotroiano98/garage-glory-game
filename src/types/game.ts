@@ -2,7 +2,7 @@
 export type PartCategory = 'mechanical' | 'body' | 'tires' | 'interior';
 
 // 6 parts per category = 24 total parts
-export type VehicleType = 'car' | 'motorcycle';
+export type VehicleType = 'car' | 'motorcycle' | 'truck';
 
 export type PartType = 
   // Car Mechanical (6)
@@ -20,7 +20,15 @@ export type PartType =
   // Motorcycle Tires (4)
   | 'moto_front_tire' | 'moto_rear_tire' | 'moto_front_suspension' | 'moto_rear_suspension'
   // Motorcycle Electrical (4)
-  | 'moto_battery' | 'moto_wiring' | 'moto_instruments' | 'moto_seat';
+  | 'moto_battery' | 'moto_wiring' | 'moto_instruments' | 'moto_seat'
+  // Truck Mechanical (4)
+  | 'truck_engine' | 'truck_transmission' | 'truck_brakes' | 'truck_hydraulics'
+  // Truck Body (4)
+  | 'truck_cabin' | 'truck_bed' | 'truck_frame' | 'truck_lights'
+  // Truck Tires (4)
+  | 'truck_front_axle' | 'truck_rear_axle' | 'truck_tires' | 'truck_suspension'
+  // Truck Interior (4)
+  | 'truck_dashboard' | 'truck_wiring' | 'truck_ac' | 'truck_seat';
 
 export type DamageLevel = 'none' | 'minor' | 'moderate' | 'major' | 'critical';
 
@@ -50,7 +58,11 @@ export type MotorcycleCategory =
   | 'moto_naked' | 'moto_touring' | 'moto_adventure'
   | 'moto_enduro' | 'moto_supersport' | 'moto_caferacer' | 'moto_superbike';
 
-export type VehicleCategory = CarCategory | MotorcycleCategory;
+export type TruckCategory =
+  | 'truck_old_pickup' | 'truck_pickup' | 'truck_van' | 'truck_delivery' | 'truck_flatbed'
+  | 'truck_box' | 'truck_tow' | 'truck_semi_light' | 'truck_semi' | 'truck_heavy';
+
+export type VehicleCategory = CarCategory | MotorcycleCategory | TruckCategory;
 
 // Map levels to car categories
 export const CATEGORY_UNLOCK_LEVEL: Record<CarCategory, number> = {
@@ -67,6 +79,12 @@ export const MOTO_CATEGORY_UNLOCK_LEVEL: Record<MotorcycleCategory, number> = {
   moto_enduro: 13, moto_supersport: 15, moto_caferacer: 17, moto_superbike: 19,
 };
 
+// Map levels to truck categories (even levels)
+export const TRUCK_CATEGORY_UNLOCK_LEVEL: Record<TruckCategory, number> = {
+  truck_old_pickup: 2, truck_pickup: 4, truck_van: 6, truck_delivery: 8, truck_flatbed: 10,
+  truck_box: 12, truck_tow: 14, truck_semi_light: 16, truck_semi: 18, truck_heavy: 20,
+};
+
 // Category display names
 export const CATEGORY_NAMES: Record<VehicleCategory, string> = {
   junker: 'Junker', beater: 'Beater', economy: 'Economy', compact: 'Compact',
@@ -80,13 +98,18 @@ export const CATEGORY_NAMES: Record<VehicleCategory, string> = {
   moto_naked: 'Naked', moto_touring: 'Touring', moto_adventure: 'Adventure',
   moto_enduro: 'Enduro', moto_supersport: 'Supersport', moto_caferacer: 'Cafe Racer',
   moto_superbike: 'Superbike',
+  // Trucks
+  truck_old_pickup: 'Old Pickup', truck_pickup: 'Pickup', truck_van: 'Van',
+  truck_delivery: 'Delivery', truck_flatbed: 'Flatbed', truck_box: 'Box Truck',
+  truck_tow: 'Tow Truck', truck_semi_light: 'Light Semi', truck_semi: 'Semi',
+  truck_heavy: 'Heavy Duty',
 };
 
 export interface Car {
   id: string;
   name: string;
   vehicleType?: VehicleType; // 'car' | 'motorcycle', defaults to 'car'
-  category: CarCategory | MotorcycleCategory;
+  category: CarCategory | MotorcycleCategory | TruckCategory;
   image: string;
   imageVariant?: number;
   baseValue: number;

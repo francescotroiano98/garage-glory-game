@@ -169,8 +169,31 @@ interface Translations {
    partMotoBattery: string;
    partMotoWiring: string;
    partMotoInstruments: string;
-   partMotoSeat: string;
-   
+    partMotoSeat: string;
+    // Truck part names
+    partTruckEngine: string;
+    partTruckTransmission: string;
+    partTruckBrakes: string;
+    partTruckHydraulics: string;
+    partTruckCabin: string;
+    partTruckBed: string;
+    partTruckFrame: string;
+    partTruckLights: string;
+    partTruckFrontAxle: string;
+    partTruckRearAxle: string;
+    partTruckTires: string;
+    partTruckSuspension: string;
+    partTruckDashboard: string;
+    partTruckWiring: string;
+    partTruckAC: string;
+    partTruckSeat: string;
+    
+    // Filters
+    allVehicles: string;
+    cars: string;
+    motorcycles: string;
+    trucks: string;
+    allCategories: string;
    // Damage levels
    damageMinor: string;
    damageModerate: string;
@@ -326,7 +349,19 @@ const translations: Record<Language, Translations> = {
      partMotoFender: 'Fender', partMotoMirrors: 'Mirrors', partMotoFrontTire: 'Front Tire',
      partMotoRearTire: 'Rear Tire', partMotoFrontSuspension: 'Front Fork',
      partMotoRearSuspension: 'Rear Shock', partMotoBattery: 'Battery',
-     partMotoWiring: 'Wiring', partMotoInstruments: 'Instruments', partMotoSeat: 'Seat',
+      partMotoWiring: 'Wiring', partMotoInstruments: 'Instruments', partMotoSeat: 'Seat',
+      // Truck parts
+      partTruckEngine: 'Engine', partTruckTransmission: 'Transmission',
+      partTruckBrakes: 'Brakes', partTruckHydraulics: 'Hydraulics',
+      partTruckCabin: 'Cabin', partTruckBed: 'Truck Bed',
+      partTruckFrame: 'Frame', partTruckLights: 'Lights',
+      partTruckFrontAxle: 'Front Axle', partTruckRearAxle: 'Rear Axle',
+      partTruckTires: 'Tires', partTruckSuspension: 'Suspension',
+      partTruckDashboard: 'Dashboard', partTruckWiring: 'Wiring',
+      partTruckAC: 'A/C', partTruckSeat: 'Seat',
+      // Filters
+      allVehicles: 'All', cars: 'Cars', motorcycles: 'Motorcycles', trucks: 'Trucks',
+      allCategories: 'All Categories',
      
      // Damage levels
      damageMinor: 'Minor',
@@ -481,7 +516,19 @@ const translations: Record<Language, Translations> = {
      partMotoFender: 'Parafango', partMotoMirrors: 'Specchietti', partMotoFrontTire: 'Gomma Anteriore',
      partMotoRearTire: 'Gomma Posteriore', partMotoFrontSuspension: 'Forcella',
      partMotoRearSuspension: 'Ammortizzatore', partMotoBattery: 'Batteria',
-     partMotoWiring: 'Impianto Elettrico', partMotoInstruments: 'Strumentazione', partMotoSeat: 'Sella',
+      partMotoWiring: 'Impianto Elettrico', partMotoInstruments: 'Strumentazione', partMotoSeat: 'Sella',
+      // Truck parts
+      partTruckEngine: 'Motore', partTruckTransmission: 'Cambio',
+      partTruckBrakes: 'Freni', partTruckHydraulics: 'Idraulica',
+      partTruckCabin: 'Cabina', partTruckBed: 'Cassone',
+      partTruckFrame: 'Telaio', partTruckLights: 'Fari',
+      partTruckFrontAxle: 'Asse Anteriore', partTruckRearAxle: 'Asse Posteriore',
+      partTruckTires: 'Pneumatici', partTruckSuspension: 'Sospensioni',
+      partTruckDashboard: 'Cruscotto', partTruckWiring: 'Impianto Elettrico',
+      partTruckAC: 'Aria Condizionata', partTruckSeat: 'Sedile',
+      // Filters
+      allVehicles: 'Tutti', cars: 'Auto', motorcycles: 'Moto', trucks: 'Camion',
+      allCategories: 'Tutte le Categorie',
      
      // Damage levels
      damageMinor: 'Lieve',

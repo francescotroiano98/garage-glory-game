@@ -17,12 +17,28 @@ import { PartType, PartCategory, MAX_LEVEL } from '@/types/game';
 const GARAGE_BAYS = GARAGE_UPGRADES.carBays;
 const GARAGE_EQUIPMENT = GARAGE_UPGRADES.specialEquipment;
 
-const PARTS_BY_CATEGORY: Record<PartCategory, PartType[]> = {
+const CAR_PARTS: Record<PartCategory, PartType[]> = {
   mechanical: ['engine', 'transmission', 'brakes', 'suspension', 'exhaust', 'fuel_system'],
   body: ['paint', 'dents', 'rust', 'windows', 'lights', 'bumpers'],
   tires: ['front_tires', 'rear_tires', 'wheels', 'alignment', 'tire_pressure', 'wheel_bearings'],
   interior: ['seats', 'dashboard', 'electronics', 'cleaning', 'air_conditioning', 'audio_system'],
 };
+
+const MOTO_PARTS: Record<PartCategory, PartType[]> = {
+  mechanical: ['moto_engine', 'moto_chain', 'moto_exhaust', 'moto_carburetor'],
+  body: ['moto_fairing', 'moto_tank', 'moto_fender', 'moto_mirrors'],
+  tires: ['moto_front_tire', 'moto_rear_tire', 'moto_front_suspension', 'moto_rear_suspension'],
+  interior: ['moto_battery', 'moto_wiring', 'moto_instruments', 'moto_seat'],
+};
+
+const TRUCK_PARTS: Record<PartCategory, PartType[]> = {
+  mechanical: ['truck_engine', 'truck_transmission', 'truck_brakes', 'truck_hydraulics'],
+  body: ['truck_cabin', 'truck_bed', 'truck_frame', 'truck_lights'],
+  tires: ['truck_front_axle', 'truck_rear_axle', 'truck_tires', 'truck_suspension'],
+  interior: ['truck_dashboard', 'truck_wiring', 'truck_ac', 'truck_seat'],
+};
+
+type VehiclePartTab = 'car' | 'moto' | 'truck';
 
 const MAX_PART_LEVEL = 10;
 
@@ -31,6 +47,7 @@ export function ShopScreen() {
    const { t } = useLanguage();
    const { playSound } = useSound();
   const [selectedPartCategory, setSelectedPartCategory] = useState<PartCategory>('mechanical');
+  const [vehiclePartTab, setVehiclePartTab] = useState<VehiclePartTab>('car');
 
   const buyToolUpgrade = (upgrade: typeof TOOL_UPGRADES[0]) => {
     if (!canAfford(upgrade.cost)) {
@@ -308,7 +325,22 @@ export function ShopScreen() {
               10 levels per part • +3% DIY success each level
             </CardDescription>
           </CardHeader>
-          <CardContent>
+           <CardContent>
+            {/* Vehicle type selector */}
+            <div className="flex gap-1 mb-3">
+              {(['car', 'moto', 'truck'] as VehiclePartTab[]).map(tab => (
+                <Button
+                  key={tab}
+                  size="sm"
+                  variant={vehiclePartTab === tab ? 'default' : 'outline'}
+                  className="text-xs flex-1"
+                  onClick={() => setVehiclePartTab(tab)}
+                >
+                  {tab === 'car' ? '🚗 Auto' : tab === 'moto' ? '🏍️ Moto' : '🚛 Truck'}
+                </Button>
+              ))}
+            </div>
+
             <Tabs value={selectedPartCategory} onValueChange={(v) => setSelectedPartCategory(v as PartCategory)}>
               <TabsList className="grid w-full grid-cols-4 mb-4">
                 <TabsTrigger value="mechanical" className="text-xs">⚙️ {t.mech}</TabsTrigger>
@@ -317,44 +349,46 @@ export function ShopScreen() {
                 <TabsTrigger value="interior" className="text-xs">🪑 {t.int}</TabsTrigger>
               </TabsList>
               
-              {Object.entries(PARTS_BY_CATEGORY).map(([category, parts]) => (
-                <TabsContent key={category} value={category} className="space-y-2 mt-0">
-                  {parts.map((partType) => {
-                    const currentLevel = state.partUpgrades[partType] || 0;
-                    const cost = getPartUpgradeCost(partType, currentLevel);
-                    const isMaxed = currentLevel >= MAX_PART_LEVEL;
-                    const partDef = PART_DEFINITIONS[partType];
-                    
-                    return (
-                      <div key={partType} className="flex items-center justify-between p-2 bg-secondary/30 rounded-lg">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2">
-                            <span className="text-lg">{PART_ICONS[partType]}</span>
-                            <span className="font-medium text-sm">{getPartName(partType, t as unknown as Record<string, string>)}</span>
-                            <Badge variant={isMaxed ? "default" : "secondary"} className="text-xs">
-                              {currentLevel}/{MAX_PART_LEVEL}
-                            </Badge>
+              {(() => {
+                const partsMap = vehiclePartTab === 'moto' ? MOTO_PARTS : vehiclePartTab === 'truck' ? TRUCK_PARTS : CAR_PARTS;
+                return Object.entries(partsMap).map(([category, parts]) => (
+                  <TabsContent key={category} value={category} className="space-y-2 mt-0">
+                    {(parts as PartType[]).map((partType) => {
+                      const currentLevel = state.partUpgrades[partType] || 0;
+                      const cost = getPartUpgradeCost(partType, currentLevel);
+                      const isMaxed = currentLevel >= MAX_PART_LEVEL;
+                      
+                      return (
+                        <div key={partType} className="flex items-center justify-between p-2 bg-secondary/30 rounded-lg">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2">
+                              <span className="text-lg">{PART_ICONS[partType]}</span>
+                              <span className="font-medium text-sm">{getPartName(partType, t as unknown as Record<string, string>)}</span>
+                              <Badge variant={isMaxed ? "default" : "secondary"} className="text-xs">
+                                {currentLevel}/{MAX_PART_LEVEL}
+                              </Badge>
+                            </div>
+                            <div className="flex items-center gap-2 mt-1">
+                              <Progress value={(currentLevel / MAX_PART_LEVEL) * 100} className="h-1.5 flex-1" />
+                              <span className="text-xs text-muted-foreground">
+                                +{currentLevel * 3}% DIY
+                              </span>
+                            </div>
                           </div>
-                          <div className="flex items-center gap-2 mt-1">
-                            <Progress value={(currentLevel / MAX_PART_LEVEL) * 100} className="h-1.5 flex-1" />
-                            <span className="text-xs text-muted-foreground">
-                              +{currentLevel * 3}% DIY
-                            </span>
-                          </div>
+                          <Button 
+                            size="sm" 
+                            onClick={() => upgradePartLevel(partType)}
+                            disabled={isMaxed || !canAfford(cost)}
+                            className="ml-2"
+                          >
+                            {isMaxed ? <Check className="w-4 h-4" /> : `$${cost.toLocaleString()}`}
+                          </Button>
                         </div>
-                        <Button 
-                          size="sm" 
-                          onClick={() => upgradePartLevel(partType)}
-                          disabled={isMaxed || !canAfford(cost)}
-                          className="ml-2"
-                        >
-                          {isMaxed ? <Check className="w-4 h-4" /> : `$${cost.toLocaleString()}`}
-                        </Button>
-                      </div>
-                    );
-                  })}
-                </TabsContent>
-              ))}
+                      );
+                    })}
+                  </TabsContent>
+                ));
+              })()}
             </Tabs>
           </CardContent>
         </Card>

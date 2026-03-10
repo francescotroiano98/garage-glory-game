@@ -17,9 +17,18 @@
    moto_fender: 'partMotoFender', moto_mirrors: 'partMotoMirrors',
    moto_front_tire: 'partMotoFrontTire', moto_rear_tire: 'partMotoRearTire',
    moto_front_suspension: 'partMotoFrontSuspension', moto_rear_suspension: 'partMotoRearSuspension',
-   moto_battery: 'partMotoBattery', moto_wiring: 'partMotoWiring',
-   moto_instruments: 'partMotoInstruments', moto_seat: 'partMotoSeat',
- };
+    moto_battery: 'partMotoBattery', moto_wiring: 'partMotoWiring',
+    moto_instruments: 'partMotoInstruments', moto_seat: 'partMotoSeat',
+    // Truck parts
+    truck_engine: 'partTruckEngine', truck_transmission: 'partTruckTransmission',
+    truck_brakes: 'partTruckBrakes', truck_hydraulics: 'partTruckHydraulics',
+    truck_cabin: 'partTruckCabin', truck_bed: 'partTruckBed',
+    truck_frame: 'partTruckFrame', truck_lights: 'partTruckLights',
+    truck_front_axle: 'partTruckFrontAxle', truck_rear_axle: 'partTruckRearAxle',
+    truck_tires: 'partTruckTires', truck_suspension: 'partTruckSuspension',
+    truck_dashboard: 'partTruckDashboard', truck_wiring: 'partTruckWiring',
+    truck_ac: 'partTruckAC', truck_seat: 'partTruckSeat',
+  };
  
  // Map category types to translation keys
  export const CATEGORY_TRANSLATION_KEYS: Record<PartCategory, string> = {

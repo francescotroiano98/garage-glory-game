@@ -2,11 +2,13 @@ import React, { createContext, useContext, useReducer, useEffect, useCallback, u
 import { GameState, Car, PartType, ToolLevel, DiagnosticLevel, RepairJob, SaleState, Customer, Skills, calculateXpFromSale, MAX_LEVEL, VehicleCategory } from '@/types/game';
 import { recalculateCarValue } from '@/data/cars';
 import { recalculateMotorcycleValue } from '@/data/motorcycles';
+import { recalculateTruckValue } from '@/data/trucks';
 import { generateCustomer, calculateCustomerOffer } from '@/data/customers';
 
 // Helper to recalculate value for both cars and motorcycles
 function recalculateVehicleValue(car: Car): number {
   if (car.vehicleType === 'motorcycle') return recalculateMotorcycleValue(car);
+  if (car.vehicleType === 'truck') return recalculateTruckValue(car);
   return recalculateCarValue(car);
 }
 import { PART_DEFINITIONS, calculateDiySuccessChance, getInitialPartUpgrades } from '@/data/parts';
