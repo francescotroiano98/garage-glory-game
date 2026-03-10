@@ -2,7 +2,7 @@
 export type PartCategory = 'mechanical' | 'body' | 'tires' | 'interior';
 
 // 6 parts per category = 24 total parts
-export type VehicleType = 'car' | 'motorcycle';
+export type VehicleType = 'car' | 'motorcycle' | 'truck';
 
 export type PartType = 
   // Car Mechanical (6)
