@@ -18,6 +18,14 @@ export const PART_ICONS: Record<PartType, string> = {
   moto_front_tire: '🛞', moto_rear_tire: '🛞', moto_front_suspension: '🔩', moto_rear_suspension: '🔩',
   // Motorcycle Electrical
   moto_battery: '🔋', moto_wiring: '⚡', moto_instruments: '🖥️', moto_seat: '🪑',
+  // Truck Mechanical
+  truck_engine: '🔧', truck_transmission: '⚙️', truck_brakes: '🛑', truck_hydraulics: '🏗️',
+  // Truck Body
+  truck_cabin: '🚛', truck_bed: '📦', truck_frame: '🔩', truck_lights: '💡',
+  // Truck Tires
+  truck_front_axle: '🛞', truck_rear_axle: '🛞', truck_tires: '🛞', truck_suspension: '🔩',
+  // Truck Interior
+  truck_dashboard: '🖥️', truck_wiring: '⚡', truck_ac: '❄️', truck_seat: '🪑',
 };
 
 // Part definitions with costs balanced for 3x value increase minimum
