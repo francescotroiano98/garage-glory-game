@@ -58,7 +58,11 @@ export type MotorcycleCategory =
   | 'moto_naked' | 'moto_touring' | 'moto_adventure'
   | 'moto_enduro' | 'moto_supersport' | 'moto_caferacer' | 'moto_superbike';
 
-export type VehicleCategory = CarCategory | MotorcycleCategory;
+export type TruckCategory =
+  | 'truck_old_pickup' | 'truck_pickup' | 'truck_van' | 'truck_delivery' | 'truck_flatbed'
+  | 'truck_box' | 'truck_tow' | 'truck_semi_light' | 'truck_semi' | 'truck_heavy';
+
+export type VehicleCategory = CarCategory | MotorcycleCategory | TruckCategory;
 
 // Map levels to car categories
 export const CATEGORY_UNLOCK_LEVEL: Record<CarCategory, number> = {
