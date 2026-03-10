@@ -109,7 +109,7 @@ export interface Car {
   id: string;
   name: string;
   vehicleType?: VehicleType; // 'car' | 'motorcycle', defaults to 'car'
-  category: CarCategory | MotorcycleCategory;
+  category: CarCategory | MotorcycleCategory | TruckCategory;
   image: string;
   imageVariant?: number;
   baseValue: number;
