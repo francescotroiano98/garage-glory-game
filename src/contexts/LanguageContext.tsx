@@ -349,7 +349,19 @@ const translations: Record<Language, Translations> = {
      partMotoFender: 'Fender', partMotoMirrors: 'Mirrors', partMotoFrontTire: 'Front Tire',
      partMotoRearTire: 'Rear Tire', partMotoFrontSuspension: 'Front Fork',
      partMotoRearSuspension: 'Rear Shock', partMotoBattery: 'Battery',
-     partMotoWiring: 'Wiring', partMotoInstruments: 'Instruments', partMotoSeat: 'Seat',
+      partMotoWiring: 'Wiring', partMotoInstruments: 'Instruments', partMotoSeat: 'Seat',
+      // Truck parts
+      partTruckEngine: 'Engine', partTruckTransmission: 'Transmission',
+      partTruckBrakes: 'Brakes', partTruckHydraulics: 'Hydraulics',
+      partTruckCabin: 'Cabin', partTruckBed: 'Truck Bed',
+      partTruckFrame: 'Frame', partTruckLights: 'Lights',
+      partTruckFrontAxle: 'Front Axle', partTruckRearAxle: 'Rear Axle',
+      partTruckTires: 'Tires', partTruckSuspension: 'Suspension',
+      partTruckDashboard: 'Dashboard', partTruckWiring: 'Wiring',
+      partTruckAC: 'A/C', partTruckSeat: 'Seat',
+      // Filters
+      allVehicles: 'All', cars: 'Cars', motorcycles: 'Motorcycles', trucks: 'Trucks',
+      allCategories: 'All Categories',
      
      // Damage levels
      damageMinor: 'Minor',
