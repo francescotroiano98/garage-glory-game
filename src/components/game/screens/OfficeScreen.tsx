@@ -5,7 +5,7 @@ import { NewspaperScreen } from './NewspaperScreen';
 import { CustomerCard } from '@/components/game/CustomerCard';
 import { CarCard } from '@/components/game/CarCard';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Newspaper, Phone, PhoneCall, Loader2 } from 'lucide-react';
+import { ArrowLeft, Briefcase, Newspaper, Phone, PhoneCall, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useSound } from '@/hooks/useSound';
 import { getPatienceRounds } from '@/data/customers';
