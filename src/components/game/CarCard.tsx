@@ -5,12 +5,9 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { Info, AlertTriangle, CheckCircle } from 'lucide-react';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { CATEGORY_DISPLAY_NAMES, VEHICLE_NAME_IT, getPartName, getDamageLevelName } from '@/utils/partTranslations';
 
 interface CarCardProps {
   car: Car;
@@ -51,21 +48,19 @@ function getVehicleIcon(vehicleType?: string): string {
 }
 
 export function CarCard({
-  car,
-  onClick,
-  showPrice = true,
-  showDamages = true,
-  visibilityChance = 0,
-  compact = false,
-  actionButton,
-  topBadge,
+  car, onClick, showPrice = true, showDamages = true,
+  visibilityChance = 0, compact = false, actionButton, topBadge,
 }: CarCardProps) {
   const [showIssuesDialog, setShowIssuesDialog] = useState(false);
+  const { language, t, formatMoney } = useLanguage();
   
   const visibleDamages = car.damages.filter(d => !d.repaired && (d.visible || Math.random() < visibilityChance));
   const unrepaired = car.damages.filter(d => !d.repaired).length;
   const repaired = car.damages.filter(d => d.repaired).length;
   const allRepaired = unrepaired === 0;
+
+  const displayName = language === 'it' ? (VEHICLE_NAME_IT[car.name] || car.name) : car.name;
+  const categoryName = CATEGORY_DISPLAY_NAMES[language]?.[car.category] || car.category;
 
   const handleInfoClick = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -82,50 +77,33 @@ export function CarCard({
         )}
         onClick={onClick}
       >
-        {topBadge && (
-          <div className="absolute top-2 left-2 z-10">
-            {topBadge}
-          </div>
-        )}
-
-        {actionButton && (
-          <div className="absolute top-2 right-2 z-10">
-            {actionButton}
-          </div>
-        )}
+        {topBadge && <div className="absolute top-2 left-2 z-10">{topBadge}</div>}
+        {actionButton && <div className="absolute top-2 right-2 z-10">{actionButton}</div>}
 
         <CardContent className={cn('p-4', compact && 'p-2', (actionButton || topBadge) && 'pt-12')}>
           <div className="flex items-center gap-3">
-            {/* Car Image - use car.image directly which is set at generation time */}
-            <div className={cn(
-              'flex items-center justify-center rounded-lg overflow-hidden shrink-0',
-              compact ? 'w-14 h-14' : 'w-20 h-20'
-            )}>
-              <img 
-                src={car.image} 
-                alt={car.name}
-                className="w-full h-full object-contain"
-              />
+            <div className={cn('flex items-center justify-center rounded-lg overflow-hidden shrink-0', compact ? 'w-14 h-14' : 'w-20 h-20')}>
+              <img src={car.image} alt={displayName} className="w-full h-full object-contain" />
             </div>
 
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-1">
                 <h3 className={cn('font-bold truncate', compact ? 'text-sm' : 'text-base')}>
-                  {car.name}
+                  {displayName}
                 </h3>
                 <Badge variant="outline" className={cn('text-xs shrink-0 border', categoryColors[getCategoryColorKey(car.category)])}>
-                  {getVehicleIcon(car.vehicleType)} {car.category.replace('moto_', '').replace('truck_', '').replace(/_/g, ' ')}
+                  {getVehicleIcon(car.vehicleType)} {categoryName}
                 </Badge>
               </div>
 
               {showPrice && (
                 <div className="flex items-center gap-2">
                   <span className={cn('font-bold text-primary', compact ? 'text-sm' : 'text-lg')}>
-                    ${car.askingPrice.toLocaleString()}
+                    {formatMoney(car.askingPrice)}
                   </span>
                   {car.purchased && (
                     <span className="text-xs text-muted-foreground">
-                      Value: ${Math.round(car.currentValue).toLocaleString()}
+                      {t.value}: {formatMoney(Math.round(car.currentValue))}
                     </span>
                   )}
                 </div>
@@ -136,19 +114,14 @@ export function CarCard({
                   {allRepaired ? (
                     <Badge variant="secondary" className="text-xs bg-green-500/20 text-green-700 dark:text-green-400">
                       <CheckCircle className="w-3 h-3 mr-1" />
-                      Ready to sell
+                      {t.readyToSellBadge}
                     </Badge>
                   ) : (
                     <>
                       <Badge variant="secondary" className="text-xs">
-                        {repaired}/{repaired + unrepaired} fixed
+                        {repaired}/{repaired + unrepaired} {t.fixed}
                       </Badge>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        className="h-6 w-6 p-0"
-                        onClick={handleInfoClick}
-                      >
+                      <Button size="sm" variant="ghost" className="h-6 w-6 p-0" onClick={handleInfoClick}>
                         <Info className="w-4 h-4 text-muted-foreground" />
                       </Button>
                     </>
@@ -165,27 +138,25 @@ export function CarCard({
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <AlertTriangle className="w-5 h-5 text-destructive" />
-              {car.name} - Issues
+              {displayName} - {t.issuesTitle}
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-2 max-h-[60vh] overflow-y-auto">
             {visibleDamages.length > 0 ? (
               visibleDamages.map((d, i) => (
                 <div key={i} className="flex items-center justify-between p-2 bg-destructive/10 rounded-lg border border-destructive/20">
-                  <span className="text-sm capitalize">{d.part.replace('_', ' ')}</span>
+                  <span className="text-sm">{getPartName(d.part, t as unknown as Record<string, string>)}</span>
                   <Badge variant="outline" className="text-xs border-destructive/30 text-destructive">
-                    {d.level}
+                    {getDamageLevelName(d.level, t as unknown as Record<string, string>)}
                   </Badge>
                 </div>
               ))
             ) : (
-              <p className="text-sm text-muted-foreground text-center py-4">
-                No visible issues detected
-              </p>
+              <p className="text-sm text-muted-foreground text-center py-4">{t.noVisibleIssues}</p>
             )}
             {unrepaired > visibleDamages.length && (
               <p className="text-xs text-muted-foreground text-center mt-2">
-                + {unrepaired - visibleDamages.length} hidden issue(s)
+                + {unrepaired - visibleDamages.length} {t.hiddenIssuesText}
               </p>
             )}
           </div>

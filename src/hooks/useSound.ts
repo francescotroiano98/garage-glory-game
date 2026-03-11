@@ -27,6 +27,11 @@ export function useSound() {
     return saved === 'true';
   });
   
+  const [sfxVolume, setSfxVolumeState] = useState(() => {
+    const saved = localStorage.getItem('game_sfx_volume');
+    return saved ? parseFloat(saved) : 0.3;
+  });
+  
   const audioRefs = useRef<Map<SoundType, HTMLAudioElement>>(new Map());
 
   // Preload sounds
@@ -34,7 +39,7 @@ export function useSound() {
     Object.entries(SOUNDS).forEach(([key, url]) => {
       const audio = new Audio(url);
       audio.preload = 'auto';
-      audio.volume = 0.3;
+      audio.volume = sfxVolume;
       audioRefs.current.set(key as SoundType, audio);
     });
     
@@ -47,15 +52,20 @@ export function useSound() {
     };
   }, []);
 
+  // Update volume on all audio elements when it changes
+  useEffect(() => {
+    audioRefs.current.forEach(audio => {
+      audio.volume = sfxVolume;
+    });
+  }, [sfxVolume]);
+
   const playSound = useCallback((type: SoundType) => {
     if (muted) return;
     
     const audio = audioRefs.current.get(type);
     if (audio) {
       audio.currentTime = 0;
-      audio.play().catch(() => {
-        // Ignore autoplay errors
-      });
+      audio.play().catch(() => {});
     }
   }, [muted]);
 
@@ -67,93 +77,114 @@ export function useSound() {
     });
   }, []);
 
-  return { playSound, muted, toggleMute };
+  const setSfxVolume = useCallback((volume: number) => {
+    setSfxVolumeState(volume);
+    localStorage.setItem('game_sfx_volume', String(volume));
+  }, []);
+
+  return { playSound, muted, toggleMute, sfxVolume, setSfxVolume };
 }
 
 // Use a local audio file for reliable playback
 import backgroundMusicFile from '@/assets/audio/background-music.mp3';
  
- // Global audio instance for background music - singleton pattern
- class BackgroundMusicManager {
-   private static instance: BackgroundMusicManager;
-   private audio: HTMLAudioElement | null = null;
-   private initialized = false;
-   private userInteracted = false;
- 
-   static getInstance(): BackgroundMusicManager {
-     if (!BackgroundMusicManager.instance) {
-       BackgroundMusicManager.instance = new BackgroundMusicManager();
-     }
-     return BackgroundMusicManager.instance;
-   }
- 
-   init() {
-     if (this.initialized) return;
-     this.initialized = true;
- 
-     this.audio = new Audio(backgroundMusicFile);
-     this.audio.loop = true;
-     this.audio.volume = 0.15;
-     this.audio.preload = 'auto';
- 
-     // Handle user interaction requirement
-     const enableAudio = () => {
-       this.userInteracted = true;
-       const shouldPlay = localStorage.getItem('game_music_playing') === 'true';
-       if (shouldPlay && this.audio) {
-         this.audio.play().catch(() => {});
-       }
-       document.removeEventListener('click', enableAudio);
-       document.removeEventListener('touchstart', enableAudio);
-     };
- 
-     document.addEventListener('click', enableAudio);
-     document.addEventListener('touchstart', enableAudio);
-   }
- 
-   play() {
-     if (this.audio && this.userInteracted) {
-       this.audio.play().catch(() => {});
-     }
-   }
- 
-   pause() {
-     if (this.audio) {
-       this.audio.pause();
-     }
-   }
- }
- 
- // Initialize on module load
- const musicManager = BackgroundMusicManager.getInstance();
- 
- export function useBackgroundMusic() {
-   const [playing, setPlaying] = useState(() => {
-     const saved = localStorage.getItem('game_music_playing');
-     return saved === 'true';
-   });
- 
-   // Initialize music manager once
-   useEffect(() => {
-     musicManager.init();
-   }, []);
- 
-   // Sync play state
-   useEffect(() => {
-     if (playing) {
-       musicManager.play();
-     } else {
-       musicManager.pause();
-     }
-   }, [playing]);
- 
-   const toggleMusic = useCallback(() => {
-     setPlaying(prev => {
-       const newValue = !prev;
-       localStorage.setItem('game_music_playing', String(newValue));
-       return newValue;
-     });
-   }, []);
- 
-   return { playing, toggleMusic };
- }
+// Global audio instance for background music - singleton pattern
+class BackgroundMusicManager {
+  private static instance: BackgroundMusicManager;
+  private audio: HTMLAudioElement | null = null;
+  private initialized = false;
+  private userInteracted = false;
+
+  static getInstance(): BackgroundMusicManager {
+    if (!BackgroundMusicManager.instance) {
+      BackgroundMusicManager.instance = new BackgroundMusicManager();
+    }
+    return BackgroundMusicManager.instance;
+  }
+
+  init() {
+    if (this.initialized) return;
+    this.initialized = true;
+
+    this.audio = new Audio(backgroundMusicFile);
+    this.audio.loop = true;
+    this.audio.volume = parseFloat(localStorage.getItem('game_music_volume') || '0.15');
+    this.audio.preload = 'auto';
+
+    const enableAudio = () => {
+      this.userInteracted = true;
+      const shouldPlay = localStorage.getItem('game_music_playing') === 'true';
+      if (shouldPlay && this.audio) {
+        this.audio.play().catch(() => {});
+      }
+      document.removeEventListener('click', enableAudio);
+      document.removeEventListener('touchstart', enableAudio);
+    };
+
+    document.addEventListener('click', enableAudio);
+    document.addEventListener('touchstart', enableAudio);
+  }
+
+  play() {
+    if (this.audio && this.userInteracted) {
+      this.audio.play().catch(() => {});
+    }
+  }
+
+  pause() {
+    if (this.audio) {
+      this.audio.pause();
+    }
+  }
+
+  setVolume(volume: number) {
+    if (this.audio) {
+      this.audio.volume = volume;
+    }
+  }
+}
+
+// Initialize on module load
+const musicManager = BackgroundMusicManager.getInstance();
+
+export function useBackgroundMusic() {
+  const [playing, setPlaying] = useState(() => {
+    const saved = localStorage.getItem('game_music_playing');
+    return saved === 'true';
+  });
+
+  const [musicVolume, setMusicVolumeState] = useState(() => {
+    const saved = localStorage.getItem('game_music_volume');
+    return saved ? parseFloat(saved) : 0.15;
+  });
+
+  // Initialize music manager once
+  useEffect(() => {
+    musicManager.init();
+  }, []);
+
+  // Sync play state
+  useEffect(() => {
+    if (playing) {
+      musicManager.play();
+    } else {
+      musicManager.pause();
+    }
+  }, [playing]);
+
+  const toggleMusic = useCallback(() => {
+    setPlaying(prev => {
+      const newValue = !prev;
+      localStorage.setItem('game_music_playing', String(newValue));
+      return newValue;
+    });
+  }, []);
+
+  const setMusicVolume = useCallback((volume: number) => {
+    setMusicVolumeState(volume);
+    localStorage.setItem('game_music_volume', String(volume));
+    musicManager.setVolume(volume);
+  }, []);
+
+  return { playing, toggleMusic, musicVolume, setMusicVolume };
+}

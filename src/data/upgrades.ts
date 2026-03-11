@@ -64,11 +64,13 @@ export function getSkillUpgradeCost(currentLevel: number): number {
   return Math.floor(100 * Math.pow(1.5, currentLevel - 1));
 }
 
-// XP required for next level: +1000 XP per level
+// XP required for next level
+// Levels 1-5: 1000 XP each, 6-15: 2000 XP each, 16+: 3000 XP each
 export function getXpForLevel(level: number): number {
   if (level >= MAX_LEVEL) return Infinity;
-  // Level 1->2: 1000 XP, Level 2->3: 2000 XP, etc.
-  return level * 1000;
+  if (level <= 5) return 1000;
+  if (level <= 15) return 2000;
+  return 3000;
 }
 
 // Skill points per level

@@ -2,62 +2,24 @@ import { useGame } from '@/contexts/GameContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { CarCard } from '@/components/game/CarCard';
 import { Button } from '@/components/ui/button';
- import { Car as CarIcon, Wrench, Loader2, DollarSign, Clock, Newspaper } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Car as CarIcon, Wrench, Loader2, DollarSign, Tag, Briefcase } from 'lucide-react';
 import garageBg from '@/assets/garage-bg.jpg';
-import { useSound } from '@/hooks/useSound';
 
 interface GarageScreenProps {
-  onNavigateToNewspaper: () => void;
+  onNavigateToOffice: () => void;
   onSelectCar: (carId: string) => void;
 }
 
-export function GarageScreen({ onNavigateToNewspaper, onSelectCar }: GarageScreenProps) {
-  const { state, dispatch, getSaleState, handleSaleComplete } = useGame();
-  const { t } = useLanguage();
+export function GarageScreen({ onNavigateToOffice, onSelectCar }: GarageScreenProps) {
+  const { state } = useGame();
+  const { t, formatMoney } = useLanguage();
   const { carsInGarage, garageUpgrades, repairQueue } = state;
-  const { playSound } = useSound();
-   const emptySlots = garageUpgrades.carBays - carsInGarage.length;
-
-  const handleStartSale = (carId: string, e: React.MouseEvent) => {
-    e.stopPropagation();
-    const car = carsInGarage.find(c => c.id === carId);
-    if (!car) return;
-    
-    const hasDamages = car.damages.some(d => !d.repaired);
-    if (hasDamages) return;
-    
-    dispatch({ type: 'LIST_CAR_FOR_SALE', payload: { carId, askingPrice: car.currentValue } });
-     playSound('saleStart');
-  };
-
-  const handleAcceptOffer = (carId: string, e: React.MouseEvent) => {
-    e.stopPropagation();
-    const saleState = getSaleState(carId);
-    if (!saleState?.customer || !saleState.customerOffer) return;
-    
-    const car = carsInGarage.find(c => c.id === carId);
-    if (!car) return;
-    
-    handleSaleComplete(carId, saleState.customerOffer);
-    playSound('cashRegister');
-  };
-
-  const handleRejectOffer = (carId: string, e: React.MouseEvent) => {
-    e.stopPropagation();
-    dispatch({ type: 'CANCEL_SALE', payload: carId });
-  };
-
-  const handleCancelSale = (carId: string, e: React.MouseEvent) => {
-    e.stopPropagation();
-    dispatch({ type: 'CANCEL_SALE', payload: carId });
-  };
+  const emptySlots = garageUpgrades.carBays - carsInGarage.length;
 
   return (
     <div className="flex flex-col min-h-[100dvh] pb-20 relative overflow-hidden">
-      <div 
-        className="fixed inset-0 bg-cover bg-center"
-        style={{ backgroundImage: `url(${garageBg})` }}
-      />
+      <div className="fixed inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${garageBg})` }} />
       
       <div className="relative z-10 flex flex-col min-h-full">
         <div className="p-4 py-5 border-b-2 border-border bg-card/95 backdrop-blur-sm">
@@ -90,83 +52,36 @@ export function GarageScreen({ onNavigateToNewspaper, onSelectCar }: GarageScree
                 <CarIcon className="w-8 h-8 text-muted-foreground" />
               </div>
               <h2 className="text-lg font-bold mb-2">{t.noCarsYet}</h2>
-              <p className="text-sm text-muted-foreground mb-4">
-                {t.browseAdsToFind}
-              </p>
-              <Button onClick={onNavigateToNewspaper}>
-                <Newspaper className="w-4 h-4 mr-2" />
+              <p className="text-sm text-muted-foreground mb-4 px-8">{t.browseAdsToFind}</p>
+              <Button onClick={onNavigateToOffice}>
+                <Briefcase className="w-4 h-4 mr-2" />
                 {t.browseAds}
               </Button>
             </div>
           ) : (
             <div className="space-y-3">
               {carsInGarage.map((car) => {
-                const saleState = getSaleState(car.id);
-                const isWaitingForCustomer = saleState && !saleState.customer;
-                const hasCustomer = saleState?.customer;
                 const hasDamages = car.damages.some(d => !d.repaired);
-                const isInSale = !!saleState;
-                
+                const allRepaired = !hasDamages;
+                const isListed = car.listedForSale;
                 const totalInvestment = (car.purchasePrice || car.askingPrice) + (car.totalRepairCost || 0);
                 const potentialProfit = car.currentValue - totalInvestment;
-                
-                const actionButton = (() => {
-                  if (!isInSale) {
-                    return (
-                      <Button
-                        size="sm"
-                        variant={hasDamages ? "secondary" : "default"}
-                        onClick={(e) => handleStartSale(car.id, e)}
-                        disabled={hasDamages}
-                        className="shadow-lg"
-                      >
-                        <DollarSign className="w-3 h-3 mr-1" />
-                        {t.sell}
-                      </Button>
-                    );
-                  }
-                  if (isWaitingForCustomer) {
-                    return (
-                      <div className="flex gap-1">
-                        <Button size="sm" variant="secondary" className="animate-pulse" disabled>
-                          <Clock className="w-3 h-3 mr-1 animate-spin" />
-                          {t.waiting}
-                        </Button>
-                        <Button size="sm" variant="outline" onClick={(e) => handleCancelSale(car.id, e)}>
-                          ✕
-                        </Button>
-                      </div>
-                    );
-                  }
-                  if (hasCustomer) {
-                    return (
-                      <div className="flex gap-1">
-                        <Button
-                          size="sm"
-                          variant="default"
-                          onClick={(e) => handleAcceptOffer(car.id, e)}
-                          className="bg-green-600 text-white"
-                        >
-                          ✓ ${saleState.customerOffer?.toLocaleString()}
-                        </Button>
-                        <Button size="sm" variant="destructive" onClick={(e) => handleRejectOffer(car.id, e)}>
-                          ✕
-                        </Button>
-                      </div>
-                    );
-                  }
-                  return null;
-                })();
 
-                const topBadge = hasCustomer ? (
-                  <div className="px-2 py-1 rounded-md text-xs font-medium bg-primary text-primary-foreground animate-pulse">
-                    🔔 {saleState.customer?.avatar} {saleState.customer?.name}
-                  </div>
+                const topBadge = isListed ? (
+                  <Badge variant="secondary" className="text-xs bg-primary/20 text-primary animate-pulse">
+                    📞 {t.listedForSaleBadge}
+                  </Badge>
                 ) : (
                   <div className={`px-2 py-1 rounded-md text-xs font-medium ${potentialProfit >= 0 ? 'bg-primary/20 text-primary' : 'bg-destructive/20 text-destructive'}`}>
-                    {potentialProfit >= 0 ? '+' : ''}{potentialProfit.toLocaleString()}
+                    {potentialProfit >= 0 ? '+' : ''}{formatMoney(potentialProfit)}
                   </div>
                 );
+
+                const actionButton = allRepaired && !isListed ? (
+                  <Badge variant="secondary" className="text-xs bg-green-500/20 text-green-700 dark:text-green-400">
+                    ✓ {t.readyToSellBadge}
+                  </Badge>
+                ) : null;
 
                 return (
                   <CarCard
