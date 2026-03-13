@@ -138,7 +138,7 @@ export function ShopScreen() {
   const xpForNextLevel = state.level >= MAX_LEVEL ? 0 : getXpForLevel(state.level);
 
   return (
-    <div className="flex flex-col min-h-[100dvh] pb-20 relative">
+    <div className="flex flex-col h-[100dvh] pb-20 relative">
       <div 
         className="fixed inset-0 bg-cover bg-center"
         style={{ 
