@@ -22,7 +22,7 @@ export function StatsBar() {
     claimChallengeReward,
      claimWeeklyChallengeReward,
   } = useGame();
-  const { t, formatMoney } = useLanguage();
+  const { t } = useLanguage();
   const [timeRemaining, setTimeRemaining] = useState(0);
   const [showAchievements, setShowAchievements] = useState(false);
   const [showChallenges, setShowChallenges] = useState(false);
@@ -74,8 +74,8 @@ export function StatsBar() {
            <div className="flex flex-col gap-1.5">
             {/* Money */}
              <div className="flex items-center gap-1.5 bg-primary/15 px-2.5 py-1 rounded-lg border border-primary/30">
-                <DollarSign className="w-4 h-4 text-primary" />
-                <span className="font-bold text-sm text-primary min-w-[60px]">{formatMoney(state.money)}</span>
+               <DollarSign className="w-4 h-4 text-primary" />
+               <span className="font-bold text-sm text-primary min-w-[60px]">${state.money.toLocaleString()}</span>
             </div>
 
              {/* Energy + Recharge */}
@@ -186,7 +186,7 @@ export function StatsBar() {
                     <div className="text-xs text-muted-foreground">{achievement.description}</div>
                   </div>
                   <div className="text-right">
-                    <div className="text-xs text-primary font-bold">+{formatMoney(achievement.reward)}</div>
+                    <div className="text-xs text-primary font-bold">+${achievement.reward}</div>
                     {achievement.unlocked && (
                       <div className="text-xs text-muted-foreground">✓</div>
                     )}

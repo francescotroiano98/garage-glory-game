@@ -2,13 +2,17 @@ import { useState, useEffect } from 'react';
 import { useGame } from '@/contexts/GameContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { PartRepairCard } from '@/components/game/PartRepairCard';
+import { CustomerCard } from '@/components/game/CustomerCard';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { Slider } from '@/components/ui/slider';
 import { PartCategory } from '@/types/game';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, DollarSign, Tag, Loader2 } from 'lucide-react';
 import { useSound } from '@/hooks/useSound';
-import { CATEGORY_ICONS } from '@/data/parts';
-import { getCategoryName } from '@/utils/partTranslations';
+import { CATEGORY_ICONS, CATEGORY_LABELS } from '@/data/parts';
+import { getPatienceRounds } from '@/data/customers';
+ import { getCategoryName } from '@/utils/partTranslations';
 
 import garageBg from '@/assets/garage-bg.jpg';
 
@@ -36,15 +40,36 @@ export function RepairScreen({ carId, onBack }: RepairScreenProps) {
     startDiyRepair,
     getRepairProgress,
     isRepairing,
+    getSaleState,
     getDiySuccessChance,
+    handleSaleComplete,
     updateChallengeProgress,
   } = useGame();
-  const { t, formatMoney } = useLanguage();
+  const { t } = useLanguage();
   
   const [selectedCategory, setSelectedCategory] = useState<PartCategory>('mechanical');
+  const [showSellDialog, setShowSellDialog] = useState(false);
+  const [sellPrice, setSellPrice] = useState(0);
   const { playSound } = useSound();
 
   const car = state.carsInGarage.find(c => c.id === carId);
+  const saleState = getSaleState(carId);
+  const waitingForCustomer = saleState && !saleState.customer;
+  const customer = saleState?.customer;
+  const customerOffer = saleState?.customerOffer || 0;
+  const negotiationRound = saleState?.negotiationRound || 0;
+
+  useEffect(() => {
+    if (car) {
+      setSellPrice(Math.round(car.currentValue * 1.2));
+    }
+  }, [car?.currentValue]);
+
+  useEffect(() => {
+    if (customer) {
+      playSound('customerCall');
+    }
+  }, [customer, playSound]);
 
   const handleRepair = (partType: string) => {
     if (!car) return;
@@ -84,6 +109,51 @@ export function RepairScreen({ carId, onBack }: RepairScreenProps) {
     }
   };
 
+  const handleListForSale = () => {
+    if (!car) return;
+    
+    dispatch({ type: 'LIST_CAR_FOR_SALE', payload: { carId, askingPrice: sellPrice } });
+    setShowSellDialog(false);
+  };
+
+  const handleAcceptOffer = () => {
+    if (!car || !customer) return;
+
+    handleSaleComplete(carId, customerOffer);
+    playSound('cashRegister');
+    onBack();
+  };
+
+  const handleCounterOffer = () => {
+    if (!customer || !saleState) return;
+
+    const maxRounds = getPatienceRounds(customer.patience);
+    
+    if (!hasEnergy(2)) return;
+    dispatch({ type: 'SPEND_ENERGY', payload: 2 });
+    
+    if (customer.patience === 'very_low' || customer.patience === 'low') {
+      const leaveChance = customer.patience === 'very_low' ? 0.5 : 0.3;
+      if (Math.random() < leaveChance) {
+        dispatch({ type: 'CANCEL_SALE', payload: carId });
+        return;
+      }
+    }
+    
+    if (negotiationRound >= maxRounds) {
+      dispatch({ type: 'CANCEL_SALE', payload: carId });
+      return;
+    }
+
+    const increase = (saleState.askingPrice - customerOffer) * (0.2 + Math.random() * 0.3) * (1 - customer.bargainSkill * 0.05);
+    const newOffer = Math.round(customerOffer + Math.max(increase, 50));
+    dispatch({ type: 'UPDATE_SALE_OFFER', payload: { carId, offer: Math.min(newOffer, customer.maxBudget), round: negotiationRound + 1 } });
+  };
+
+  const handleRejectOffer = () => {
+    dispatch({ type: 'CANCEL_SALE', payload: carId });
+  };
+
   if (!car) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -98,13 +168,15 @@ export function RepairScreen({ carId, onBack }: RepairScreenProps) {
   const categoryDamages = car.damages.filter(d => d.category === selectedCategory);
   const unrepaired = car.damages.filter(d => !d.repaired).length;
   const repaired = car.damages.filter(d => d.repaired).length;
+  const allRepaired = unrepaired === 0;
   
+  // Use car.image directly - it's stored at generation time
   const carImage = car.image;
   
   const totalInvestment = (car.purchasePrice || car.askingPrice) + (car.totalRepairCost || 0);
 
   return (
-    <div className="flex flex-col h-[100dvh] pb-20 relative">
+    <div className="flex flex-col min-h-[100dvh] pb-20 relative">
       <div 
         className="fixed inset-0 bg-cover bg-center"
         style={{ backgroundImage: `url(${garageBg})` }}
@@ -121,13 +193,22 @@ export function RepairScreen({ carId, onBack }: RepairScreenProps) {
               <div className="flex items-center gap-2 text-sm flex-wrap">
                 <Badge variant="secondary">{repaired}/{repaired + unrepaired} {t.fixed}</Badge>
                 <span className="text-muted-foreground">
-                  {t.carValue}: <span className="text-primary font-medium">{formatMoney(Math.round(car.currentValue))}</span>
+                  {t.carValue}: <span className="text-primary font-medium">${Math.round(car.currentValue).toLocaleString()}</span>
                 </span>
               </div>
               <div className="text-xs text-muted-foreground mt-1">
-                {t.invested}: {formatMoney(totalInvestment)}
+                {t.invested}: ${totalInvestment.toLocaleString()}
               </div>
             </div>
+            <Button 
+              onClick={() => setShowSellDialog(true)} 
+              disabled={!allRepaired || car.listedForSale}
+              size="sm"
+              className="shrink-0"
+            >
+              <Tag className="w-4 h-4 mr-1" />
+              {t.sell}
+            </Button>
           </div>
           
           <div className="flex justify-center mt-3">
@@ -138,6 +219,30 @@ export function RepairScreen({ carId, onBack }: RepairScreenProps) {
             />
           </div>
         </div>
+
+        {(waitingForCustomer || customer) && (
+          <div className="p-4 border-b border-border bg-card/95 backdrop-blur-sm">
+            {waitingForCustomer ? (
+              <div className="flex items-center gap-3 p-4 bg-secondary/80 rounded-lg border-2 border-border">
+                <Loader2 className="w-5 h-5 animate-spin text-primary" />
+                <div>
+                  <p className="font-medium">{t.waitingForBuyer}</p>
+                  <p className="text-sm text-muted-foreground">{t.customerWillArrive}</p>
+                </div>
+              </div>
+            ) : customer && (
+              <CustomerCard
+                customer={customer}
+                offerPrice={customerOffer}
+                onAccept={handleAcceptOffer}
+                onCounter={handleCounterOffer}
+                onReject={handleRejectOffer}
+                isNegotiating={negotiationRound > 0}
+                negotiationRound={negotiationRound}
+              />
+            )}
+          </div>
+        )}
 
         <div className="flex gap-2 p-4 overflow-x-auto bg-card/95 backdrop-blur-sm">
           {categoryList.map((cat) => {
@@ -191,6 +296,63 @@ export function RepairScreen({ carId, onBack }: RepairScreenProps) {
           )}
         </div>
       </div>
+
+      <Dialog open={showSellDialog} onOpenChange={setShowSellDialog}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>{t.listForSale} {car.name}</DialogTitle>
+          </DialogHeader>
+
+          <div className="space-y-4">
+            <div className="text-center">
+              <img src={carImage} alt={car.name} className="h-20 mx-auto mb-2" />
+              <p className="text-sm text-muted-foreground mb-1">{t.carValue}</p>
+              <p className="text-2xl font-bold text-primary">
+                ${Math.round(car.currentValue).toLocaleString()}
+              </p>
+            </div>
+
+            <div className="space-y-2">
+              <div className="flex justify-between text-sm">
+                <span>{t.yourOffer}:</span>
+                <span className="font-bold">${sellPrice.toLocaleString()}</span>
+              </div>
+              <Slider
+                value={[sellPrice]}
+                onValueChange={([v]) => setSellPrice(v)}
+                min={Math.round(car.currentValue * 0.8)}
+                max={Math.round(car.currentValue * 1.5)}
+                step={50}
+              />
+              <div className="flex justify-between text-xs text-muted-foreground">
+                <span>80% value</span>
+                <span className="text-center text-primary font-medium">Max: 150% value</span>
+                <span>Fast sale</span>
+              </div>
+            </div>
+
+            <div className="p-3 bg-secondary/80 rounded-lg space-y-1 border-2 border-border">
+              <div className="flex justify-between text-sm">
+                <span>{t.totalInvested}:</span>
+                <span className="font-medium">${totalInvestment.toLocaleString()}</span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span>{t.potentialProfit}:</span>
+                <span className={`font-bold ${sellPrice - totalInvestment > 0 ? 'text-primary' : 'text-destructive'}`}>
+                  ${(sellPrice - totalInvestment).toLocaleString()}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button onClick={handleListForSale} className="w-full">
+              <DollarSign className="w-4 h-4 mr-1" />
+              {t.listForSale}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

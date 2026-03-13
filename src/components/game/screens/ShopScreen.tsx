@@ -44,7 +44,7 @@ const MAX_PART_LEVEL = 10;
 
 export function ShopScreen() {
   const { state, dispatch, canAfford, getToolLevelIndex, getNegotiationBonus, getDiySuccessChance } = useGame();
-   const { t, formatMoney } = useLanguage();
+   const { t } = useLanguage();
    const { playSound } = useSound();
   const [selectedPartCategory, setSelectedPartCategory] = useState<PartCategory>('mechanical');
   const [vehiclePartTab, setVehiclePartTab] = useState<VehiclePartTab>('car');
@@ -138,7 +138,7 @@ export function ShopScreen() {
   const xpForNextLevel = state.level >= MAX_LEVEL ? 0 : getXpForLevel(state.level);
 
   return (
-    <div className="flex flex-col h-[100dvh] pb-20 relative">
+    <div className="flex flex-col min-h-[100dvh] pb-20 relative">
       <div 
         className="fixed inset-0 bg-cover bg-center"
         style={{ 
@@ -381,7 +381,7 @@ export function ShopScreen() {
                             disabled={isMaxed || !canAfford(cost)}
                             className="ml-2"
                           >
-                            {isMaxed ? <Check className="w-4 h-4" /> : formatMoney(cost)}
+                            {isMaxed ? <Check className="w-4 h-4" /> : `$${cost.toLocaleString()}`}
                           </Button>
                         </div>
                       );
@@ -423,7 +423,7 @@ export function ShopScreen() {
                       onClick={() => buyToolUpgrade(upgrade)}
                       disabled={!nextUp || !canAfford(upgrade.cost)}
                     >
-                      {formatMoney(upgrade.cost)}
+                      ${upgrade.cost.toLocaleString()}
                     </Button>
                   )}
                 </div>
@@ -462,7 +462,7 @@ export function ShopScreen() {
                       onClick={() => buyDiagnosticUpgrade(upgrade)}
                       disabled={!nextUp || !canAfford(upgrade.cost)}
                     >
-                      {formatMoney(upgrade.cost)}
+                      ${upgrade.cost.toLocaleString()}
                     </Button>
                   )}
                 </div>
@@ -500,7 +500,7 @@ export function ShopScreen() {
                       onClick={() => buyGarageBay(upgrade)}
                       disabled={!nextUp || !canAfford(upgrade.cost)}
                     >
-                      {formatMoney(upgrade.cost)}
+                      ${upgrade.cost.toLocaleString()}
                     </Button>
                   )}
                 </div>
@@ -525,7 +525,7 @@ export function ShopScreen() {
                         onClick={() => buyGarageEquipment(equip)}
                         disabled={!canAfford(equip.cost)}
                       >
-                        {formatMoney(equip.cost)}
+                        ${equip.cost.toLocaleString()}
                       </Button>
                     )}
                   </div>
@@ -564,7 +564,7 @@ export function ShopScreen() {
                       onClick={() => buyEnergyUpgrade(upgrade)}
                       disabled={!nextUp || !canAfford(upgrade.cost)}
                     >
-                      {formatMoney(upgrade.cost)}
+                      ${upgrade.cost.toLocaleString()}
                     </Button>
                   )}
                 </div>

@@ -27,7 +27,7 @@ type VehicleTypeFilter = 'all' | 'car' | 'motorcycle' | 'truck';
 
 export function NewspaperScreen({ onCarBought }: NewspaperScreenProps) {
   const { state, dispatch, canAfford, hasEnergy, getVisibilityChance, getNegotiationBonus, updateChallengeProgress } = useGame();
-  const { t, formatMoney } = useLanguage();
+  const { t } = useLanguage();
   const [ads, setAds] = useState<NewspaperAd[]>([]);
   const [selectedAd, setSelectedAd] = useState<NewspaperAd | null>(null);
   const [negotiatePrice, setNegotiatePrice] = useState(0);
@@ -135,7 +135,7 @@ export function NewspaperScreen({ onCarBought }: NewspaperScreenProps) {
   const garageFull = state.carsInGarage.length >= state.garageUpgrades.carBays;
 
   return (
-    <div className="flex flex-col h-[100dvh] pb-20 relative overflow-hidden">
+    <div className="flex flex-col min-h-[100dvh] pb-20 relative overflow-hidden">
       <div 
         className="fixed inset-0 bg-cover bg-center"
         style={{ backgroundImage: `url(${newspaperBg})` }}
@@ -224,7 +224,7 @@ export function NewspaperScreen({ onCarBought }: NewspaperScreenProps) {
       </div>
 
       <Dialog open={!!selectedAd} onOpenChange={(open) => !open && setSelectedAd(null)}>
-        <DialogContent className="max-w-sm max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-sm">
           <DialogHeader>
             <DialogTitle>{t.buy} {selectedAd?.car.name}?</DialogTitle>
           </DialogHeader>
@@ -236,14 +236,14 @@ export function NewspaperScreen({ onCarBought }: NewspaperScreenProps) {
               <div className="space-y-2">
                 <div className="flex justify-between text-sm">
                   <span>{t.askingPrice}:</span>
-                  <span className="font-bold">{formatMoney(selectedAd.car.askingPrice)}</span>
+                  <span className="font-bold">${selectedAd.car.askingPrice.toLocaleString()}</span>
                 </div>
                 
                 {selectedAd.negotiable && (
                   <>
                     <div className="flex justify-between text-sm">
                       <span>{t.yourOffer}:</span>
-                      <span className="font-bold text-primary">{formatMoney(negotiatePrice)}</span>
+                      <span className="font-bold text-primary">${negotiatePrice.toLocaleString()}</span>
                     </div>
                     <Slider
                       value={[negotiatePrice]}
@@ -263,7 +263,7 @@ export function NewspaperScreen({ onCarBought }: NewspaperScreenProps) {
                 <div className="flex justify-between text-sm text-muted-foreground">
                   <span>{t.yourBalance}:</span>
                   <span className={canAfford(negotiatePrice) ? 'text-primary font-bold' : 'text-destructive font-bold'}>
-                    {formatMoney(state.money)}
+                    ${state.money.toLocaleString()}
                   </span>
                 </div>
               </div>
