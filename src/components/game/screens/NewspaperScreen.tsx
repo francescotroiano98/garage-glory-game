@@ -236,14 +236,14 @@ export function NewspaperScreen({ onCarBought }: NewspaperScreenProps) {
               <div className="space-y-2">
                 <div className="flex justify-between text-sm">
                   <span>{t.askingPrice}:</span>
-                  <span className="font-bold">${selectedAd.car.askingPrice.toLocaleString()}</span>
+                  <span className="font-bold">{formatMoney(selectedAd.car.askingPrice)}</span>
                 </div>
                 
                 {selectedAd.negotiable && (
                   <>
                     <div className="flex justify-between text-sm">
                       <span>{t.yourOffer}:</span>
-                      <span className="font-bold text-primary">${negotiatePrice.toLocaleString()}</span>
+                      <span className="font-bold text-primary">{formatMoney(negotiatePrice)}</span>
                     </div>
                     <Slider
                       value={[negotiatePrice]}
