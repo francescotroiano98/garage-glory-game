@@ -263,7 +263,7 @@ export function NewspaperScreen({ onCarBought }: NewspaperScreenProps) {
                 <div className="flex justify-between text-sm text-muted-foreground">
                   <span>{t.yourBalance}:</span>
                   <span className={canAfford(negotiatePrice) ? 'text-primary font-bold' : 'text-destructive font-bold'}>
-                    ${state.money.toLocaleString()}
+                    {formatMoney(state.money)}
                   </span>
                 </div>
               </div>
