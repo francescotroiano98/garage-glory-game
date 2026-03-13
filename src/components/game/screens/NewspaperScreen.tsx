@@ -224,7 +224,7 @@ export function NewspaperScreen({ onCarBought }: NewspaperScreenProps) {
       </div>
 
       <Dialog open={!!selectedAd} onOpenChange={(open) => !open && setSelectedAd(null)}>
-        <DialogContent className="max-w-sm">
+        <DialogContent className="max-w-sm max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{t.buy} {selectedAd?.car.name}?</DialogTitle>
           </DialogHeader>

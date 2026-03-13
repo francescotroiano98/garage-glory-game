@@ -74,8 +74,8 @@ export function StatsBar() {
            <div className="flex flex-col gap-1.5">
             {/* Money */}
              <div className="flex items-center gap-1.5 bg-primary/15 px-2.5 py-1 rounded-lg border border-primary/30">
-               <DollarSign className="w-4 h-4 text-primary" />
-               <span className="font-bold text-sm text-primary min-w-[60px]">${state.money.toLocaleString()}</span>
+                <DollarSign className="w-4 h-4 text-primary" />
+                <span className="font-bold text-sm text-primary min-w-[60px]">{formatMoney(state.money)}</span>
             </div>
 
              {/* Energy + Recharge */}

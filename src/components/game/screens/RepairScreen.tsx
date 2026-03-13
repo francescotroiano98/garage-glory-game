@@ -176,7 +176,7 @@ export function RepairScreen({ carId, onBack }: RepairScreenProps) {
   const totalInvestment = (car.purchasePrice || car.askingPrice) + (car.totalRepairCost || 0);
 
   return (
-    <div className="flex flex-col min-h-[100dvh] pb-20 relative">
+    <div className="flex flex-col h-[100dvh] pb-20 relative">
       <div 
         className="fixed inset-0 bg-cover bg-center"
         style={{ backgroundImage: `url(${garageBg})` }}
