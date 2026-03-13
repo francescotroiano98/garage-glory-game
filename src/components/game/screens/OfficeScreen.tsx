@@ -58,7 +58,7 @@ export function OfficeScreen({ onCarBought }: OfficeScreenProps) {
 
   if (view === 'newspaper') {
     return (
-      <div className="flex flex-col min-h-[100dvh] pb-20">
+      <div className="flex flex-col h-[100dvh] pb-20">
         <div className="p-3 bg-card/95 backdrop-blur-sm border-b-2 border-border sticky top-0 z-40">
           <Button variant="ghost" size="sm" onClick={() => setView('hub')}>
             <ArrowLeft className="w-4 h-4 mr-1" /> {t.goBack}
