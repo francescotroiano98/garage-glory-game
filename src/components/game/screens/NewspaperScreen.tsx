@@ -135,7 +135,7 @@ export function NewspaperScreen({ onCarBought }: NewspaperScreenProps) {
   const garageFull = state.carsInGarage.length >= state.garageUpgrades.carBays;
 
   return (
-    <div className="flex flex-col min-h-[100dvh] pb-20 relative overflow-hidden">
+    <div className="flex flex-col h-[100dvh] pb-20 relative overflow-hidden">
       <div 
         className="fixed inset-0 bg-cover bg-center"
         style={{ backgroundImage: `url(${newspaperBg})` }}
