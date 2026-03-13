@@ -381,7 +381,7 @@ export function ShopScreen() {
                             disabled={isMaxed || !canAfford(cost)}
                             className="ml-2"
                           >
-                            {isMaxed ? <Check className="w-4 h-4" /> : `$${cost.toLocaleString()}`}
+                            {isMaxed ? <Check className="w-4 h-4" /> : formatMoney(cost)}
                           </Button>
                         </div>
                       );
