@@ -71,7 +71,7 @@ export function OfficeScreen({ onCarBought }: OfficeScreenProps) {
 
   if (view === 'phone') {
     return (
-      <div className="flex flex-col min-h-[100dvh] pb-20 relative">
+      <div className="flex flex-col h-[100dvh] pb-20 relative">
         <div className="fixed inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${officeBg})` }} />
         <div className="relative z-10">
           <div className="p-3 bg-card/95 backdrop-blur-sm border-b-2 border-border sticky top-0 z-40">
