@@ -564,7 +564,7 @@ export function ShopScreen() {
                       onClick={() => buyEnergyUpgrade(upgrade)}
                       disabled={!nextUp || !canAfford(upgrade.cost)}
                     >
-                      ${upgrade.cost.toLocaleString()}
+                      {formatMoney(upgrade.cost)}
                     </Button>
                   )}
                 </div>
