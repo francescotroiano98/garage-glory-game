@@ -44,7 +44,7 @@ const MAX_PART_LEVEL = 10;
 
 export function ShopScreen() {
   const { state, dispatch, canAfford, getToolLevelIndex, getNegotiationBonus, getDiySuccessChance } = useGame();
-   const { t } = useLanguage();
+   const { t, formatMoney } = useLanguage();
    const { playSound } = useSound();
   const [selectedPartCategory, setSelectedPartCategory] = useState<PartCategory>('mechanical');
   const [vehiclePartTab, setVehiclePartTab] = useState<VehiclePartTab>('car');
