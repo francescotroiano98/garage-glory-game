@@ -36,36 +36,13 @@ export function RepairScreen({ carId, onBack }: RepairScreenProps) {
     startDiyRepair,
     getRepairProgress,
     isRepairing,
-    getSaleState,
     getDiySuccessChance,
-    handleSaleComplete,
     updateChallengeProgress,
   } = useGame();
-  const { t } = useLanguage();
+  const { t, formatMoney } = useLanguage();
   
   const [selectedCategory, setSelectedCategory] = useState<PartCategory>('mechanical');
-  const [showSellDialog, setShowSellDialog] = useState(false);
-  const [sellPrice, setSellPrice] = useState(0);
   const { playSound } = useSound();
-
-  const car = state.carsInGarage.find(c => c.id === carId);
-  const saleState = getSaleState(carId);
-  const waitingForCustomer = saleState && !saleState.customer;
-  const customer = saleState?.customer;
-  const customerOffer = saleState?.customerOffer || 0;
-  const negotiationRound = saleState?.negotiationRound || 0;
-
-  useEffect(() => {
-    if (car) {
-      setSellPrice(Math.round(car.currentValue * 1.2));
-    }
-  }, [car?.currentValue]);
-
-  useEffect(() => {
-    if (customer) {
-      playSound('customerCall');
-    }
-  }, [customer, playSound]);
 
   const handleRepair = (partType: string) => {
     if (!car) return;
