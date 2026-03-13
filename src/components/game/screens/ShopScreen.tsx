@@ -525,7 +525,7 @@ export function ShopScreen() {
                         onClick={() => buyGarageEquipment(equip)}
                         disabled={!canAfford(equip.cost)}
                       >
-                        ${equip.cost.toLocaleString()}
+                        {formatMoney(equip.cost)}
                       </Button>
                     )}
                   </div>
