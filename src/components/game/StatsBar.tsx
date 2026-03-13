@@ -186,7 +186,7 @@ export function StatsBar() {
                     <div className="text-xs text-muted-foreground">{achievement.description}</div>
                   </div>
                   <div className="text-right">
-                    <div className="text-xs text-primary font-bold">+${achievement.reward}</div>
+                    <div className="text-xs text-primary font-bold">+{formatMoney(achievement.reward)}</div>
                     {achievement.unlocked && (
                       <div className="text-xs text-muted-foreground">✓</div>
                     )}
