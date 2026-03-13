@@ -18,7 +18,7 @@ export function GarageScreen({ onNavigateToOffice, onSelectCar }: GarageScreenPr
   const emptySlots = garageUpgrades.carBays - carsInGarage.length;
 
   return (
-    <div className="flex flex-col min-h-[100dvh] pb-20 relative overflow-hidden">
+    <div className="flex flex-col h-[100dvh] pb-20 relative overflow-hidden">
       <div className="fixed inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${garageBg})` }} />
       
       <div className="relative z-10 flex flex-col min-h-full">
