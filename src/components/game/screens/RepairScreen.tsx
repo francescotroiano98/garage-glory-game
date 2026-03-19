@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { useGame } from '@/contexts/GameContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { PartRepairCard } from '@/components/game/PartRepairCard';
-import { CustomerCard } from '@/components/game/CustomerCard';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
@@ -10,9 +9,8 @@ import { Slider } from '@/components/ui/slider';
 import { PartCategory } from '@/types/game';
 import { ArrowLeft, DollarSign, Tag, Loader2, PhoneCall } from 'lucide-react';
 import { useSound } from '@/hooks/useSound';
-import { CATEGORY_ICONS, CATEGORY_LABELS } from '@/data/parts';
-import { getPatienceRounds } from '@/data/customers';
- import { getCategoryName } from '@/utils/partTranslations';
+import { CATEGORY_ICONS } from '@/data/parts';
+import { getCategoryName } from '@/utils/partTranslations';
 
 import garageBg from '@/assets/garage-bg.jpg';
 
