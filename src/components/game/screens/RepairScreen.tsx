@@ -116,43 +116,7 @@ export function RepairScreen({ carId, onBack }: RepairScreenProps) {
     setShowSellDialog(false);
   };
 
-  const handleAcceptOffer = () => {
-    if (!car || !customer) return;
-
-    handleSaleComplete(carId, customerOffer);
-    playSound('cashRegister');
-    onBack();
-  };
-
-  const handleCounterOffer = () => {
-    if (!customer || !saleState) return;
-
-    const maxRounds = getPatienceRounds(customer.patience);
-    
-    if (!hasEnergy(2)) return;
-    dispatch({ type: 'SPEND_ENERGY', payload: 2 });
-    
-    if (customer.patience === 'very_low' || customer.patience === 'low') {
-      const leaveChance = customer.patience === 'very_low' ? 0.5 : 0.3;
-      if (Math.random() < leaveChance) {
-        dispatch({ type: 'CANCEL_SALE', payload: carId });
-        return;
-      }
-    }
-    
-    if (negotiationRound >= maxRounds) {
-      dispatch({ type: 'CANCEL_SALE', payload: carId });
-      return;
-    }
-
-    const increase = (saleState.askingPrice - customerOffer) * (0.2 + Math.random() * 0.3) * (1 - customer.bargainSkill * 0.05);
-    const newOffer = Math.round(customerOffer + Math.max(increase, 50));
-    dispatch({ type: 'UPDATE_SALE_OFFER', payload: { carId, offer: Math.min(newOffer, customer.maxBudget), round: negotiationRound + 1 } });
-  };
-
-  const handleRejectOffer = () => {
-    dispatch({ type: 'CANCEL_SALE', payload: carId });
-  };
+  // Customer negotiation now happens in the Office phone screen
 
   if (!car) {
     return (
