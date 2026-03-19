@@ -298,24 +298,24 @@ export function RepairScreen({ carId, onBack }: RepairScreenProps) {
       </div>
 
       <Dialog open={showSellDialog} onOpenChange={setShowSellDialog}>
-        <DialogContent className="max-w-sm">
+        <DialogContent className="max-w-[calc(100vw-2rem)] sm:max-w-sm p-4">
           <DialogHeader>
             <DialogTitle>{t.listForSale} {car.name}</DialogTitle>
           </DialogHeader>
 
-          <div className="space-y-4">
+          <div className="space-y-3">
             <div className="text-center">
               <img src={carImage} alt={car.name} className="h-20 mx-auto mb-2" />
               <p className="text-sm text-muted-foreground mb-1">{t.carValue}</p>
               <p className="text-2xl font-bold text-primary">
-                ${Math.round(car.currentValue).toLocaleString()}
+                {formatMoney(Math.round(car.currentValue))}
               </p>
             </div>
 
             <div className="space-y-2">
               <div className="flex justify-between text-sm">
                 <span>{t.yourOffer}:</span>
-                <span className="font-bold">${sellPrice.toLocaleString()}</span>
+                <span className="font-bold">{formatMoney(sellPrice)}</span>
               </div>
               <Slider
                 value={[sellPrice]}
@@ -325,21 +325,21 @@ export function RepairScreen({ carId, onBack }: RepairScreenProps) {
                 step={50}
               />
               <div className="flex justify-between text-xs text-muted-foreground">
-                <span>80% value</span>
-                <span className="text-center text-primary font-medium">Max: 150% value</span>
-                <span>Fast sale</span>
+                <span>80%</span>
+                <span className="text-center text-primary font-medium">Max: 150%</span>
+                <span>{t.sell}</span>
               </div>
             </div>
 
             <div className="p-3 bg-secondary/80 rounded-lg space-y-1 border-2 border-border">
               <div className="flex justify-between text-sm">
                 <span>{t.totalInvested}:</span>
-                <span className="font-medium">${totalInvestment.toLocaleString()}</span>
+                <span className="font-medium">{formatMoney(totalInvestment)}</span>
               </div>
               <div className="flex justify-between text-sm">
                 <span>{t.potentialProfit}:</span>
                 <span className={`font-bold ${sellPrice - totalInvestment > 0 ? 'text-primary' : 'text-destructive'}`}>
-                  ${(sellPrice - totalInvestment).toLocaleString()}
+                  {formatMoney(sellPrice - totalInvestment)}
                 </span>
               </div>
             </div>
