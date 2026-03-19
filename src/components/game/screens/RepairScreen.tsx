@@ -8,7 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Slider } from '@/components/ui/slider';
 import { PartCategory } from '@/types/game';
-import { ArrowLeft, DollarSign, Tag, Loader2 } from 'lucide-react';
+import { ArrowLeft, DollarSign, Tag, Loader2, PhoneCall } from 'lucide-react';
 import { useSound } from '@/hooks/useSound';
 import { CATEGORY_ICONS, CATEGORY_LABELS } from '@/data/parts';
 import { getPatienceRounds } from '@/data/customers';
