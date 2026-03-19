@@ -47,6 +47,7 @@ export function GarageScreen({ onNavigateToOffice, onSelectCar }: GarageScreenPr
   };
 
   return (
+    <>
     <div className="flex flex-col min-h-[100dvh] pb-20 relative overflow-hidden">
       <div className="fixed inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${garageBg})` }} />
       
