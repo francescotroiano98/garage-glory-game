@@ -17,6 +17,7 @@ import garageBg from '@/assets/garage-bg.jpg';
 interface RepairScreenProps {
   carId: string;
   onBack: () => void;
+  onNavigateToOffice?: () => void;
 }
 
 const categoryList: { id: PartCategory; icon: string }[] = [
