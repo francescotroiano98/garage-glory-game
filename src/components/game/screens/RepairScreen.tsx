@@ -45,7 +45,7 @@ export function RepairScreen({ carId, onBack }: RepairScreenProps) {
     handleSaleComplete,
     updateChallengeProgress,
   } = useGame();
-  const { t } = useLanguage();
+  const { t, formatMoney } = useLanguage();
   
   const [selectedCategory, setSelectedCategory] = useState<PartCategory>('mechanical');
   const [showSellDialog, setShowSellDialog] = useState(false);
