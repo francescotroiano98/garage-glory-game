@@ -17,6 +17,7 @@ import garageBg from '@/assets/garage-bg.jpg';
 interface RepairScreenProps {
   carId: string;
   onBack: () => void;
+  onNavigateToOffice?: () => void;
 }
 
 const categoryList: { id: PartCategory; icon: string }[] = [
@@ -26,7 +27,7 @@ const categoryList: { id: PartCategory; icon: string }[] = [
   { id: 'interior', icon: CATEGORY_ICONS.interior },
 ];
 
-export function RepairScreen({ carId, onBack }: RepairScreenProps) {
+export function RepairScreen({ carId, onBack, onNavigateToOffice }: RepairScreenProps) {
   const { 
     state, 
     dispatch, 
@@ -196,13 +197,17 @@ export function RepairScreen({ carId, onBack }: RepairScreenProps) {
 
         {customer && (
           <div className="p-4 border-b border-border bg-accent/20 backdrop-blur-sm">
-            <div className="flex items-center gap-3 p-4 bg-primary/10 rounded-lg border-2 border-primary/30">
+            <button
+              onClick={onNavigateToOffice}
+              className="w-full flex items-center gap-3 p-4 bg-primary/10 rounded-lg border-2 border-primary/30 hover:bg-primary/20 transition-colors"
+            >
               <PhoneCall className="w-5 h-5 text-primary animate-bounce" />
-              <div className="flex-1">
+              <div className="flex-1 text-left">
                 <p className="font-medium">{t.incomingCalls}</p>
                 <p className="text-sm text-muted-foreground">{t.goToOfficeToAnswer}</p>
               </div>
-            </div>
+              <ArrowLeft className="w-5 h-5 text-primary rotate-180" />
+            </button>
           </div>
         )}
 

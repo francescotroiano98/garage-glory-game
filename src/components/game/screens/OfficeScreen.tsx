@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useGame } from '@/contexts/GameContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { NewspaperScreen } from './NewspaperScreen';
@@ -26,6 +26,13 @@ export function OfficeScreen({ onCarBought }: OfficeScreenProps) {
   const activeSalesWithCustomer = state.activeSales.filter(s => s.customer);
   const pendingCalls = activeSalesWithCustomer.length;
   const listedCars = state.carsInGarage.filter(c => c.listedForSale);
+
+  // Auto-return to hub when no listed cars remain while on phone view
+  useEffect(() => {
+    if (view === 'phone' && listedCars.length === 0) {
+      setView('hub');
+    }
+  }, [view, listedCars.length]);
 
   const handleCounterOffer = (carId: string) => {
     const saleState = getSaleState(carId);
