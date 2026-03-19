@@ -91,7 +91,14 @@ function GameContent() {
       <div className="min-h-screen bg-background flex flex-col">
         <StatsBar />
         <div className="flex-1 overflow-auto">
-          <RepairScreen carId={selectedCarId} onBack={handleBackFromRepair} />
+          <RepairScreen
+            carId={selectedCarId}
+            onBack={handleBackFromRepair}
+            onNavigateToOffice={() => {
+              setSelectedCarId(null);
+              setCurrentScreen('office');
+            }}
+          />
         </div>
         {showTutorial && <TutorialOverlay onComplete={handleTutorialComplete} />}
       </div>
