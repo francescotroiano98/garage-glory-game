@@ -138,5 +138,56 @@ export function GarageScreen({ onNavigateToOffice, onSelectCar }: GarageScreenPr
         </div>
       </div>
     </div>
+
+    <Dialog open={showSellDialog} onOpenChange={setShowSellDialog}>
+      <DialogContent className="max-w-[calc(100vw-2rem)] sm:max-w-sm p-4">
+        <DialogHeader>
+          <DialogTitle>{t.listForSale} {sellCar?.name}</DialogTitle>
+        </DialogHeader>
+        {sellCar && (
+          <div className="space-y-3">
+            <div className="text-center">
+              <img src={sellCar.image} alt={sellCar.name} className="h-20 mx-auto mb-2" />
+              <p className="text-sm text-muted-foreground mb-1">{t.carValue}</p>
+              <p className="text-2xl font-bold text-primary">
+                {formatMoney(Math.round(sellCar.currentValue))}
+              </p>
+            </div>
+            <div className="space-y-2">
+              <div className="flex justify-between text-sm">
+                <span>{t.yourOffer}:</span>
+                <span className="font-bold">{formatMoney(sellPrice)}</span>
+              </div>
+              <Slider
+                value={[sellPrice]}
+                onValueChange={([v]) => setSellPrice(v)}
+                min={Math.round(sellCar.currentValue * 0.8)}
+                max={Math.round(sellCar.currentValue * 1.5)}
+                step={50}
+              />
+            </div>
+            <div className="p-3 bg-secondary/80 rounded-lg space-y-1 border-2 border-border">
+              <div className="flex justify-between text-sm">
+                <span>{t.totalInvested}:</span>
+                <span className="font-medium">{formatMoney(sellTotalInvestment)}</span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span>{t.potentialProfit}:</span>
+                <span className={`font-bold ${sellPrice - sellTotalInvestment > 0 ? 'text-primary' : 'text-destructive'}`}>
+                  {formatMoney(sellPrice - sellTotalInvestment)}
+                </span>
+              </div>
+            </div>
+          </div>
+        )}
+        <DialogFooter>
+          <Button onClick={handleListForSale} className="w-full">
+            <DollarSign className="w-4 h-4 mr-1" />
+            {t.listForSale}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+    </>
   );
 }
