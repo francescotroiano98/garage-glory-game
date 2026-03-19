@@ -130,6 +130,7 @@ interface Translations {
   notEnoughMoney: string;
   carNotFound: string;
   goBack: string;
+  goToOfficeToAnswer: string;
   
   // Part names
   partEngine: string;
@@ -401,6 +402,7 @@ const translations: Record<Language, Translations> = {
     notEnoughMoney: 'Not enough money!',
     carNotFound: 'Vehicle not found',
     goBack: 'Go Back',
+    goToOfficeToAnswer: 'Go to the Office to answer',
     
     // Part names
     partEngine: 'Engine', partTransmission: 'Transmission', partBrakes: 'Brakes',
@@ -595,6 +597,7 @@ const translations: Record<Language, Translations> = {
     notEnoughMoney: 'Soldi insufficienti!',
     carNotFound: 'Veicolo non trovato',
     goBack: 'Torna Indietro',
+    goToOfficeToAnswer: 'Vai in Ufficio per rispondere',
     
     // Part names
     partEngine: 'Motore', partTransmission: 'Trasmissione', partBrakes: 'Freni',

@@ -1,8 +1,11 @@
+import { useState, useEffect } from 'react';
 import { useGame } from '@/contexts/GameContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { CarCard } from '@/components/game/CarCard';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { Slider } from '@/components/ui/slider';
 import { Car as CarIcon, Wrench, Loader2, DollarSign, Tag, Briefcase } from 'lucide-react';
 import garageBg from '@/assets/garage-bg.jpg';
 
@@ -12,12 +15,39 @@ interface GarageScreenProps {
 }
 
 export function GarageScreen({ onNavigateToOffice, onSelectCar }: GarageScreenProps) {
-  const { state } = useGame();
+  const { state, dispatch } = useGame();
   const { t, formatMoney } = useLanguage();
   const { carsInGarage, garageUpgrades, repairQueue } = state;
   const emptySlots = garageUpgrades.carBays - carsInGarage.length;
 
+  const [showSellDialog, setShowSellDialog] = useState(false);
+  const [sellCarId, setSellCarId] = useState<string | null>(null);
+  const [sellPrice, setSellPrice] = useState(0);
+
+  const sellCar = sellCarId ? carsInGarage.find(c => c.id === sellCarId) : null;
+  const sellTotalInvestment = sellCar ? (sellCar.purchasePrice || sellCar.askingPrice) + (sellCar.totalRepairCost || 0) : 0;
+
+  useEffect(() => {
+    if (sellCar) {
+      setSellPrice(Math.round(sellCar.currentValue * 1.2));
+    }
+  }, [sellCar?.currentValue]);
+
+  const handleOpenSellDialog = (carId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setSellCarId(carId);
+    setShowSellDialog(true);
+  };
+
+  const handleListForSale = () => {
+    if (!sellCar) return;
+    dispatch({ type: 'LIST_CAR_FOR_SALE', payload: { carId: sellCar.id, askingPrice: sellPrice } });
+    setShowSellDialog(false);
+    setSellCarId(null);
+  };
+
   return (
+    <>
     <div className="flex flex-col min-h-[100dvh] pb-20 relative overflow-hidden">
       <div className="fixed inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${garageBg})` }} />
       
@@ -78,9 +108,10 @@ export function GarageScreen({ onNavigateToOffice, onSelectCar }: GarageScreenPr
                 );
 
                 const actionButton = allRepaired && !isListed ? (
-                  <Badge variant="secondary" className="text-xs bg-green-500/20 text-green-700 dark:text-green-400">
-                    ✓ {t.readyToSellBadge}
-                  </Badge>
+                  <Button size="sm" variant="default" className="text-xs h-7" onClick={(e) => handleOpenSellDialog(car.id, e)}>
+                    <Tag className="w-3 h-3 mr-1" />
+                    {t.sell}
+                  </Button>
                 ) : null;
 
                 return (
@@ -108,5 +139,56 @@ export function GarageScreen({ onNavigateToOffice, onSelectCar }: GarageScreenPr
         </div>
       </div>
     </div>
+
+    <Dialog open={showSellDialog} onOpenChange={setShowSellDialog}>
+      <DialogContent className="max-w-[calc(100vw-2rem)] sm:max-w-sm p-4">
+        <DialogHeader>
+          <DialogTitle>{t.listForSale} {sellCar?.name}</DialogTitle>
+        </DialogHeader>
+        {sellCar && (
+          <div className="space-y-3">
+            <div className="text-center">
+              <img src={sellCar.image} alt={sellCar.name} className="h-20 mx-auto mb-2" />
+              <p className="text-sm text-muted-foreground mb-1">{t.carValue}</p>
+              <p className="text-2xl font-bold text-primary">
+                {formatMoney(Math.round(sellCar.currentValue))}
+              </p>
+            </div>
+            <div className="space-y-2">
+              <div className="flex justify-between text-sm">
+                <span>{t.yourOffer}:</span>
+                <span className="font-bold">{formatMoney(sellPrice)}</span>
+              </div>
+              <Slider
+                value={[sellPrice]}
+                onValueChange={([v]) => setSellPrice(v)}
+                min={Math.round(sellCar.currentValue * 0.8)}
+                max={Math.round(sellCar.currentValue * 1.5)}
+                step={50}
+              />
+            </div>
+            <div className="p-3 bg-secondary/80 rounded-lg space-y-1 border-2 border-border">
+              <div className="flex justify-between text-sm">
+                <span>{t.totalInvested}:</span>
+                <span className="font-medium">{formatMoney(sellTotalInvestment)}</span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span>{t.potentialProfit}:</span>
+                <span className={`font-bold ${sellPrice - sellTotalInvestment > 0 ? 'text-primary' : 'text-destructive'}`}>
+                  {formatMoney(sellPrice - sellTotalInvestment)}
+                </span>
+              </div>
+            </div>
+          </div>
+        )}
+        <DialogFooter>
+          <Button onClick={handleListForSale} className="w-full">
+            <DollarSign className="w-4 h-4 mr-1" />
+            {t.listForSale}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+    </>
   );
 }

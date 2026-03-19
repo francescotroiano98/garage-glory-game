@@ -192,7 +192,7 @@ export function OfficeScreen({ onCarBought }: OfficeScreenProps) {
               {pendingCalls > 0
                 ? `${pendingCalls} ${t.callsWaiting}`
                 : listedCars.length > 0
-                  ? `${listedCars.length} ${t.listedForSaleBadge}`
+                  ? t.noCallsDesc
                   : t.noCallsDesc}
             </span>
           </button>

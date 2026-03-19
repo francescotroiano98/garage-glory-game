@@ -2,17 +2,15 @@ import { useState, useEffect } from 'react';
 import { useGame } from '@/contexts/GameContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { PartRepairCard } from '@/components/game/PartRepairCard';
-import { CustomerCard } from '@/components/game/CustomerCard';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Slider } from '@/components/ui/slider';
 import { PartCategory } from '@/types/game';
-import { ArrowLeft, DollarSign, Tag, Loader2 } from 'lucide-react';
+import { ArrowLeft, DollarSign, Tag, Loader2, PhoneCall } from 'lucide-react';
 import { useSound } from '@/hooks/useSound';
-import { CATEGORY_ICONS, CATEGORY_LABELS } from '@/data/parts';
-import { getPatienceRounds } from '@/data/customers';
- import { getCategoryName } from '@/utils/partTranslations';
+import { CATEGORY_ICONS } from '@/data/parts';
+import { getCategoryName } from '@/utils/partTranslations';
 
 import garageBg from '@/assets/garage-bg.jpg';
 
@@ -45,7 +43,7 @@ export function RepairScreen({ carId, onBack }: RepairScreenProps) {
     handleSaleComplete,
     updateChallengeProgress,
   } = useGame();
-  const { t } = useLanguage();
+  const { t, formatMoney } = useLanguage();
   
   const [selectedCategory, setSelectedCategory] = useState<PartCategory>('mechanical');
   const [showSellDialog, setShowSellDialog] = useState(false);
@@ -116,43 +114,7 @@ export function RepairScreen({ carId, onBack }: RepairScreenProps) {
     setShowSellDialog(false);
   };
 
-  const handleAcceptOffer = () => {
-    if (!car || !customer) return;
-
-    handleSaleComplete(carId, customerOffer);
-    playSound('cashRegister');
-    onBack();
-  };
-
-  const handleCounterOffer = () => {
-    if (!customer || !saleState) return;
-
-    const maxRounds = getPatienceRounds(customer.patience);
-    
-    if (!hasEnergy(2)) return;
-    dispatch({ type: 'SPEND_ENERGY', payload: 2 });
-    
-    if (customer.patience === 'very_low' || customer.patience === 'low') {
-      const leaveChance = customer.patience === 'very_low' ? 0.5 : 0.3;
-      if (Math.random() < leaveChance) {
-        dispatch({ type: 'CANCEL_SALE', payload: carId });
-        return;
-      }
-    }
-    
-    if (negotiationRound >= maxRounds) {
-      dispatch({ type: 'CANCEL_SALE', payload: carId });
-      return;
-    }
-
-    const increase = (saleState.askingPrice - customerOffer) * (0.2 + Math.random() * 0.3) * (1 - customer.bargainSkill * 0.05);
-    const newOffer = Math.round(customerOffer + Math.max(increase, 50));
-    dispatch({ type: 'UPDATE_SALE_OFFER', payload: { carId, offer: Math.min(newOffer, customer.maxBudget), round: negotiationRound + 1 } });
-  };
-
-  const handleRejectOffer = () => {
-    dispatch({ type: 'CANCEL_SALE', payload: carId });
-  };
+  // Customer negotiation now happens in the Office phone screen
 
   if (!car) {
     return (
@@ -193,11 +155,11 @@ export function RepairScreen({ carId, onBack }: RepairScreenProps) {
               <div className="flex items-center gap-2 text-sm flex-wrap">
                 <Badge variant="secondary">{repaired}/{repaired + unrepaired} {t.fixed}</Badge>
                 <span className="text-muted-foreground">
-                  {t.carValue}: <span className="text-primary font-medium">${Math.round(car.currentValue).toLocaleString()}</span>
+                  {t.carValue}: <span className="text-primary font-medium">{formatMoney(Math.round(car.currentValue))}</span>
                 </span>
               </div>
               <div className="text-xs text-muted-foreground mt-1">
-                {t.invested}: ${totalInvestment.toLocaleString()}
+                {t.invested}: {formatMoney(totalInvestment)}
               </div>
             </div>
             <Button 
@@ -220,27 +182,27 @@ export function RepairScreen({ carId, onBack }: RepairScreenProps) {
           </div>
         </div>
 
-        {(waitingForCustomer || customer) && (
+        {waitingForCustomer && (
           <div className="p-4 border-b border-border bg-card/95 backdrop-blur-sm">
-            {waitingForCustomer ? (
-              <div className="flex items-center gap-3 p-4 bg-secondary/80 rounded-lg border-2 border-border">
-                <Loader2 className="w-5 h-5 animate-spin text-primary" />
-                <div>
-                  <p className="font-medium">{t.waitingForBuyer}</p>
-                  <p className="text-sm text-muted-foreground">{t.customerWillArrive}</p>
-                </div>
+            <div className="flex items-center gap-3 p-4 bg-secondary/80 rounded-lg border-2 border-border">
+              <Loader2 className="w-5 h-5 animate-spin text-primary" />
+              <div>
+                <p className="font-medium">{t.waitingForBuyer}</p>
+                <p className="text-sm text-muted-foreground">{t.customerWillArrive}</p>
               </div>
-            ) : customer && (
-              <CustomerCard
-                customer={customer}
-                offerPrice={customerOffer}
-                onAccept={handleAcceptOffer}
-                onCounter={handleCounterOffer}
-                onReject={handleRejectOffer}
-                isNegotiating={negotiationRound > 0}
-                negotiationRound={negotiationRound}
-              />
-            )}
+            </div>
+          </div>
+        )}
+
+        {customer && (
+          <div className="p-4 border-b border-border bg-accent/20 backdrop-blur-sm">
+            <div className="flex items-center gap-3 p-4 bg-primary/10 rounded-lg border-2 border-primary/30">
+              <PhoneCall className="w-5 h-5 text-primary animate-bounce" />
+              <div className="flex-1">
+                <p className="font-medium">{t.incomingCalls}</p>
+                <p className="text-sm text-muted-foreground">{t.goToOfficeToAnswer}</p>
+              </div>
+            </div>
           </div>
         )}
 
@@ -298,24 +260,24 @@ export function RepairScreen({ carId, onBack }: RepairScreenProps) {
       </div>
 
       <Dialog open={showSellDialog} onOpenChange={setShowSellDialog}>
-        <DialogContent className="max-w-sm">
+        <DialogContent className="max-w-[calc(100vw-2rem)] sm:max-w-sm p-4">
           <DialogHeader>
             <DialogTitle>{t.listForSale} {car.name}</DialogTitle>
           </DialogHeader>
 
-          <div className="space-y-4">
+          <div className="space-y-3">
             <div className="text-center">
               <img src={carImage} alt={car.name} className="h-20 mx-auto mb-2" />
               <p className="text-sm text-muted-foreground mb-1">{t.carValue}</p>
               <p className="text-2xl font-bold text-primary">
-                ${Math.round(car.currentValue).toLocaleString()}
+                {formatMoney(Math.round(car.currentValue))}
               </p>
             </div>
 
             <div className="space-y-2">
               <div className="flex justify-between text-sm">
                 <span>{t.yourOffer}:</span>
-                <span className="font-bold">${sellPrice.toLocaleString()}</span>
+                <span className="font-bold">{formatMoney(sellPrice)}</span>
               </div>
               <Slider
                 value={[sellPrice]}
@@ -325,21 +287,21 @@ export function RepairScreen({ carId, onBack }: RepairScreenProps) {
                 step={50}
               />
               <div className="flex justify-between text-xs text-muted-foreground">
-                <span>80% value</span>
-                <span className="text-center text-primary font-medium">Max: 150% value</span>
-                <span>Fast sale</span>
+                <span>80%</span>
+                <span className="text-center text-primary font-medium">Max: 150%</span>
+                <span>{t.sell}</span>
               </div>
             </div>
 
             <div className="p-3 bg-secondary/80 rounded-lg space-y-1 border-2 border-border">
               <div className="flex justify-between text-sm">
                 <span>{t.totalInvested}:</span>
-                <span className="font-medium">${totalInvestment.toLocaleString()}</span>
+                <span className="font-medium">{formatMoney(totalInvestment)}</span>
               </div>
               <div className="flex justify-between text-sm">
                 <span>{t.potentialProfit}:</span>
                 <span className={`font-bold ${sellPrice - totalInvestment > 0 ? 'text-primary' : 'text-destructive'}`}>
-                  ${(sellPrice - totalInvestment).toLocaleString()}
+                  {formatMoney(sellPrice - totalInvestment)}
                 </span>
               </div>
             </div>

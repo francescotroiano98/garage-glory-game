@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useGame } from '@/contexts/GameContext';
 import { useLanguage } from '@/contexts/LanguageContext';
- import { Zap, DollarSign, Gift, Trophy, Target, Star, ChevronDown } from 'lucide-react';
+ import { Zap, DollarSign, Gift, Trophy, Target, Star, ChevronDown, Euro, PoundSterling } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -22,7 +22,7 @@ export function StatsBar() {
     claimChallengeReward,
      claimWeeklyChallengeReward,
   } = useGame();
-  const { t } = useLanguage();
+  const { t, formatMoney, currency } = useLanguage();
   const [timeRemaining, setTimeRemaining] = useState(0);
   const [showAchievements, setShowAchievements] = useState(false);
   const [showChallenges, setShowChallenges] = useState(false);
@@ -73,10 +73,10 @@ export function StatsBar() {
            {/* Left side: Money & Energy in column */}
            <div className="flex flex-col gap-1.5">
             {/* Money */}
-             <div className="flex items-center gap-1.5 bg-primary/15 px-2.5 py-1 rounded-lg border border-primary/30">
-               <DollarSign className="w-4 h-4 text-primary" />
-               <span className="font-bold text-sm text-primary min-w-[60px]">${state.money.toLocaleString()}</span>
-            </div>
+              <div className="flex items-center gap-1.5 bg-primary/15 px-2.5 py-1 rounded-lg border border-primary/30">
+                {currency === 'EUR' ? <Euro className="w-4 h-4 text-primary" /> : currency === 'GBP' ? <PoundSterling className="w-4 h-4 text-primary" /> : <DollarSign className="w-4 h-4 text-primary" />}
+                <span className="font-bold text-sm text-primary min-w-[60px]">{formatMoney(state.money)}</span>
+             </div>
 
              {/* Energy + Recharge */}
              <div className="flex items-center gap-2">
