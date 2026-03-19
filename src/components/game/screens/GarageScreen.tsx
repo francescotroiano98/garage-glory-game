@@ -107,9 +107,10 @@ export function GarageScreen({ onNavigateToOffice, onSelectCar }: GarageScreenPr
                 );
 
                 const actionButton = allRepaired && !isListed ? (
-                  <Badge variant="secondary" className="text-xs bg-green-500/20 text-green-700 dark:text-green-400">
-                    ✓ {t.readyToSellBadge}
-                  </Badge>
+                  <Button size="sm" variant="default" className="text-xs h-7" onClick={(e) => handleOpenSellDialog(car.id, e)}>
+                    <Tag className="w-3 h-3 mr-1" />
+                    {t.sell}
+                  </Button>
                 ) : null;
 
                 return (
