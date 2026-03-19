@@ -193,11 +193,11 @@ export function RepairScreen({ carId, onBack }: RepairScreenProps) {
               <div className="flex items-center gap-2 text-sm flex-wrap">
                 <Badge variant="secondary">{repaired}/{repaired + unrepaired} {t.fixed}</Badge>
                 <span className="text-muted-foreground">
-                  {t.carValue}: <span className="text-primary font-medium">${Math.round(car.currentValue).toLocaleString()}</span>
+                  {t.carValue}: <span className="text-primary font-medium">{formatMoney(Math.round(car.currentValue))}</span>
                 </span>
               </div>
               <div className="text-xs text-muted-foreground mt-1">
-                {t.invested}: ${totalInvestment.toLocaleString()}
+                {t.invested}: {formatMoney(totalInvestment)}
               </div>
             </div>
             <Button 
