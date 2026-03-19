@@ -402,6 +402,7 @@ const translations: Record<Language, Translations> = {
     notEnoughMoney: 'Not enough money!',
     carNotFound: 'Vehicle not found',
     goBack: 'Go Back',
+    goToOfficeToAnswer: 'Go to the Office to answer',
     
     // Part names
     partEngine: 'Engine', partTransmission: 'Transmission', partBrakes: 'Brakes',
