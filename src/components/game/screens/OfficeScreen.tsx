@@ -27,6 +27,13 @@ export function OfficeScreen({ onCarBought }: OfficeScreenProps) {
   const pendingCalls = activeSalesWithCustomer.length;
   const listedCars = state.carsInGarage.filter(c => c.listedForSale);
 
+  // Auto-return to hub when no listed cars remain while on phone view
+  useEffect(() => {
+    if (view === 'phone' && listedCars.length === 0) {
+      setView('hub');
+    }
+  }, [view, listedCars.length]);
+
   const handleCounterOffer = (carId: string) => {
     const saleState = getSaleState(carId);
     if (!saleState?.customer) return;
