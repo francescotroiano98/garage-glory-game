@@ -27,7 +27,7 @@ const categoryList: { id: PartCategory; icon: string }[] = [
   { id: 'interior', icon: CATEGORY_ICONS.interior },
 ];
 
-export function RepairScreen({ carId, onBack }: RepairScreenProps) {
+export function RepairScreen({ carId, onBack, onNavigateToOffice }: RepairScreenProps) {
   const { 
     state, 
     dispatch, 
