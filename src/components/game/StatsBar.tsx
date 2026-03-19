@@ -22,7 +22,7 @@ export function StatsBar() {
     claimChallengeReward,
      claimWeeklyChallengeReward,
   } = useGame();
-  const { t } = useLanguage();
+  const { t, formatMoney, currency } = useLanguage();
   const [timeRemaining, setTimeRemaining] = useState(0);
   const [showAchievements, setShowAchievements] = useState(false);
   const [showChallenges, setShowChallenges] = useState(false);
