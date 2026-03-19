@@ -597,6 +597,7 @@ const translations: Record<Language, Translations> = {
     notEnoughMoney: 'Soldi insufficienti!',
     carNotFound: 'Veicolo non trovato',
     goBack: 'Torna Indietro',
+    goToOfficeToAnswer: 'Vai in Ufficio per rispondere',
     
     // Part names
     partEngine: 'Motore', partTransmission: 'Trasmissione', partBrakes: 'Freni',
