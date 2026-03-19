@@ -15,10 +15,36 @@ interface GarageScreenProps {
 }
 
 export function GarageScreen({ onNavigateToOffice, onSelectCar }: GarageScreenProps) {
-  const { state } = useGame();
+  const { state, dispatch } = useGame();
   const { t, formatMoney } = useLanguage();
   const { carsInGarage, garageUpgrades, repairQueue } = state;
   const emptySlots = garageUpgrades.carBays - carsInGarage.length;
+
+  const [showSellDialog, setShowSellDialog] = useState(false);
+  const [sellCarId, setSellCarId] = useState<string | null>(null);
+  const [sellPrice, setSellPrice] = useState(0);
+
+  const sellCar = sellCarId ? carsInGarage.find(c => c.id === sellCarId) : null;
+  const sellTotalInvestment = sellCar ? (sellCar.purchasePrice || sellCar.askingPrice) + (sellCar.totalRepairCost || 0) : 0;
+
+  useEffect(() => {
+    if (sellCar) {
+      setSellPrice(Math.round(sellCar.currentValue * 1.2));
+    }
+  }, [sellCar?.currentValue]);
+
+  const handleOpenSellDialog = (carId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setSellCarId(carId);
+    setShowSellDialog(true);
+  };
+
+  const handleListForSale = () => {
+    if (!sellCar) return;
+    dispatch({ type: 'LIST_CAR_FOR_SALE', payload: { carId: sellCar.id, askingPrice: sellPrice } });
+    setShowSellDialog(false);
+    setSellCarId(null);
+  };
 
   return (
     <div className="flex flex-col min-h-[100dvh] pb-20 relative overflow-hidden">
