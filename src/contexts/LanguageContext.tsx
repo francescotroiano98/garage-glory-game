@@ -130,6 +130,7 @@ interface Translations {
   notEnoughMoney: string;
   carNotFound: string;
   goBack: string;
+  goToOfficeToAnswer: string;
   
   // Part names
   partEngine: string;
