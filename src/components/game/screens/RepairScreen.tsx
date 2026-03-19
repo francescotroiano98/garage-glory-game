@@ -220,27 +220,27 @@ export function RepairScreen({ carId, onBack }: RepairScreenProps) {
           </div>
         </div>
 
-        {(waitingForCustomer || customer) && (
+        {waitingForCustomer && (
           <div className="p-4 border-b border-border bg-card/95 backdrop-blur-sm">
-            {waitingForCustomer ? (
-              <div className="flex items-center gap-3 p-4 bg-secondary/80 rounded-lg border-2 border-border">
-                <Loader2 className="w-5 h-5 animate-spin text-primary" />
-                <div>
-                  <p className="font-medium">{t.waitingForBuyer}</p>
-                  <p className="text-sm text-muted-foreground">{t.customerWillArrive}</p>
-                </div>
+            <div className="flex items-center gap-3 p-4 bg-secondary/80 rounded-lg border-2 border-border">
+              <Loader2 className="w-5 h-5 animate-spin text-primary" />
+              <div>
+                <p className="font-medium">{t.waitingForBuyer}</p>
+                <p className="text-sm text-muted-foreground">{t.customerWillArrive}</p>
               </div>
-            ) : customer && (
-              <CustomerCard
-                customer={customer}
-                offerPrice={customerOffer}
-                onAccept={handleAcceptOffer}
-                onCounter={handleCounterOffer}
-                onReject={handleRejectOffer}
-                isNegotiating={negotiationRound > 0}
-                negotiationRound={negotiationRound}
-              />
-            )}
+            </div>
+          </div>
+        )}
+
+        {customer && (
+          <div className="p-4 border-b border-border bg-accent/20 backdrop-blur-sm">
+            <div className="flex items-center gap-3 p-4 bg-primary/10 rounded-lg border-2 border-primary/30">
+              <PhoneCall className="w-5 h-5 text-primary animate-bounce" />
+              <div className="flex-1">
+                <p className="font-medium">{t.incomingCalls}</p>
+                <p className="text-sm text-muted-foreground">{t.goToOfficeToAnswer}</p>
+              </div>
+            </div>
           </div>
         )}
 
