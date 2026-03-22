@@ -10,6 +10,7 @@ import { useSound, useBackgroundMusic } from '@/hooks/useSound';
 export function SettingsScreen() {
   const { state } = useGame();
   const { t, language, setLanguage, currency, setCurrency, formatMoney } = useLanguage();
+  const { user, username, signOut } = useAuth();
   const { muted, toggleMute, sfxVolume, setSfxVolume } = useSound();
   const { playing, toggleMusic, musicVolume, setMusicVolume } = useBackgroundMusic();
 
