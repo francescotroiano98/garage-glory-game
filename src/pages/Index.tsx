@@ -1,6 +1,7 @@
 import { useState, useEffect, Component, ReactNode } from 'react';
-import { GameProvider } from '@/contexts/GameContext';
+import { GameProvider, useGame } from '@/contexts/GameContext';
 import { LanguageProvider } from '@/contexts/LanguageContext';
+import { AuthProvider, useAuth } from '@/contexts/AuthContext';
 import { StatsBar } from '@/components/game/StatsBar';
 import { BottomNav, Screen } from '@/components/game/BottomNav';
 import { GarageScreen } from '@/components/game/screens/GarageScreen';
@@ -8,6 +9,7 @@ import { OfficeScreen } from '@/components/game/screens/OfficeScreen';
 import { RepairScreen } from '@/components/game/screens/RepairScreen';
 import { ShopScreen } from '@/components/game/screens/ShopScreen';
 import { SettingsScreen } from '@/components/game/screens/SettingsScreen';
+import { LeaderboardScreen } from '@/components/game/screens/LeaderboardScreen';
 import { WelcomeScreen } from '@/components/game/screens/WelcomeScreen';
 import { TutorialOverlay } from '@/components/game/TutorialOverlay';
 import { useBackgroundMusic } from '@/hooks/useSound';
@@ -42,6 +44,26 @@ class GameErrorBoundary extends Component<{ children: ReactNode }, { hasError: b
 
 const TUTORIAL_KEY = 'car_mechanic_tutorial_done';
 const WELCOME_KEY = 'car_mechanic_welcome_done';
+
+// Syncs game state to profile DB
+function ProfileSync() {
+  const { state } = useGame();
+  const { user, updateProfile } = useAuth();
+
+  useEffect(() => {
+    if (!user) return;
+    const timeout = setTimeout(() => {
+      updateProfile({
+        total_profit: state.totalProfit,
+        total_cars_sold: state.totalCarsSold,
+        level: state.level,
+      });
+    }, 5000); // Debounce 5s
+    return () => clearTimeout(timeout);
+  }, [user, state.totalProfit, state.totalCarsSold, state.level]);
+
+  return null;
+}
 
 function GameContent() {
   const [currentScreen, setCurrentScreen] = useState<Screen>('garage');
@@ -119,10 +141,12 @@ function GameContent() {
           <OfficeScreen onCarBought={handleCarBought} />
         )}
         {currentScreen === 'shop' && <ShopScreen />}
+        {currentScreen === 'leaderboard' && <LeaderboardScreen />}
         {currentScreen === 'settings' && <SettingsScreen />}
       </div>
       <BottomNav currentScreen={currentScreen} onNavigate={setCurrentScreen} />
       {showTutorial && <TutorialOverlay onComplete={handleTutorialComplete} />}
+      <ProfileSync />
     </div>
   );
 }
@@ -130,9 +154,11 @@ function GameContent() {
 const Index = () => (
   <GameErrorBoundary>
     <LanguageProvider>
-      <GameProvider>
-        <GameContent />
-      </GameProvider>
+      <AuthProvider>
+        <GameProvider>
+          <GameContent />
+        </GameProvider>
+      </AuthProvider>
     </LanguageProvider>
   </GameErrorBoundary>
 );
