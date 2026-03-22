@@ -1,14 +1,16 @@
 import { useGame } from '@/contexts/GameContext';
 import { useLanguage, Language, Currency } from '@/contexts/LanguageContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Slider } from '@/components/ui/slider';
-import { Settings, RotateCcw, Trophy, DollarSign, Car, Star, Volume2, VolumeX, Music, Globe } from 'lucide-react';
+import { Settings, RotateCcw, Trophy, DollarSign, Car, Star, Volume2, VolumeX, Music, Globe, LogOut, User } from 'lucide-react';
 import { useSound, useBackgroundMusic } from '@/hooks/useSound';
 
 export function SettingsScreen() {
   const { state } = useGame();
   const { t, language, setLanguage, currency, setCurrency, formatMoney } = useLanguage();
+  const { user, username, signOut } = useAuth();
   const { muted, toggleMute, sfxVolume, setSfxVolume } = useSound();
   const { playing, toggleMusic, musicVolume, setMusicVolume } = useBackgroundMusic();
 
@@ -191,6 +193,25 @@ export function SettingsScreen() {
             <p>5. <strong>{t.howToPlay5}</strong></p>
           </CardContent>
         </Card>
+
+        {/* Account */}
+        {user && (
+          <Card className="border-2">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-base flex items-center gap-2">
+                <User className="w-4 h-4 text-primary" />
+                Account
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <p className="text-sm text-muted-foreground">{t.loggedInAs}: <strong>{username || user.email}</strong></p>
+              <Button variant="outline" className="w-full border-2" onClick={signOut}>
+                <LogOut className="w-4 h-4 mr-2" />
+                {t.logOut}
+              </Button>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Reset */}
         <Card className="border-2 border-destructive/30">

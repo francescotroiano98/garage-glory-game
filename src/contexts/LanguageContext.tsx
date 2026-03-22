@@ -293,6 +293,24 @@ interface Translations {
   auto: string;
   moto: string;
   truck: string;
+  
+  // Auth & Leaderboard
+  leaderboard: string;
+  loading: string;
+  noPlayersYet: string;
+  you: string;
+  login: string;
+  signUp: string;
+  email: string;
+  password: string;
+  createAccount: string;
+  alreadyHaveAccount: string;
+  dontHaveAccount: string;
+  loginToPlay: string;
+  orContinueAsGuest: string;
+  playAsGuest: string;
+  logOut: string;
+  loggedInAs: string;
 }
 
 const translations: Record<Language, Translations> = {
@@ -490,6 +508,22 @@ const translations: Record<Language, Translations> = {
     auto: 'Cars',
     moto: 'Moto',
     truck: 'Trucks',
+    leaderboard: 'Leaderboard',
+    loading: 'Loading',
+    noPlayersYet: 'No players yet',
+    you: 'You',
+    login: 'Login',
+    signUp: 'Sign Up',
+    email: 'Email',
+    password: 'Password',
+    createAccount: 'Create Account',
+    alreadyHaveAccount: 'Already have an account?',
+    dontHaveAccount: "Don't have an account?",
+    loginToPlay: 'Login to save your progress and compete!',
+    orContinueAsGuest: 'Or continue without an account',
+    playAsGuest: 'Play as Guest',
+    logOut: 'Log Out',
+    loggedInAs: 'Logged in as',
   },
   it: {
     settings: 'Impostazioni',
@@ -686,6 +720,22 @@ const translations: Record<Language, Translations> = {
     auto: 'Auto',
     moto: 'Moto',
     truck: 'Camion',
+    leaderboard: 'Classifica',
+    loading: 'Caricamento',
+    noPlayersYet: 'Nessun giocatore ancora',
+    you: 'Tu',
+    login: 'Accedi',
+    signUp: 'Registrati',
+    email: 'Email',
+    password: 'Password',
+    createAccount: 'Crea Account',
+    alreadyHaveAccount: 'Hai già un account?',
+    dontHaveAccount: 'Non hai un account?',
+    loginToPlay: 'Accedi per salvare i progressi e competere!',
+    orContinueAsGuest: 'Oppure continua senza account',
+    playAsGuest: 'Gioca come Ospite',
+    logOut: 'Esci',
+    loggedInAs: 'Connesso come',
   },
 };
 
