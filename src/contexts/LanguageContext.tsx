@@ -293,6 +293,24 @@ interface Translations {
   auto: string;
   moto: string;
   truck: string;
+  
+  // Auth & Leaderboard
+  leaderboard: string;
+  loading: string;
+  noPlayersYet: string;
+  you: string;
+  login: string;
+  signUp: string;
+  email: string;
+  password: string;
+  createAccount: string;
+  alreadyHaveAccount: string;
+  dontHaveAccount: string;
+  loginToPlay: string;
+  orContinueAsGuest: string;
+  playAsGuest: string;
+  logOut: string;
+  loggedInAs: string;
 }
 
 const translations: Record<Language, Translations> = {
