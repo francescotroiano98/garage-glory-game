@@ -194,6 +194,25 @@ export function SettingsScreen() {
           </CardContent>
         </Card>
 
+        {/* Account */}
+        {user && (
+          <Card className="border-2">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-base flex items-center gap-2">
+                <User className="w-4 h-4 text-primary" />
+                Account
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <p className="text-sm text-muted-foreground">{t.loggedInAs}: <strong>{username || user.email}</strong></p>
+              <Button variant="outline" className="w-full border-2" onClick={signOut}>
+                <LogOut className="w-4 h-4 mr-2" />
+                {t.logOut}
+              </Button>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Reset */}
         <Card className="border-2 border-destructive/30">
           <CardContent className="p-4">
