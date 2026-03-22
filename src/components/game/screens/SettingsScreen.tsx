@@ -1,9 +1,10 @@
 import { useGame } from '@/contexts/GameContext';
 import { useLanguage, Language, Currency } from '@/contexts/LanguageContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Slider } from '@/components/ui/slider';
-import { Settings, RotateCcw, Trophy, DollarSign, Car, Star, Volume2, VolumeX, Music, Globe } from 'lucide-react';
+import { Settings, RotateCcw, Trophy, DollarSign, Car, Star, Volume2, VolumeX, Music, Globe, LogOut, User } from 'lucide-react';
 import { useSound, useBackgroundMusic } from '@/hooks/useSound';
 
 export function SettingsScreen() {
