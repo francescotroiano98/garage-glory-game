@@ -311,6 +311,10 @@ interface Translations {
   playAsGuest: string;
   logOut: string;
   loggedInAs: string;
+  inspectVehicle: string;
+  inspectCost: string;
+  issuesFound: string;
+  noIssuesFound: string;
 }
 
 const translations: Record<Language, Translations> = {
