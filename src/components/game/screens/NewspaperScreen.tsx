@@ -3,6 +3,7 @@ import { useGame } from '@/contexts/GameContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { CarCard } from '@/components/game/CarCard';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Slider } from '@/components/ui/slider';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -13,8 +14,9 @@ import { NewspaperAd, Car, CATEGORY_NAMES, VehicleCategory } from '@/types/game'
 import { getCategoriesForLevel } from '@/types/game';
 import { getMotoCategoriesForLevel } from '@/data/motorcycles';
 import { getTruckCategoriesForLevel } from '@/data/trucks';
-import { Newspaper, RefreshCw, DollarSign, Zap, Filter } from 'lucide-react';
+import { Newspaper, RefreshCw, DollarSign, Zap, Filter, Search } from 'lucide-react';
 import { useSound } from '@/hooks/useSound';
+import { getPartName, getDamageLevelName } from '@/utils/partTranslations';
 import newspaperBg from '@/assets/newspaper-bg.jpg';
 
 interface NewspaperScreenProps {
