@@ -528,6 +528,10 @@ const translations: Record<Language, Translations> = {
     playAsGuest: 'Play as Guest',
     logOut: 'Log Out',
     loggedInAs: 'Logged in as',
+    inspectVehicle: 'Inspect Vehicle',
+    inspectCost: 'Inspect',
+    issuesFound: 'Issues Found',
+    noIssuesFound: 'No additional issues found',
   },
   it: {
     settings: 'Impostazioni',
