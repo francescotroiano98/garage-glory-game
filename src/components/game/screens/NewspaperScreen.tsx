@@ -379,7 +379,7 @@ export function NewspaperScreen({ onCarBought }: NewspaperScreenProps) {
                 <CarCard
                   car={ad.car}
                   onClick={() => handleSelectAd(ad)}
-                  visibilityChance={getVisibilityChance()}
+                  showDamages={false}
                 />
                 {ad.negotiable && (
                   <div className="absolute top-2 right-2 flex items-center gap-1 text-xs text-primary bg-card/95 px-2 py-1 rounded-md border-2 font-medium">
