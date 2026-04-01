@@ -223,78 +223,22 @@ export function NewspaperScreen({ onCarBought }: NewspaperScreenProps) {
         </div>
       </div>
 
-      <Dialog open={!!selectedAd} onOpenChange={(open) => !open && setSelectedAd(null)}>
-        <DialogContent className="max-w-[calc(100vw-2rem)] sm:max-w-sm p-4">
-          <DialogHeader>
-            <DialogTitle>{t.buy} {selectedAd?.car.name}?</DialogTitle>
-          </DialogHeader>
-
-          {selectedAd && (
-            <div className="space-y-3">
-              <CarCard car={selectedAd.car} showPrice={false} visibilityChance={getVisibilityChance()} compact />
-
-              <div className="space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span>{t.askingPrice}:</span>
-                  <span className="font-bold">{formatMoney(selectedAd.car.askingPrice)}</span>
-                </div>
-                
-                {selectedAd.negotiable && (
-                  <>
-                    <div className="flex justify-between text-sm">
-                      <span>{t.yourOffer}:</span>
-                      <span className="font-bold text-primary">{formatMoney(negotiatePrice)}</span>
-                    </div>
-                    <Slider
-                      value={[negotiatePrice]}
-                      onValueChange={([v]) => setNegotiatePrice(v)}
-                      min={Math.max(10, Math.round(selectedAd.car.askingPrice * 0.7))}
-                      max={selectedAd.car.askingPrice}
-                      step={Math.max(1, Math.round(selectedAd.car.askingPrice * 0.01))}
-                    />
-                    {negotiationCount > 0 && (
-                      <div className="text-xs text-muted-foreground text-center">
-                        {t.negotiations}: {negotiationCount} (cost: {negotiationCount * NEGOTIATION_ENERGY_COST} {t.energy.toLowerCase()})
-                      </div>
-                    )}
-                  </>
-                )}
-
-                <div className="flex justify-between text-sm text-muted-foreground">
-                  <span>{t.yourBalance}:</span>
-                  <span className={canAfford(negotiatePrice) ? 'text-primary font-bold' : 'text-destructive font-bold'}>
-                    {formatMoney(state.money)}
-                  </span>
-                </div>
-              </div>
-            </div>
-          )}
-
-          <DialogFooter className="flex gap-2">
-            {selectedAd?.negotiable && (
-              <Button 
-                variant="outline" 
-                onClick={handleNegotiate} 
-                className="flex-1 border-2"
-                disabled={!hasEnergy(NEGOTIATION_ENERGY_COST)}
-              >
-                <DollarSign className="w-4 h-4 mr-1" />
-                {t.negotiate}
-                <span className="ml-1 text-xs flex items-center">
-                  (<Zap className="w-3 h-3" />{NEGOTIATION_ENERGY_COST})
-                </span>
-              </Button>
-            )}
-            <Button 
-              onClick={() => handleBuy(isNegotiating ? negotiatePrice : selectedAd?.car.askingPrice || 0)} 
-              disabled={!canAfford(negotiatePrice) || garageFull}
-              className="flex-1"
-            >
-              {t.buyNow}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <VehicleDetailDialog
+        ad={selectedAd}
+        onClose={() => setSelectedAd(null)}
+        negotiatePrice={negotiatePrice}
+        setNegotiatePrice={setNegotiatePrice}
+        isNegotiating={isNegotiating}
+        negotiationCount={negotiationCount}
+        onNegotiate={handleNegotiate}
+        onBuy={handleBuy}
+        garageFull={garageFull}
+        canAfford={canAfford}
+        hasEnergy={hasEnergy}
+        getVisibilityChance={getVisibilityChance}
+        formatMoney={formatMoney}
+        t={t}
+      />
     </div>
   );
 }
