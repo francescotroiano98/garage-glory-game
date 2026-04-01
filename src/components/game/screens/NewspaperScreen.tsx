@@ -3,6 +3,7 @@ import { useGame } from '@/contexts/GameContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { CarCard } from '@/components/game/CarCard';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Slider } from '@/components/ui/slider';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -13,8 +14,9 @@ import { NewspaperAd, Car, CATEGORY_NAMES, VehicleCategory } from '@/types/game'
 import { getCategoriesForLevel } from '@/types/game';
 import { getMotoCategoriesForLevel } from '@/data/motorcycles';
 import { getTruckCategoriesForLevel } from '@/data/trucks';
-import { Newspaper, RefreshCw, DollarSign, Zap, Filter } from 'lucide-react';
+import { Newspaper, RefreshCw, DollarSign, Zap, Filter, Search } from 'lucide-react';
 import { useSound } from '@/hooks/useSound';
+import { getPartName, getDamageLevelName } from '@/utils/partTranslations';
 import newspaperBg from '@/assets/newspaper-bg.jpg';
 
 interface NewspaperScreenProps {
@@ -22,8 +24,175 @@ interface NewspaperScreenProps {
 }
 
 const NEGOTIATION_ENERGY_COST = 2;
+const INSPECT_ENERGY_COST = 2;
 
 type VehicleTypeFilter = 'all' | 'car' | 'motorcycle' | 'truck';
+
+interface VehicleDetailDialogProps {
+  ad: NewspaperAd | null;
+  onClose: () => void;
+  negotiatePrice: number;
+  setNegotiatePrice: (v: number) => void;
+  isNegotiating: boolean;
+  negotiationCount: number;
+  onNegotiate: () => void;
+  onBuy: (price: number) => void;
+  garageFull: boolean;
+  canAfford: (amount: number) => boolean;
+  hasEnergy: (amount: number) => boolean;
+  getVisibilityChance: () => number;
+  formatMoney: (n: number) => string;
+  t: Record<string, any>;
+}
+
+function VehicleDetailDialog({
+  ad, onClose, negotiatePrice, setNegotiatePrice, isNegotiating, negotiationCount,
+  onNegotiate, onBuy, garageFull, canAfford, hasEnergy, getVisibilityChance, formatMoney, t,
+}: VehicleDetailDialogProps) {
+  const [inspected, setInspected] = useState(false);
+  const [revealedDamages, setRevealedDamages] = useState<string[]>([]);
+  const { playSound } = useSound();
+  const { state, dispatch } = useGame();
+
+  // Reset inspection state when dialog changes
+  useEffect(() => {
+    setInspected(false);
+    setRevealedDamages([]);
+  }, [ad?.id]);
+
+  const handleInspect = () => {
+    if (!ad || !hasEnergy(INSPECT_ENERGY_COST)) return;
+    dispatch({ type: 'SPEND_ENERGY', payload: INSPECT_ENERGY_COST });
+    playSound('inspect');
+
+    // Reveal some hidden damages (not all)
+    const hiddenDamages = ad.car.damages.filter(d => !d.visible && !d.repaired);
+    const revealCount = Math.min(Math.ceil(hiddenDamages.length * 0.5), hiddenDamages.length);
+    const shuffled = [...hiddenDamages].sort(() => Math.random() - 0.5);
+    const revealed = shuffled.slice(0, revealCount).map(d => d.part);
+    setRevealedDamages(revealed);
+    setInspected(true);
+  };
+
+  if (!ad) return null;
+
+  const visibleDamages = ad.car.damages.filter(d => !d.repaired && (d.visible || revealedDamages.includes(d.part)));
+  const totalUnrepaired = ad.car.damages.filter(d => !d.repaired).length;
+  const hiddenCount = totalUnrepaired - visibleDamages.length;
+
+  return (
+    <Dialog open={!!ad} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="max-w-[calc(100vw-2rem)] sm:max-w-sm p-3 max-h-[90vh] overflow-y-auto">
+        <DialogHeader className="pb-1">
+          <DialogTitle className="text-base">{t.buy} {ad.car.name}?</DialogTitle>
+        </DialogHeader>
+
+        <div className="space-y-2">
+          {/* Vehicle image & basic info */}
+          <div className="flex items-center gap-3">
+            <img src={ad.car.image} alt={ad.car.name} className="w-16 h-16 object-contain shrink-0 rounded-lg" />
+            <div className="flex-1 min-w-0">
+              <p className="font-bold text-sm truncate">{ad.car.name}</p>
+              <p className="text-lg font-bold text-primary">{formatMoney(ad.car.askingPrice)}</p>
+            </div>
+          </div>
+
+          {/* Visible damages */}
+          {visibleDamages.length > 0 && (
+            <div className="space-y-1">
+              <p className="text-xs font-medium text-muted-foreground">{t.issuesFound}:</p>
+              <div className="grid grid-cols-2 gap-1">
+                {visibleDamages.map((d, i) => (
+                  <div key={i} className="flex items-center justify-between px-2 py-1 bg-destructive/10 rounded border border-destructive/20 text-xs">
+                    <span className="truncate">{getPartName(d.part, t)}</span>
+                    <Badge variant="outline" className="text-[10px] ml-1 shrink-0 border-destructive/30 text-destructive px-1">
+                      {getDamageLevelName(d.level, t)}
+                    </Badge>
+                  </div>
+                ))}
+              </div>
+              {hiddenCount > 0 && (
+                <p className="text-xs text-muted-foreground text-center">+ {hiddenCount} {t.hiddenIssuesText}</p>
+              )}
+            </div>
+          )}
+
+          {/* Inspect button */}
+          {!inspected && totalUnrepaired > 0 && (
+            <Button
+              variant="outline"
+              size="sm"
+              className="w-full text-xs border-2"
+              onClick={handleInspect}
+              disabled={!hasEnergy(INSPECT_ENERGY_COST)}
+            >
+              <Search className="w-3 h-3 mr-1" />
+              {t.inspectCost}
+              <span className="ml-1 flex items-center">(<Zap className="w-3 h-3" />{INSPECT_ENERGY_COST})</span>
+            </Button>
+          )}
+
+          {inspected && revealedDamages.length === 0 && (
+            <p className="text-xs text-center text-muted-foreground py-1">{t.noIssuesFound}</p>
+          )}
+
+          {/* Negotiate section */}
+          {ad.negotiable && (
+            <div className="space-y-1.5">
+              <div className="flex justify-between text-sm">
+                <span>{t.yourOffer}:</span>
+                <span className="font-bold text-primary">{formatMoney(negotiatePrice)}</span>
+              </div>
+              <Slider
+                value={[negotiatePrice]}
+                onValueChange={([v]) => setNegotiatePrice(v)}
+                min={Math.max(10, Math.round(ad.car.askingPrice * 0.7))}
+                max={ad.car.askingPrice}
+                step={Math.max(1, Math.round(ad.car.askingPrice * 0.01))}
+              />
+              {negotiationCount > 0 && (
+                <p className="text-xs text-muted-foreground text-center">
+                  {t.negotiations}: {negotiationCount}
+                </p>
+              )}
+            </div>
+          )}
+
+          <div className="flex justify-between text-sm text-muted-foreground">
+            <span>{t.yourBalance}:</span>
+            <span className={canAfford(negotiatePrice) ? 'text-primary font-bold' : 'text-destructive font-bold'}>
+              {formatMoney(state.money)}
+            </span>
+          </div>
+        </div>
+
+        <DialogFooter className="flex gap-2 pt-1">
+          {ad.negotiable && (
+            <Button
+              variant="outline"
+              onClick={onNegotiate}
+              className="flex-1 border-2"
+              disabled={!hasEnergy(NEGOTIATION_ENERGY_COST)}
+              size="sm"
+            >
+              <DollarSign className="w-3 h-3 mr-1" />
+              {t.negotiate}
+              <span className="ml-1 text-xs flex items-center">(<Zap className="w-3 h-3" />{NEGOTIATION_ENERGY_COST})</span>
+            </Button>
+          )}
+          <Button
+            onClick={() => onBuy(isNegotiating ? negotiatePrice : ad.car.askingPrice)}
+            disabled={!canAfford(negotiatePrice) || garageFull}
+            className="flex-1"
+            size="sm"
+          >
+            {t.buyNow}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
 
 export function NewspaperScreen({ onCarBought }: NewspaperScreenProps) {
   const { state, dispatch, canAfford, hasEnergy, getVisibilityChance, getNegotiationBonus, updateChallengeProgress } = useGame();
@@ -223,78 +392,22 @@ export function NewspaperScreen({ onCarBought }: NewspaperScreenProps) {
         </div>
       </div>
 
-      <Dialog open={!!selectedAd} onOpenChange={(open) => !open && setSelectedAd(null)}>
-        <DialogContent className="max-w-[calc(100vw-2rem)] sm:max-w-sm p-4">
-          <DialogHeader>
-            <DialogTitle>{t.buy} {selectedAd?.car.name}?</DialogTitle>
-          </DialogHeader>
-
-          {selectedAd && (
-            <div className="space-y-3">
-              <CarCard car={selectedAd.car} showPrice={false} visibilityChance={getVisibilityChance()} compact />
-
-              <div className="space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span>{t.askingPrice}:</span>
-                  <span className="font-bold">{formatMoney(selectedAd.car.askingPrice)}</span>
-                </div>
-                
-                {selectedAd.negotiable && (
-                  <>
-                    <div className="flex justify-between text-sm">
-                      <span>{t.yourOffer}:</span>
-                      <span className="font-bold text-primary">{formatMoney(negotiatePrice)}</span>
-                    </div>
-                    <Slider
-                      value={[negotiatePrice]}
-                      onValueChange={([v]) => setNegotiatePrice(v)}
-                      min={Math.max(10, Math.round(selectedAd.car.askingPrice * 0.7))}
-                      max={selectedAd.car.askingPrice}
-                      step={Math.max(1, Math.round(selectedAd.car.askingPrice * 0.01))}
-                    />
-                    {negotiationCount > 0 && (
-                      <div className="text-xs text-muted-foreground text-center">
-                        {t.negotiations}: {negotiationCount} (cost: {negotiationCount * NEGOTIATION_ENERGY_COST} {t.energy.toLowerCase()})
-                      </div>
-                    )}
-                  </>
-                )}
-
-                <div className="flex justify-between text-sm text-muted-foreground">
-                  <span>{t.yourBalance}:</span>
-                  <span className={canAfford(negotiatePrice) ? 'text-primary font-bold' : 'text-destructive font-bold'}>
-                    {formatMoney(state.money)}
-                  </span>
-                </div>
-              </div>
-            </div>
-          )}
-
-          <DialogFooter className="flex gap-2">
-            {selectedAd?.negotiable && (
-              <Button 
-                variant="outline" 
-                onClick={handleNegotiate} 
-                className="flex-1 border-2"
-                disabled={!hasEnergy(NEGOTIATION_ENERGY_COST)}
-              >
-                <DollarSign className="w-4 h-4 mr-1" />
-                {t.negotiate}
-                <span className="ml-1 text-xs flex items-center">
-                  (<Zap className="w-3 h-3" />{NEGOTIATION_ENERGY_COST})
-                </span>
-              </Button>
-            )}
-            <Button 
-              onClick={() => handleBuy(isNegotiating ? negotiatePrice : selectedAd?.car.askingPrice || 0)} 
-              disabled={!canAfford(negotiatePrice) || garageFull}
-              className="flex-1"
-            >
-              {t.buyNow}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <VehicleDetailDialog
+        ad={selectedAd}
+        onClose={() => setSelectedAd(null)}
+        negotiatePrice={negotiatePrice}
+        setNegotiatePrice={setNegotiatePrice}
+        isNegotiating={isNegotiating}
+        negotiationCount={negotiationCount}
+        onNegotiate={handleNegotiate}
+        onBuy={handleBuy}
+        garageFull={garageFull}
+        canAfford={canAfford}
+        hasEnergy={hasEnergy}
+        getVisibilityChance={getVisibilityChance}
+        formatMoney={formatMoney}
+        t={t}
+      />
     </div>
   );
 }

@@ -311,6 +311,10 @@ interface Translations {
   playAsGuest: string;
   logOut: string;
   loggedInAs: string;
+  inspectVehicle: string;
+  inspectCost: string;
+  issuesFound: string;
+  noIssuesFound: string;
 }
 
 const translations: Record<Language, Translations> = {
@@ -524,6 +528,10 @@ const translations: Record<Language, Translations> = {
     playAsGuest: 'Play as Guest',
     logOut: 'Log Out',
     loggedInAs: 'Logged in as',
+    inspectVehicle: 'Inspect Vehicle',
+    inspectCost: 'Inspect',
+    issuesFound: 'Issues Found',
+    noIssuesFound: 'No additional issues found',
   },
   it: {
     settings: 'Impostazioni',
@@ -736,6 +744,10 @@ const translations: Record<Language, Translations> = {
     playAsGuest: 'Gioca come Ospite',
     logOut: 'Esci',
     loggedInAs: 'Connesso come',
+    inspectVehicle: 'Ispeziona Veicolo',
+    inspectCost: 'Ispeziona',
+    issuesFound: 'Problemi Trovati',
+    noIssuesFound: 'Nessun problema aggiuntivo trovato',
   },
 };
 
