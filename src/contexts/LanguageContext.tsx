@@ -744,6 +744,10 @@ const translations: Record<Language, Translations> = {
     playAsGuest: 'Gioca come Ospite',
     logOut: 'Esci',
     loggedInAs: 'Connesso come',
+    inspectVehicle: 'Ispeziona Veicolo',
+    inspectCost: 'Ispeziona',
+    issuesFound: 'Problemi Trovati',
+    noIssuesFound: 'Nessun problema aggiuntivo trovato',
   },
 };
 
