@@ -48,11 +48,11 @@ export function GarageScreen({ onNavigateToOffice, onSelectCar }: GarageScreenPr
 
   return (
     <>
-    <div className="flex flex-col min-h-[100dvh] pb-20 relative overflow-hidden">
+    <div className="flex flex-col h-[100svh] pb-20 relative">
       <div className="fixed inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${garageBg})` }} />
       
-      <div className="relative z-10 flex flex-col min-h-full">
-        <div className="p-4 py-5 border-b-2 border-border bg-card/95 backdrop-blur-sm">
+      <div className="relative z-10 flex flex-col h-full">
+        <div className="p-4 py-5 border-b-2 border-border bg-card/95 backdrop-blur-sm shrink-0 sticky top-0 z-20">
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-2xl font-bold flex items-center gap-2">
@@ -64,18 +64,17 @@ export function GarageScreen({ onNavigateToOffice, onSelectCar }: GarageScreenPr
               </p>
             </div>
           </div>
+          {repairQueue.length > 0 && (
+            <div className="mt-3 p-2 bg-accent/30 border border-accent/50 rounded-lg flex items-center gap-2">
+              <Loader2 className="w-4 h-4 animate-spin text-accent-foreground" />
+              <span className="text-sm font-medium">
+                {repairQueue.length} {t.repairsInProgress}
+              </span>
+            </div>
+          )}
         </div>
 
-        {repairQueue.length > 0 && (
-          <div className="mx-4 mt-4 p-3 bg-accent/30 border-2 border-accent/50 rounded-lg flex items-center gap-2 backdrop-blur-sm">
-            <Loader2 className="w-4 h-4 animate-spin text-accent-foreground" />
-            <span className="text-sm font-medium">
-              {repairQueue.length} {t.repairsInProgress}
-            </span>
-          </div>
-        )}
-
-        <div className="flex-1 p-4">
+        <div className="flex-1 overflow-y-auto p-4">
           {carsInGarage.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-64 text-center bg-card/95 backdrop-blur-sm rounded-xl border-2 border-dashed border-border">
               <div className="w-16 h-16 rounded-full bg-secondary flex items-center justify-center mb-4">
