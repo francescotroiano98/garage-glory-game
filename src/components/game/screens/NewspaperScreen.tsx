@@ -91,7 +91,7 @@ function VehicleDetailDialog({
 
   return (
     <Dialog open={!!ad} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-[calc(100vw-2rem)] sm:max-w-sm p-3 max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-[calc(100vw-2rem)] sm:max-w-sm p-3 max-h-[90vh] overflow-y-auto rounded-lg">
         <DialogHeader className="pb-1">
           <DialogTitle className="text-base">{t.buy} {ad.car.name}?</DialogTitle>
         </DialogHeader>
