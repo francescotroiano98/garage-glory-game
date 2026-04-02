@@ -536,6 +536,10 @@ const translations: Record<Language, Translations> = {
     inspectCost: 'Inspect',
     issuesFound: 'Issues Found',
     noIssuesFound: 'No additional issues found',
+    watchAd: 'Watch Ad',
+    watchAdForEnergy: 'Watch an ad to get energy!',
+    watchingAd: 'Watching...',
+    adEnergyReward: 'Energy received!',
   },
   it: {
     settings: 'Impostazioni',
