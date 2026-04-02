@@ -60,14 +60,23 @@ function VehicleDetailDialog({
     setRevealedDamages([]);
   }, [ad?.id]);
 
+  // Calculate reveal percentage based on player level
+  const getRevealPercent = () => {
+    const level = state.level;
+    if (level >= 15) return 1.0;
+    if (level >= 10) return 0.7;
+    if (level >= 5) return 0.5;
+    return 0.3;
+  };
+
   const handleInspect = () => {
     if (!ad || !hasEnergy(INSPECT_ENERGY_COST)) return;
     dispatch({ type: 'SPEND_ENERGY', payload: INSPECT_ENERGY_COST });
     playSound('inspect');
 
-    // Reveal some hidden damages (not all)
     const hiddenDamages = ad.car.damages.filter(d => !d.visible && !d.repaired);
-    const revealCount = Math.min(Math.ceil(hiddenDamages.length * 0.5), hiddenDamages.length);
+    const revealPercent = getRevealPercent();
+    const revealCount = Math.min(Math.ceil(hiddenDamages.length * revealPercent), hiddenDamages.length);
     const shuffled = [...hiddenDamages].sort(() => Math.random() - 0.5);
     const revealed = shuffled.slice(0, revealCount).map(d => d.part);
     setRevealedDamages(revealed);
