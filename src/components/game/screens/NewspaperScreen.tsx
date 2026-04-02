@@ -376,7 +376,7 @@ export function NewspaperScreen({ onCarBought }: NewspaperScreenProps) {
           </div>
         )}
 
-        <div className="flex-1 p-4 space-y-3">
+        <div className="flex-1 overflow-y-auto p-4 space-y-3">
           {filteredAds.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground bg-card/80 rounded-lg backdrop-blur-sm">
               <Filter className="w-8 h-8 mx-auto mb-2 opacity-50" />

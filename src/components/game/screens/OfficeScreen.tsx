@@ -151,11 +151,11 @@ export function OfficeScreen({ onCarBought }: OfficeScreenProps) {
 
   // Hub view
   return (
-    <div className="flex flex-col min-h-[100dvh] pb-20 relative overflow-hidden">
+    <div className="flex flex-col h-[100svh] pb-20 relative">
       <div className="fixed inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${officeBg})` }} />
 
-      <div className="relative z-10 flex flex-col min-h-full">
-        <div className="p-4 py-5 border-b-2 border-border bg-card/95 backdrop-blur-sm">
+      <div className="relative z-10 flex flex-col h-full">
+        <div className="p-4 py-5 border-b-2 border-border bg-card/95 backdrop-blur-sm shrink-0 sticky top-0 z-20">
           <h1 className="text-2xl font-bold flex items-center gap-2">
             <Briefcase className="w-6 h-6 text-primary" />
             {t.theOffice}
