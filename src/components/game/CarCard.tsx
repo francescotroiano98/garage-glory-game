@@ -66,24 +66,30 @@ export function CarCard({
       )}
       onClick={onClick}
     >
-      {topBadge && <div className="absolute top-2 left-2 z-10">{topBadge}</div>}
       {actionButton && <div className="absolute top-2 right-2 z-10">{actionButton}</div>}
 
-      <CardContent className={cn('p-4', compact && 'p-2', (actionButton || topBadge) && 'pt-12')}>
+      <CardContent className={cn('p-4', compact && 'p-2', actionButton && 'pt-12')}>
         <div className="flex items-center gap-3">
-          <div className={cn('flex items-center justify-center rounded-lg overflow-hidden shrink-0', compact ? 'w-14 h-14' : 'w-20 h-20')}>
-            <img src={car.image} alt={displayName} className="w-full h-full object-contain" />
+          <div className="relative shrink-0">
+            {topBadge && (
+              <div className="absolute -top-1 left-1/2 -translate-x-1/2 z-10 whitespace-nowrap">
+                {topBadge}
+              </div>
+            )}
+            <div className={cn('flex items-center justify-center rounded-lg overflow-hidden', compact ? 'w-14 h-14' : 'w-20 h-20', topBadge && 'mt-5')}>
+              <img src={car.image} alt={displayName} className="w-full h-full object-contain" />
+            </div>
           </div>
 
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-1">
-              <h3 className={cn('font-bold truncate', compact ? 'text-sm' : 'text-base')}>
+              <h3 className={cn('font-bold', compact ? 'text-sm' : 'text-base')}>
                 {displayName}
               </h3>
-              <Badge variant="outline" className={cn('text-xs shrink-0 border', categoryColors[getCategoryColorKey(car.category)])}>
-                {getVehicleIcon(car.vehicleType)} {categoryName}
-              </Badge>
             </div>
+            <Badge variant="outline" className={cn('text-xs shrink-0 border mb-1', categoryColors[getCategoryColorKey(car.category)])}>
+              {getVehicleIcon(car.vehicleType)} {categoryName}
+            </Badge>
 
             {showPrice && (
               <div className="flex items-center gap-2">

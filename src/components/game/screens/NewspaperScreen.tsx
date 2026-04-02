@@ -60,14 +60,23 @@ function VehicleDetailDialog({
     setRevealedDamages([]);
   }, [ad?.id]);
 
+  // Calculate reveal percentage based on player level
+  const getRevealPercent = () => {
+    const level = state.level;
+    if (level >= 15) return 1.0;
+    if (level >= 10) return 0.7;
+    if (level >= 5) return 0.5;
+    return 0.3;
+  };
+
   const handleInspect = () => {
     if (!ad || !hasEnergy(INSPECT_ENERGY_COST)) return;
     dispatch({ type: 'SPEND_ENERGY', payload: INSPECT_ENERGY_COST });
     playSound('inspect');
 
-    // Reveal some hidden damages (not all)
     const hiddenDamages = ad.car.damages.filter(d => !d.visible && !d.repaired);
-    const revealCount = Math.min(Math.ceil(hiddenDamages.length * 0.5), hiddenDamages.length);
+    const revealPercent = getRevealPercent();
+    const revealCount = Math.min(Math.ceil(hiddenDamages.length * revealPercent), hiddenDamages.length);
     const shuffled = [...hiddenDamages].sort(() => Math.random() - 0.5);
     const revealed = shuffled.slice(0, revealCount).map(d => d.part);
     setRevealedDamages(revealed);
@@ -82,7 +91,7 @@ function VehicleDetailDialog({
 
   return (
     <Dialog open={!!ad} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-[calc(100vw-2rem)] sm:max-w-sm p-3 max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-[calc(100vw-2rem)] sm:max-w-sm p-3 max-h-[90vh] overflow-y-auto rounded-lg">
         <DialogHeader className="pb-1">
           <DialogTitle className="text-base">{t.buy} {ad.car.name}?</DialogTitle>
         </DialogHeader>
@@ -127,7 +136,7 @@ function VehicleDetailDialog({
               disabled={!hasEnergy(INSPECT_ENERGY_COST)}
             >
               <Search className="w-3 h-3 mr-1" />
-              {t.inspectCost}
+              {t.inspectCost} ({Math.round(getRevealPercent() * 100)}%)
               <span className="ml-1 flex items-center">(<Zap className="w-3 h-3" />{INSPECT_ENERGY_COST})</span>
             </Button>
           )}
@@ -304,14 +313,14 @@ export function NewspaperScreen({ onCarBought }: NewspaperScreenProps) {
   const garageFull = state.carsInGarage.length >= state.garageUpgrades.carBays;
 
   return (
-    <div className="flex flex-col min-h-[100dvh] pb-20 relative overflow-hidden">
+    <div className="flex flex-col h-[100svh] pb-20 relative">
       <div 
         className="fixed inset-0 bg-cover bg-center"
         style={{ backgroundImage: `url(${newspaperBg})` }}
       />
       
-      <div className="relative z-10">
-        <div className="p-4 py-5 border-b-2 border-border bg-card/95 backdrop-blur-sm sticky top-0 z-40">
+      <div className="relative z-10 flex flex-col h-full">
+        <div className="p-4 py-5 border-b-2 border-border bg-card/95 backdrop-blur-sm shrink-0 sticky top-0 z-40">
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-2xl font-bold flex items-center gap-2">
@@ -367,7 +376,7 @@ export function NewspaperScreen({ onCarBought }: NewspaperScreenProps) {
           </div>
         )}
 
-        <div className="flex-1 p-4 space-y-3">
+        <div className="flex-1 overflow-y-auto p-4 space-y-3">
           {filteredAds.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground bg-card/80 rounded-lg backdrop-blur-sm">
               <Filter className="w-8 h-8 mx-auto mb-2 opacity-50" />

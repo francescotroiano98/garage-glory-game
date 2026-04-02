@@ -78,10 +78,10 @@ export function OfficeScreen({ onCarBought }: OfficeScreenProps) {
 
   if (view === 'phone') {
     return (
-      <div className="flex flex-col min-h-[100dvh] pb-20 relative">
+      <div className="flex flex-col h-[100svh] pb-20 relative">
         <div className="fixed inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${officeBg})` }} />
-        <div className="relative z-10">
-          <div className="p-3 bg-card/95 backdrop-blur-sm border-b-2 border-border sticky top-0 z-40">
+        <div className="relative z-10 flex flex-col h-full">
+          <div className="p-3 bg-card/95 backdrop-blur-sm border-b-2 border-border shrink-0 sticky top-0 z-40">
             <div className="flex items-center gap-2">
               <Button variant="ghost" size="sm" onClick={() => setView('hub')}>
                 <ArrowLeft className="w-4 h-4 mr-1" /> {t.goBack}
@@ -93,7 +93,7 @@ export function OfficeScreen({ onCarBought }: OfficeScreenProps) {
             </div>
           </div>
 
-          <div className="p-4 space-y-4">
+          <div className="flex-1 overflow-y-auto p-4 space-y-4">
             {listedCars.length === 0 ? (
               <div className="text-center py-16 bg-card/90 backdrop-blur-sm rounded-xl border-2 border-dashed border-border">
                 <Phone className="w-12 h-12 mx-auto mb-3 text-muted-foreground" />
@@ -151,11 +151,11 @@ export function OfficeScreen({ onCarBought }: OfficeScreenProps) {
 
   // Hub view
   return (
-    <div className="flex flex-col min-h-[100dvh] pb-20 relative overflow-hidden">
+    <div className="flex flex-col h-[100svh] pb-20 relative">
       <div className="fixed inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${officeBg})` }} />
 
-      <div className="relative z-10 flex flex-col min-h-full">
-        <div className="p-4 py-5 border-b-2 border-border bg-card/95 backdrop-blur-sm">
+      <div className="relative z-10 flex flex-col h-full">
+        <div className="p-4 py-5 border-b-2 border-border bg-card/95 backdrop-blur-sm shrink-0 sticky top-0 z-20">
           <h1 className="text-2xl font-bold flex items-center gap-2">
             <Briefcase className="w-6 h-6 text-primary" />
             {t.theOffice}

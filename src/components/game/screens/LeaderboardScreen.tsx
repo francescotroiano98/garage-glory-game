@@ -41,15 +41,15 @@ export function LeaderboardScreen() {
   };
 
   return (
-    <div className="flex flex-col min-h-full pb-20">
-      <div className="p-4 border-b-2 border-border bg-gradient-to-b from-secondary/30 to-transparent">
+    <div className="flex flex-col h-[100svh] pb-20">
+      <div className="p-4 border-b-2 border-border bg-gradient-to-b from-secondary/30 to-transparent shrink-0 sticky top-0 z-20 bg-background/95 backdrop-blur-sm">
         <h1 className="text-xl font-bold flex items-center gap-2">
           <Trophy className="w-5 h-5 text-yellow-500" />
           {t.leaderboard}
         </h1>
       </div>
 
-      <div className="flex-1 p-4 space-y-2">
+      <div className="flex-1 overflow-y-auto p-4 space-y-2">
         {loading ? (
           <div className="text-center text-muted-foreground py-8">{t.loading}...</div>
         ) : entries.length === 0 ? (
