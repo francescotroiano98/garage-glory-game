@@ -139,13 +139,13 @@ export function RepairScreen({ carId, onBack, onNavigateToOffice }: RepairScreen
   const totalInvestment = (car.purchasePrice || car.askingPrice) + (car.totalRepairCost || 0);
 
   return (
-    <div className="flex flex-col min-h-[100dvh] pb-20 relative">
+    <div className="flex flex-col h-[100svh] pb-20 relative">
       <div 
         className="fixed inset-0 bg-cover bg-center"
         style={{ backgroundImage: `url(${garageBg})` }}
       />
       
-      <div className="relative z-10">
+      <div className="relative z-10 flex flex-col h-full">
         <div className="relative p-4 py-5 border-b border-border bg-card/95 backdrop-blur-sm">
           <div className="flex items-start gap-3">
             <Button variant="ghost" size="icon" onClick={onBack} className="shrink-0">
