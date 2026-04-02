@@ -315,6 +315,10 @@ interface Translations {
   inspectCost: string;
   issuesFound: string;
   noIssuesFound: string;
+  watchAd: string;
+  watchAdForEnergy: string;
+  watchingAd: string;
+  adEnergyReward: string;
 }
 
 const translations: Record<Language, Translations> = {
