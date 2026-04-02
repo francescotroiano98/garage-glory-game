@@ -315,6 +315,10 @@ interface Translations {
   inspectCost: string;
   issuesFound: string;
   noIssuesFound: string;
+  watchAd: string;
+  watchAdForEnergy: string;
+  watchingAd: string;
+  adEnergyReward: string;
 }
 
 const translations: Record<Language, Translations> = {
@@ -532,6 +536,10 @@ const translations: Record<Language, Translations> = {
     inspectCost: 'Inspect',
     issuesFound: 'Issues Found',
     noIssuesFound: 'No additional issues found',
+    watchAd: 'Watch Ad',
+    watchAdForEnergy: 'Watch an ad to get energy!',
+    watchingAd: 'Watching...',
+    adEnergyReward: 'Energy received!',
   },
   it: {
     settings: 'Impostazioni',
@@ -748,6 +756,10 @@ const translations: Record<Language, Translations> = {
     inspectCost: 'Ispeziona',
     issuesFound: 'Problemi Trovati',
     noIssuesFound: 'Nessun problema aggiuntivo trovato',
+    watchAd: 'Guarda Video',
+    watchAdForEnergy: 'Guarda un video per ottenere energia!',
+    watchingAd: 'In riproduzione...',
+    adEnergyReward: 'Energia ricevuta!',
   },
 };
 

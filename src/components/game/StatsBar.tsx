@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useGame } from '@/contexts/GameContext';
 import { useLanguage } from '@/contexts/LanguageContext';
- import { Zap, DollarSign, Gift, Trophy, Target, Star, ChevronDown, Euro, PoundSterling } from 'lucide-react';
+import { Zap, DollarSign, Gift, Trophy, Target, Star, ChevronDown, Euro, PoundSterling, PlayCircle } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -11,6 +11,11 @@ import { getXpForLevel } from '@/data/upgrades';
 import { MAX_LEVEL } from '@/types/game';
 import { useSound } from '@/hooks/useSound';
 import { DailyChallengesDialog } from './DailyChallengesDialog';
+import { toast } from 'sonner';
+
+const AD_ENERGY_REWARD = 50;
+const AD_WATCH_DURATION = 5000; // 5 seconds simulated ad
+const AD_COOLDOWN = 120000; // 2 minutes between ads
 
 export function StatsBar() {
   const { 
@@ -20,13 +25,15 @@ export function StatsBar() {
     getEnergyBonusTimeRemaining,
     dailyChallenges,
     claimChallengeReward,
-     claimWeeklyChallengeReward,
+    claimWeeklyChallengeReward,
   } = useGame();
   const { t, formatMoney, currency } = useLanguage();
   const [timeRemaining, setTimeRemaining] = useState(0);
   const [showAchievements, setShowAchievements] = useState(false);
   const [showChallenges, setShowChallenges] = useState(false);
   const [showDetails, setShowDetails] = useState(false);
+  const [isWatchingAd, setIsWatchingAd] = useState(false);
+  const [lastAdWatch, setLastAdWatch] = useState(0);
   const { playSound } = useSound();
 
   useEffect(() => {
@@ -47,11 +54,40 @@ export function StatsBar() {
     claimChallengeReward(challengeId);
     playSound('achievement');
   };
- 
-   const handleClaimWeeklyReward = (challengeId: string) => {
-     claimWeeklyChallengeReward(challengeId);
-     playSound('achievement');
-   };
+
+  const handleClaimWeeklyReward = (challengeId: string) => {
+    claimWeeklyChallengeReward(challengeId);
+    playSound('achievement');
+  };
+
+  const canWatchAd = useCallback(() => {
+    if (isWatchingAd) return false;
+    const now = Date.now();
+    if (now - lastAdWatch < AD_COOLDOWN) return false;
+    // Available when energy < 100 OR as alternative to the 10min bonus timer
+    return state.energy < 100 || !canCollectEnergyBonus();
+  }, [isWatchingAd, lastAdWatch, state.energy, canCollectEnergyBonus]);
+
+  const getAdCooldownRemaining = useCallback(() => {
+    const now = Date.now();
+    const remaining = AD_COOLDOWN - (now - lastAdWatch);
+    return remaining > 0 ? remaining : 0;
+  }, [lastAdWatch]);
+
+  const handleWatchAd = () => {
+    if (!canWatchAd()) return;
+    setIsWatchingAd(true);
+    playSound('buttonClick');
+
+    // Simulate watching an ad
+    setTimeout(() => {
+      dispatch({ type: 'SET_ENERGY', payload: state.energy + AD_ENERGY_REWARD });
+      setIsWatchingAd(false);
+      setLastAdWatch(Date.now());
+      playSound('energyBonus');
+      toast.success(`⚡ +${AD_ENERGY_REWARD} ${t.adEnergyReward}`);
+    }, AD_WATCH_DURATION);
+  };
 
   const formatTime = (ms: number) => {
     const minutes = Math.floor(ms / 60000);
@@ -64,36 +100,51 @@ export function StatsBar() {
   const unlockedAchievements = state.achievements.filter(a => a.unlocked).length;
   
   const claimableChallenges = dailyChallenges.progress.filter(p => p.completed && !p.claimed).length;
-   const claimableWeeklyChallenges = (dailyChallenges.weeklyProgress || []).filter(p => p.completed && !p.claimed).length;
+  const claimableWeeklyChallenges = (dailyChallenges.weeklyProgress || []).filter(p => p.completed && !p.claimed).length;
+
+  const showAdButton = state.energy < 100 || !canCollectEnergyBonus();
+  const adCooldown = getAdCooldownRemaining();
 
   return (
     <>
-       <div className="bg-card/95 backdrop-blur-sm border-b-2 border-border p-3 sticky top-0 z-50">
-         <div className="flex items-center justify-between gap-3">
-           {/* Left side: Money & Energy in column */}
-           <div className="flex flex-col gap-1.5">
+      <div className="bg-card/95 backdrop-blur-sm border-b-2 border-border p-3 sticky top-0 z-50 shrink-0">
+        <div className="flex items-center justify-between gap-3">
+          {/* Left side: Money & Energy in column */}
+          <div className="flex flex-col gap-1.5">
             {/* Money */}
-              <div className="flex items-center gap-1.5 bg-primary/15 px-2.5 py-1 rounded-lg border border-primary/30">
-                {currency === 'EUR' ? <Euro className="w-4 h-4 text-primary" /> : currency === 'GBP' ? <PoundSterling className="w-4 h-4 text-primary" /> : <DollarSign className="w-4 h-4 text-primary" />}
-                <span className="font-bold text-sm text-primary min-w-[60px]">{formatMoney(state.money)}</span>
-             </div>
+            <div className="flex items-center gap-1.5 bg-primary/15 px-2.5 py-1 rounded-lg border border-primary/30">
+              {currency === 'EUR' ? <Euro className="w-4 h-4 text-primary" /> : currency === 'GBP' ? <PoundSterling className="w-4 h-4 text-primary" /> : <DollarSign className="w-4 h-4 text-primary" />}
+              <span className="font-bold text-sm text-primary min-w-[60px]">{formatMoney(state.money)}</span>
+            </div>
 
-             {/* Energy + Recharge */}
-             <div className="flex items-center gap-2">
-               <div className="flex items-center gap-1.5 bg-yellow-500/15 px-2.5 py-1 rounded-lg border border-yellow-500/30">
-                 <Zap className="w-4 h-4 text-yellow-500" />
-                 <span className="text-sm font-bold text-yellow-600 min-w-[40px]">{state.energy}</span>
-               </div>
-               <Button
-                 size="sm"
-                 variant={canCollectEnergyBonus() ? "default" : "secondary"}
-                 onClick={handleCollectBonus}
-                 disabled={!canCollectEnergyBonus()}
-                 className="h-7 px-2 text-xs"
-               >
-                 <Gift className="w-3.5 h-3.5 mr-1" />
-                 {canCollectEnergyBonus() ? '+30' : formatTime(timeRemaining)}
-               </Button>
+            {/* Energy + Recharge + Ad */}
+            <div className="flex items-center gap-1.5">
+              <div className="flex items-center gap-1.5 bg-yellow-500/15 px-2.5 py-1 rounded-lg border border-yellow-500/30">
+                <Zap className="w-4 h-4 text-yellow-500" />
+                <span className="text-sm font-bold text-yellow-600 min-w-[40px]">{state.energy}</span>
+              </div>
+              <Button
+                size="sm"
+                variant={canCollectEnergyBonus() ? "default" : "secondary"}
+                onClick={handleCollectBonus}
+                disabled={!canCollectEnergyBonus()}
+                className="h-7 px-2 text-xs"
+              >
+                <Gift className="w-3.5 h-3.5 mr-1" />
+                {canCollectEnergyBonus() ? '+30' : formatTime(timeRemaining)}
+              </Button>
+              {showAdButton && (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={handleWatchAd}
+                  disabled={!canWatchAd() || isWatchingAd}
+                  className="h-7 px-2 text-xs border-accent text-accent hover:bg-accent/10"
+                >
+                  <PlayCircle className="w-3.5 h-3.5 mr-1" />
+                  {isWatchingAd ? '...' : adCooldown > 0 ? formatTime(adCooldown) : `+${AD_ENERGY_REWARD}`}
+                </Button>
+              )}
             </div>
           </div>
 
@@ -124,8 +175,8 @@ export function StatsBar() {
 
             <Popover open={showDetails} onOpenChange={setShowDetails}>
               <PopoverTrigger asChild>
-                 <Button variant="outline" size="sm" className="h-8 px-2.5 text-sm gap-1.5 border-2">
-                   <Star className="w-3.5 h-3.5 text-primary" />
+                <Button variant="outline" size="sm" className="h-8 px-2.5 text-sm gap-1.5 border-2">
+                  <Star className="w-3.5 h-3.5 text-primary" />
                   Lv.{state.level}
                   {state.skillPoints > 0 && (
                     <Badge variant="default" className="h-4 px-1 text-[9px]">+{state.skillPoints}</Badge>
@@ -203,7 +254,7 @@ export function StatsBar() {
         onOpenChange={setShowChallenges}
         challengeState={dailyChallenges}
         onClaimReward={handleClaimReward}
-         onClaimWeeklyReward={handleClaimWeeklyReward}
+        onClaimWeeklyReward={handleClaimWeeklyReward}
       />
     </>
   );
