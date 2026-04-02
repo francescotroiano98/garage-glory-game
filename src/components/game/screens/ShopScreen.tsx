@@ -138,7 +138,7 @@ export function ShopScreen() {
   const xpForNextLevel = state.level >= MAX_LEVEL ? 0 : getXpForLevel(state.level);
 
   return (
-    <div className="flex flex-col min-h-[100dvh] pb-20 relative">
+    <div className="flex flex-col h-[100svh] pb-20 relative">
       <div 
         className="fixed inset-0 bg-cover bg-center"
         style={{ 
@@ -147,8 +147,8 @@ export function ShopScreen() {
         }}
       />
       
-      <div className="relative z-10">
-        <div className="p-4 py-5 border-b border-border bg-card/90 backdrop-blur-sm">
+      <div className="relative z-10 flex flex-col h-full">
+        <div className="p-4 py-5 border-b border-border bg-card/90 backdrop-blur-sm shrink-0 sticky top-0 z-20">
           <h1 className="text-2xl font-bold flex items-center gap-2">
             <ShoppingBag className="w-6 h-6 text-primary" />
              {t.upgradeShop}
