@@ -136,7 +136,7 @@ function VehicleDetailDialog({
               disabled={!hasEnergy(INSPECT_ENERGY_COST)}
             >
               <Search className="w-3 h-3 mr-1" />
-              {t.inspectCost}
+              {t.inspectCost} ({Math.round(getRevealPercent() * 100)}%)
               <span className="ml-1 flex items-center">(<Zap className="w-3 h-3" />{INSPECT_ENERGY_COST})</span>
             </Button>
           )}
