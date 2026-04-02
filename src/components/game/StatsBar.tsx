@@ -77,7 +77,7 @@ export function StatsBar() {
   const handleWatchAd = () => {
     if (!canWatchAd()) return;
     setIsWatchingAd(true);
-    playSound('click');
+    playSound('buttonClick');
 
     // Simulate watching an ad
     setTimeout(() => {
