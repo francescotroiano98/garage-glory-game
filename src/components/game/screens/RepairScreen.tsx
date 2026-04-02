@@ -235,7 +235,7 @@ export function RepairScreen({ carId, onBack, onNavigateToOffice }: RepairScreen
           })}
         </div>
 
-        <div className="flex-1 p-4 space-y-2">
+        <div className="flex-1 overflow-y-auto p-4 space-y-2">
           {categoryDamages.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground bg-card/95 backdrop-blur-sm rounded-lg border-2 border-border">
               <p>{t.noIssues}</p>
