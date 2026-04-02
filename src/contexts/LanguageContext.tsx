@@ -756,6 +756,10 @@ const translations: Record<Language, Translations> = {
     inspectCost: 'Ispeziona',
     issuesFound: 'Problemi Trovati',
     noIssuesFound: 'Nessun problema aggiuntivo trovato',
+    watchAd: 'Guarda Video',
+    watchAdForEnergy: 'Guarda un video per ottenere energia!',
+    watchingAd: 'In riproduzione...',
+    adEnergyReward: 'Energia ricevuta!',
   },
 };
 
