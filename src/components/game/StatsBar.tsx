@@ -69,7 +69,7 @@ export function StatsBar() {
   };
 
   const canWatchAd = useCallback(() => {
-    if (isWatchingAd) return false;
+    if (isWatchingAd || isShowingAd) return false;
     const now = Date.now();
     if (now - lastAdWatch < AD_COOLDOWN) return false;
     // Available when energy < 100 OR as alternative to the 10min bonus timer
