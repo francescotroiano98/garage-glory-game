@@ -159,7 +159,6 @@ export function StatsBar() {
                 </Button>
               )}
             </div>
-          </div>
             {/* Energy + Recharge + Ad */}
             <div className="flex items-center gap-1.5">
               <div className="flex items-center gap-1.5 bg-yellow-500/15 px-2.5 py-1 rounded-lg border border-yellow-500/30">
@@ -167,6 +166,8 @@ export function StatsBar() {
                 <span className="text-sm font-bold text-yellow-600 min-w-[40px]">{state.energy}</span>
               </div>
             </div>
+            
+          </div>
 
           {/* Right side: Actions */}
           <div className="flex items-center gap-1">
