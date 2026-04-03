@@ -66,7 +66,7 @@ export function useAdMob() {
 
     setIsAdLoading(true);
     try {
-      await mod.AdMob.prepareRewardedAd({
+      await mod.AdMob.prepareRewardVideoAd({
         adId: REWARDED_AD_ID,
         isTesting: !IS_PRODUCTION,
       });
