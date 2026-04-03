@@ -187,15 +187,17 @@ export function OfficeScreen({ onCarBought }: OfficeScreenProps) {
                 : 'border-border opacity-50 cursor-not-allowed'
             )}
           >
-            {pendingCalls > 0 && (
-              <div className="absolute top-4 left-4 w-20 h-16 bg-destructive text-white rounded-full flex items-center justify-center font-bold text-lg animate-pulse shadow-lg">
-                {pendingCalls}
-              </div>
-            )}
-            <PhoneCall className={cn(
-              'w-20 h-16',
-              pendingCalls > 0 ? 'text-green-500 animate-bounce' : 'text-muted-foreground'
-            )} />
+            <div className="relative">
+              {pendingCalls > 0 && (
+                <div className="absolute -top-4 right-0 w-8 h-8 bg-destructive text-white rounded-full flex items-center justify-center font-bold text-lg animate-pulse shadow-lg">
+                  {pendingCalls}
+                </div>
+              )}
+              <PhoneCall className={cn(
+                'w-20 h-16',
+                pendingCalls > 0 ? 'text-green-500 animate-bounce' : 'text-muted-foreground'
+              )} />
+            </div>
             <div className="flex flex-col text-left">
               <span className="text-xl font-bold">{t.answerPhone}</span>
               <span className="text-sm text-muted-foreground">
