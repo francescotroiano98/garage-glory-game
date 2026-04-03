@@ -167,11 +167,13 @@ export function OfficeScreen({ onCarBought }: OfficeScreenProps) {
           {/* Newspaper Button */}
           <button
             onClick={() => { setView('newspaper'); playSound('pageChange'); }}
-            className="w-full p-8 bg-card/95 backdrop-blur-sm rounded-2xl border-2 border-border hover:border-primary/50 transition-all active:scale-[0.98] flex flex-col items-center gap-3 shadow-lg"
+            className="w-full p-8 bg-card/95 backdrop-blur-sm rounded-2xl border-2 border-border hover:border-primary/50 transition-all active:scale-[0.98] flex flex-row items-center gap-3 shadow-lg"
           >
             <Newspaper className="w-8 h-8 text-primary" />
-            <span className="text-xl font-bold">{t.browseNewspaper}</span>
-            <span className="text-sm text-muted-foreground">{t.findNextProject}</span>
+            <div className="flex flex-col items-start">
+              <span className="text-xl font-bold">{t.browseNewspaper}</span>
+              <span className="text-sm text-muted-foreground">{t.findNextProject}</span>
+            </div>
           </button>
 
           {/* Phone Button */}
