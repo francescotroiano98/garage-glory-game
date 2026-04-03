@@ -158,7 +158,7 @@ export function ShopScreen() {
           </p>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-4 space-y-4">
+        <div className="h-[calc(100svh-258px)] overflow-y-auto p-4 space-y-4">
         {/* Skills Section */}
         <Card className="border-2 border-primary/30 bg-gradient-to-br from-primary/5 to-transparent">
           <CardHeader className="pb-2">
