@@ -49,7 +49,7 @@ export function LeaderboardScreen() {
         </h1>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-4 space-y-2">
+      <div className="h-[calc(100svh-258px)] overflow-y-auto p-4 space-y-4">
         {loading ? (
           <div className="text-center text-muted-foreground py-8">{t.loading}...</div>
         ) : entries.length === 0 ? (

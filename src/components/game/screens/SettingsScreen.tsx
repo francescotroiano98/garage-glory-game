@@ -39,7 +39,7 @@ export function SettingsScreen() {
         </h1>
       </div>
 
-      <div className="flex-1 p-4 space-y-4">
+      <div className="h-[calc(100svh-225px)] overflow-y-auto p-4 space-y-4">
         {/* Language Settings */}
         <Card className="border-2">
           <CardHeader className="pb-2">
