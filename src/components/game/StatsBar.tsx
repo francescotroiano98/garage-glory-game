@@ -142,7 +142,8 @@ export function StatsBar() {
                 <Zap className="w-4 h-4 text-yellow-500" />
                 <span className="text-sm font-bold text-yellow-600 min-w-[40px]">{state.energy}</span>
               </div>
-              <Button
+            </div>
+            <Button
                 size="sm"
                 variant={canCollectEnergyBonus() ? "default" : "secondary"}
                 onClick={handleCollectBonus}
@@ -164,7 +165,6 @@ export function StatsBar() {
                   {isWatchingAd || isShowingAd ? '...' : adCooldown > 0 ? formatTime(adCooldown) : `+${AD_ENERGY_REWARD}`}
                 </Button>
               )}
-            </div>
           </div>
 
           {/* Right side: Actions */}
