@@ -36,7 +36,7 @@ export function StatsBar() {
   const [isWatchingAd, setIsWatchingAd] = useState(false);
   const [lastAdWatch, setLastAdWatch] = useState(0);
   const { playSound } = useSound();
-
+  const { isNative, isShowingAd, showRewardedAd, prepareRewardedAd } = useAdMob();
   useEffect(() => {
     const interval = setInterval(() => {
       setTimeRemaining(getEnergyBonusTimeRemaining());
