@@ -143,28 +143,30 @@ export function StatsBar() {
                 <span className="text-sm font-bold text-yellow-600 min-w-[40px]">{state.energy}</span>
               </div>
             </div>
-            <Button
-                size="sm"
-                variant={canCollectEnergyBonus() ? "default" : "secondary"}
-                onClick={handleCollectBonus}
-                disabled={!canCollectEnergyBonus()}
-                className="h-7 px-2 text-xs"
-              >
-                <Gift className="w-3.5 h-3.5 mr-1" />
-                {canCollectEnergyBonus() ? '+30' : formatTime(timeRemaining)}
-              </Button>
-              {showAdButton && (
-                <Button
+            <div className="flex flex-row">
+              <Button
                   size="sm"
-                  variant="outline"
-                  onClick={handleWatchAd}
-                  disabled={!canWatchAd() || isWatchingAd || isShowingAd}
-                  className="h-7 px-2 text-xs border-accent text-accent hover:bg-accent/10"
+                  variant={canCollectEnergyBonus() ? "default" : "secondary"}
+                  onClick={handleCollectBonus}
+                  disabled={!canCollectEnergyBonus()}
+                  className="h-7 px-2 text-xs"
                 >
-                  <PlayCircle className="w-3.5 h-3.5 mr-1" />
-                  {isWatchingAd || isShowingAd ? '...' : adCooldown > 0 ? formatTime(adCooldown) : `+${AD_ENERGY_REWARD}`}
+                  <Gift className="w-3.5 h-3.5 mr-1" />
+                  {canCollectEnergyBonus() ? '+30' : formatTime(timeRemaining)}
+                </Button>
+                {showAdButton && (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={handleWatchAd}
+                    disabled={!canWatchAd() || isWatchingAd || isShowingAd}
+                    className="h-7 px-2 text-xs border-accent text-accent hover:bg-accent/10"
+                  >
+                    <PlayCircle className="w-3.5 h-3.5 mr-1" />
+                    {isWatchingAd || isShowingAd ? '...' : adCooldown > 0 ? formatTime(adCooldown) : `+${AD_ENERGY_REWARD}`}
                 </Button>
               )}
+            </div>
           </div>
 
           {/* Right side: Actions */}
