@@ -10,11 +10,12 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { getXpForLevel } from '@/data/upgrades';
 import { MAX_LEVEL } from '@/types/game';
 import { useSound } from '@/hooks/useSound';
+import { useAdMob } from '@/hooks/useAdMob';
 import { DailyChallengesDialog } from './DailyChallengesDialog';
 import { toast } from 'sonner';
 
 const AD_ENERGY_REWARD = 50;
-const AD_WATCH_DURATION = 5000; // 5 seconds simulated ad
+const AD_WATCH_DURATION = 5000; // 5 seconds simulated ad (web fallback)
 const AD_COOLDOWN = 120000; // 2 minutes between ads
 
 export function StatsBar() {
