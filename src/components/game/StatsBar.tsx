@@ -82,19 +82,30 @@ export function StatsBar() {
     return remaining > 0 ? remaining : 0;
   }, [lastAdWatch]);
 
-  const handleWatchAd = () => {
+  const handleWatchAd = async () => {
     if (!canWatchAd()) return;
-    setIsWatchingAd(true);
     playSound('buttonClick');
 
-    // Simulate watching an ad
-    setTimeout(() => {
-      dispatch({ type: 'SET_ENERGY', payload: state.energy + AD_ENERGY_REWARD });
-      setIsWatchingAd(false);
-      setLastAdWatch(Date.now());
-      playSound('energyBonus');
-      toast.success(`⚡ +${AD_ENERGY_REWARD} ${t.adEnergyReward}`);
-    }, AD_WATCH_DURATION);
+    if (isNative) {
+      // Use real AdMob rewarded ad
+      const rewarded = await showRewardedAd();
+      if (rewarded) {
+        dispatch({ type: 'SET_ENERGY', payload: state.energy + AD_ENERGY_REWARD });
+        setLastAdWatch(Date.now());
+        playSound('energyBonus');
+        toast.success(`⚡ +${AD_ENERGY_REWARD} ${t.adEnergyReward}`);
+      }
+    } else {
+      // Simulated ad for web preview
+      setIsWatchingAd(true);
+      setTimeout(() => {
+        dispatch({ type: 'SET_ENERGY', payload: state.energy + AD_ENERGY_REWARD });
+        setIsWatchingAd(false);
+        setLastAdWatch(Date.now());
+        playSound('energyBonus');
+        toast.success(`⚡ +${AD_ENERGY_REWARD} ${t.adEnergyReward}`);
+      }, AD_WATCH_DURATION);
+    }
   };
 
   const formatTime = (ms: number) => {
