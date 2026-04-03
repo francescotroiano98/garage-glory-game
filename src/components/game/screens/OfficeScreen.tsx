@@ -188,12 +188,12 @@ export function OfficeScreen({ onCarBought }: OfficeScreenProps) {
             )}
           >
             {pendingCalls > 0 && (
-              <div className="absolute top-4 right-4 w-10 h-10 bg-destructive text-white rounded-full flex items-center justify-center font-bold text-lg animate-pulse shadow-lg">
+              <div className="absolute top-4 right-4 w-20 h-16 bg-destructive text-white rounded-full flex items-center justify-center font-bold text-lg animate-pulse shadow-lg">
                 {pendingCalls}
               </div>
             )}
             <PhoneCall className={cn(
-              'w-16 h-18',
+              'w-20 h-16',
               pendingCalls > 0 ? 'text-green-500 animate-bounce' : 'text-muted-foreground'
             )} />
             <div className="flex flex-col text-left">
