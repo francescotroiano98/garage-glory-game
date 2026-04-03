@@ -370,7 +370,7 @@ export function NewspaperScreen({ onCarBought }: NewspaperScreenProps) {
         <div className={`overflow-y-auto p-4 space-y-4 ${
                             garageFull
                               ? "h-[calc(100svh-420px)]"
-                              : "h-[calc(100svh-378px)]"
+                              : "h-[calc(100svh-400px)]"
                         }`}>
           {garageFull && (
           <div className="mx-4 mt-4 p-3 bg-destructive/20 border-2 border-destructive/50 rounded-lg backdrop-blur-sm">
