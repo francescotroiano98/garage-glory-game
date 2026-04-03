@@ -163,7 +163,7 @@ export function OfficeScreen({ onCarBought }: OfficeScreenProps) {
           <p className="text-sm text-muted-foreground mt-1">{t.officeDeskDesc}</p>
         </div>
 
-        <div className="flex-1 p-6 flex flex-col gap-4 justify-center">
+        <div className="h-[calc(100svh-258px)] overflow-y-auto p-4 space-y-4">
           {/* Newspaper Button */}
           <button
             onClick={() => { setView('newspaper'); playSound('pageChange'); }}
