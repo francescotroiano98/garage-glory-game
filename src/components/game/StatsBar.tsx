@@ -135,15 +135,7 @@ export function StatsBar() {
               {currency === 'EUR' ? <Euro className="w-4 h-4 text-primary" /> : currency === 'GBP' ? <PoundSterling className="w-4 h-4 text-primary" /> : <DollarSign className="w-4 h-4 text-primary" />}
               <span className="font-bold text-sm text-primary min-w-[60px]">{formatMoney(state.money)}</span>
             </div>
-
-            {/* Energy + Recharge + Ad */}
-            <div className="flex items-center gap-1.5">
-              <div className="flex items-center gap-1.5 bg-yellow-500/15 px-2.5 py-1 rounded-lg border border-yellow-500/30">
-                <Zap className="w-4 h-4 text-yellow-500" />
-                <span className="text-sm font-bold text-yellow-600 min-w-[40px]">{state.energy}</span>
-              </div>
-            </div>
-            <div className="flex flex-row">
+            <div className="flex flex-row gap-1.5">
               <Button
                   size="sm"
                   variant={canCollectEnergyBonus() ? "default" : "secondary"}
@@ -168,6 +160,13 @@ export function StatsBar() {
               )}
             </div>
           </div>
+            {/* Energy + Recharge + Ad */}
+            <div className="flex items-center gap-1.5">
+              <div className="flex items-center gap-1.5 bg-yellow-500/15 px-2.5 py-1 rounded-lg border border-yellow-500/30">
+                <Zap className="w-4 h-4 text-yellow-500" />
+                <span className="text-sm font-bold text-yellow-600 min-w-[40px]">{state.energy}</span>
+              </div>
+            </div>
 
           {/* Right side: Actions */}
           <div className="flex items-center gap-1">
