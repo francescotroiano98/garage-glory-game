@@ -157,7 +157,7 @@ export function StatsBar() {
                   size="sm"
                   variant="outline"
                   onClick={handleWatchAd}
-                  disabled={!canWatchAd() || isWatchingAd}
+                  disabled={!canWatchAd() || isWatchingAd || isShowingAd}
                   className="h-7 px-2 text-xs border-accent text-accent hover:bg-accent/10"
                 >
                   <PlayCircle className="w-3.5 h-3.5 mr-1" />
