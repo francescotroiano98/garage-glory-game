@@ -74,7 +74,7 @@ export function StatsBar() {
     if (now - lastAdWatch < AD_COOLDOWN) return false;
     // Available when energy < 100 OR as alternative to the 10min bonus timer
     return state.energy < 100 || !canCollectEnergyBonus();
-  }, [isWatchingAd, lastAdWatch, state.energy, canCollectEnergyBonus]);
+  }, [isWatchingAd, isShowingAd, lastAdWatch, state.energy, canCollectEnergyBonus]);
 
   const getAdCooldownRemaining = useCallback(() => {
     const now = Date.now();
