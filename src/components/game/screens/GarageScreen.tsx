@@ -74,7 +74,7 @@ export function GarageScreen({ onNavigateToOffice, onSelectCar }: GarageScreenPr
           )}
         </div>
 
-        <div className="overflow-y-auto p-4" style="height: calc(100svh - 258px)">
+        <div className="h-[calc(100svh-258px)] overflow-y-auto p-4">
           {carsInGarage.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-64 text-center bg-card/95 backdrop-blur-sm rounded-xl border-2 border-dashed border-border">
               <div className="w-16 h-16 rounded-full bg-secondary flex items-center justify-center mb-4">
