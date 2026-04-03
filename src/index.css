@@ -95,6 +95,10 @@
     --sidebar-border: 25 15% 22%;
     --sidebar-ring: 30 65% 55%;
   }
+
+  #lovable-badge {
+    display: none !important;
+  }
 }
 
 @layer base {
@@ -111,6 +115,10 @@
   h1, h2, h3, h4, h5, h6 {
     font-family: 'Archivo Black', sans-serif;
     letter-spacing: -0.02em;
+  }
+
+  #lovable-badge {
+    display: none !important;
   }
 }
 
