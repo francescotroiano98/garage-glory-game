@@ -161,7 +161,7 @@ export function StatsBar() {
                   className="h-7 px-2 text-xs border-accent text-accent hover:bg-accent/10"
                 >
                   <PlayCircle className="w-3.5 h-3.5 mr-1" />
-                  {isWatchingAd ? '...' : adCooldown > 0 ? formatTime(adCooldown) : `+${AD_ENERGY_REWARD}`}
+                  {isWatchingAd || isShowingAd ? '...' : adCooldown > 0 ? formatTime(adCooldown) : `+${AD_ENERGY_REWARD}`}
                 </Button>
               )}
             </div>
