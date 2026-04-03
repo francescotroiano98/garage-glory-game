@@ -93,7 +93,7 @@ export function OfficeScreen({ onCarBought }: OfficeScreenProps) {
             </div>
           </div>
 
-          <div className="flex-1 overflow-y-auto p-4 space-y-4">
+          <div className="h-[calc(100svh-228px)] overflow-y-auto p-4 space-y-4">
             {listedCars.length === 0 ? (
               <div className="text-center py-16 bg-card/90 backdrop-blur-sm rounded-xl border-2 border-dashed border-border">
                 <Phone className="w-12 h-12 mx-auto mb-3 text-muted-foreground" />

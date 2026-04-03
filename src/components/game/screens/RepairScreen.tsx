@@ -196,7 +196,7 @@ export function RepairScreen({ carId, onBack, onNavigateToOffice }: RepairScreen
         )}
 
         {customer && (
-          <div className="p-4 border-b border-border bg-accent/20 backdrop-blur-sm">
+          <div className="p-4 border-b border-border bg-card/95 backdrop-blur-sm">
             <button
               onClick={onNavigateToOffice}
               className="w-full flex items-center gap-3 p-4 bg-primary/10 rounded-lg border-2 border-primary/30 hover:bg-primary/20 transition-colors"
