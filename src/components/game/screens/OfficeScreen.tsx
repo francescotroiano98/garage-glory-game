@@ -169,7 +169,7 @@ export function OfficeScreen({ onCarBought }: OfficeScreenProps) {
             onClick={() => { setView('newspaper'); playSound('pageChange'); }}
             className="w-full p-8 bg-card/95 backdrop-blur-sm rounded-2xl border-2 border-border hover:border-primary/50 transition-all active:scale-[0.98] flex flex-col items-center gap-3 shadow-lg"
           >
-            <Newspaper className="w-16 h-16 text-primary" />
+            <Newspaper className="w-8 h-8 text-primary" />
             <span className="text-xl font-bold">{t.browseNewspaper}</span>
             <span className="text-sm text-muted-foreground">{t.findNextProject}</span>
           </button>
@@ -179,7 +179,7 @@ export function OfficeScreen({ onCarBought }: OfficeScreenProps) {
             onClick={() => { if (listedCars.length > 0) { setView('phone'); playSound('pageChange'); } }}
             disabled={listedCars.length === 0}
             className={cn(
-              'w-full p-8 bg-card/95 backdrop-blur-sm rounded-2xl border-2 transition-all flex flex-col items-center gap-3 relative shadow-lg',
+              'w-full p-8 bg-card/95 backdrop-blur-sm rounded-2xl border-2 transition-all flex flex-row items-center gap-3 relative shadow-lg',
               listedCars.length > 0
                 ? 'border-border hover:border-primary/50 active:scale-[0.98]'
                 : 'border-border opacity-50 cursor-not-allowed'
@@ -191,17 +191,19 @@ export function OfficeScreen({ onCarBought }: OfficeScreenProps) {
               </div>
             )}
             <PhoneCall className={cn(
-              'w-16 h-16',
+              'w-8 h-8',
               pendingCalls > 0 ? 'text-green-500 animate-bounce' : 'text-muted-foreground'
             )} />
-            <span className="text-xl font-bold">{t.answerPhone}</span>
-            <span className="text-sm text-muted-foreground">
-              {pendingCalls > 0
-                ? `${pendingCalls} ${t.callsWaiting}`
-                : listedCars.length > 0
-                  ? t.noCallsDesc
-                  : t.noCallsDesc}
-            </span>
+            <div className="flex flex-col items-start">
+              <span className="text-xl font-bold">{t.answerPhone}</span>
+              <span className="text-sm text-muted-foreground">
+                {pendingCalls > 0
+                  ? `${pendingCalls} ${t.callsWaiting}`
+                  : listedCars.length > 0
+                    ? t.noCallsDesc
+                    : t.noCallsDesc}
+              </span>
+            </div>
           </button>
         </div>
       </div>
