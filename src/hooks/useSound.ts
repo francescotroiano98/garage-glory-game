@@ -1,42 +1,44 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Howl, Howler } from 'howler';
 
-// Sound URLs - coherent game sounds from freesound.org
-const SOUNDS = {
-  // Repair sounds
-  repair: 'https://cdn.freesound.org/previews/352/352659_6565101-lq.mp3',        // wrench/tool working
-  repairComplete: 'https://cdn.freesound.org/previews/320/320181_5260872-lq.mp3', // success chime
-  repairFail: 'https://cdn.freesound.org/previews/415/415079_7863133-lq.mp3',     // error buzz
-  
-  // Phone & customers
-  customerCall: 'https://cdn.freesound.org/previews/352/352432_6565101-lq.mp3',   // phone ringing
-  phonePickup: 'https://cdn.freesound.org/previews/399/399934_1676145-lq.mp3',    // phone pick up click
-  phoneHangup: 'https://cdn.freesound.org/previews/514/514132_3905081-lq.mp3',    // phone hang up
-  
-  // Money & commerce
-  cashRegister: 'https://cdn.freesound.org/previews/352/352310_6565101-lq.mp3',   // cash register
-  purchase: 'https://cdn.freesound.org/previews/131/131660_2398403-lq.mp3',       // coin/purchase
-  negotiate: 'https://cdn.freesound.org/previews/256/256113_4772965-lq.mp3',      // negotiation sound
-  
-  // Navigation & UI
-  buttonClick: 'https://cdn.freesound.org/previews/220/220206_4100637-lq.mp3',    // soft click
-  pageChange: 'https://cdn.freesound.org/previews/220/220207_4100637-lq.mp3',     // page turn
-  saleStart: 'https://cdn.freesound.org/previews/411/411462_5121236-lq.mp3',      // listing notification
-  
-  // Newspaper
-  newspaperOpen: 'https://cdn.freesound.org/previews/350/350405_6466307-lq.mp3',  // paper rustle
-  
-  // Progress & rewards
-  levelUp: 'https://cdn.freesound.org/previews/270/270404_5123851-lq.mp3',        // fanfare
-  achievement: 'https://cdn.freesound.org/previews/270/270319_5123851-lq.mp3',    // achievement jingle
-  energyBonus: 'https://cdn.freesound.org/previews/341/341695_5858296-lq.mp3',    // energy collect
-  skillUp: 'https://cdn.freesound.org/previews/341/341695_5858296-lq.mp3',        // skill upgrade
-  
-  // Error
-  error: 'https://cdn.freesound.org/previews/415/415079_7863133-lq.mp3',          // error sound
+// Local sound assets - bundled with the app for reliability
+import repairSfx from '@/assets/audio/sfx/repair.wav';
+import repairCompleteSfx from '@/assets/audio/sfx/repair-complete.wav';
+import errorSfx from '@/assets/audio/sfx/error.wav';
+import phoneRingSfx from '@/assets/audio/sfx/phone-ring.wav';
+import clickSfx from '@/assets/audio/sfx/click.wav';
+import hangupSfx from '@/assets/audio/sfx/hangup.wav';
+import cashRegisterSfx from '@/assets/audio/sfx/cash-register.wav';
+import coinSfx from '@/assets/audio/sfx/coin.wav';
+import negotiateSfx from '@/assets/audio/sfx/negotiate.wav';
+import buttonClickSfx from '@/assets/audio/sfx/button-click.wav';
+import pageChangeSfx from '@/assets/audio/sfx/page-change.wav';
+import paperRustleSfx from '@/assets/audio/sfx/paper-rustle.wav';
+import notificationSfx from '@/assets/audio/sfx/notification.wav';
+import levelUpSfx from '@/assets/audio/sfx/level-up.wav';
+import achievementSfx from '@/assets/audio/sfx/achievement.wav';
+import energyBonusSfx from '@/assets/audio/sfx/energy-bonus.wav';
 
-  // Inspection
-  inspect: 'https://cdn.freesound.org/previews/399/399934_1676145-lq.mp3',        // magnifying glass / click
+const SOUNDS = {
+  repair: repairSfx,
+  repairComplete: repairCompleteSfx,
+  repairFail: errorSfx,
+  customerCall: phoneRingSfx,
+  phonePickup: clickSfx,
+  phoneHangup: hangupSfx,
+  cashRegister: cashRegisterSfx,
+  purchase: coinSfx,
+  negotiate: negotiateSfx,
+  buttonClick: buttonClickSfx,
+  pageChange: pageChangeSfx,
+  saleStart: notificationSfx,
+  newspaperOpen: paperRustleSfx,
+  levelUp: levelUpSfx,
+  achievement: achievementSfx,
+  energyBonus: energyBonusSfx,
+  skillUp: energyBonusSfx,
+  error: errorSfx,
+  inspect: clickSfx,
 };
 
 type SoundType = keyof typeof SOUNDS;
