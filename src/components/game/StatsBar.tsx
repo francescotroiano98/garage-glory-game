@@ -10,11 +10,12 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { getXpForLevel } from '@/data/upgrades';
 import { MAX_LEVEL } from '@/types/game';
 import { useSound } from '@/hooks/useSound';
+import { useAdMob } from '@/hooks/useAdMob';
 import { DailyChallengesDialog } from './DailyChallengesDialog';
 import { toast } from 'sonner';
 
 const AD_ENERGY_REWARD = 50;
-const AD_WATCH_DURATION = 5000; // 5 seconds simulated ad
+const AD_WATCH_DURATION = 5000; // 5 seconds simulated ad (web fallback)
 const AD_COOLDOWN = 120000; // 2 minutes between ads
 
 export function StatsBar() {
@@ -35,6 +36,13 @@ export function StatsBar() {
   const [isWatchingAd, setIsWatchingAd] = useState(false);
   const [lastAdWatch, setLastAdWatch] = useState(0);
   const { playSound } = useSound();
+  const { isNative, isShowingAd, showRewardedAd, prepareRewardedAd } = useAdMob();
+  // Preload rewarded ad on native
+  useEffect(() => {
+    if (isNative) {
+      prepareRewardedAd();
+    }
+  }, [isNative, prepareRewardedAd]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -61,12 +69,12 @@ export function StatsBar() {
   };
 
   const canWatchAd = useCallback(() => {
-    if (isWatchingAd) return false;
+    if (isWatchingAd || isShowingAd) return false;
     const now = Date.now();
     if (now - lastAdWatch < AD_COOLDOWN) return false;
     // Available when energy < 100 OR as alternative to the 10min bonus timer
     return state.energy < 100 || !canCollectEnergyBonus();
-  }, [isWatchingAd, lastAdWatch, state.energy, canCollectEnergyBonus]);
+  }, [isWatchingAd, isShowingAd, lastAdWatch, state.energy, canCollectEnergyBonus]);
 
   const getAdCooldownRemaining = useCallback(() => {
     const now = Date.now();
@@ -74,19 +82,30 @@ export function StatsBar() {
     return remaining > 0 ? remaining : 0;
   }, [lastAdWatch]);
 
-  const handleWatchAd = () => {
+  const handleWatchAd = async () => {
     if (!canWatchAd()) return;
-    setIsWatchingAd(true);
     playSound('buttonClick');
 
-    // Simulate watching an ad
-    setTimeout(() => {
-      dispatch({ type: 'SET_ENERGY', payload: state.energy + AD_ENERGY_REWARD });
-      setIsWatchingAd(false);
-      setLastAdWatch(Date.now());
-      playSound('energyBonus');
-      toast.success(`⚡ +${AD_ENERGY_REWARD} ${t.adEnergyReward}`);
-    }, AD_WATCH_DURATION);
+    if (isNative) {
+      // Use real AdMob rewarded ad
+      const rewarded = await showRewardedAd();
+      if (rewarded) {
+        dispatch({ type: 'SET_ENERGY', payload: state.energy + AD_ENERGY_REWARD });
+        setLastAdWatch(Date.now());
+        playSound('energyBonus');
+        toast.success(`⚡ +${AD_ENERGY_REWARD} ${t.adEnergyReward}`);
+      }
+    } else {
+      // Simulated ad for web preview
+      setIsWatchingAd(true);
+      setTimeout(() => {
+        dispatch({ type: 'SET_ENERGY', payload: state.energy + AD_ENERGY_REWARD });
+        setIsWatchingAd(false);
+        setLastAdWatch(Date.now());
+        playSound('energyBonus');
+        toast.success(`⚡ +${AD_ENERGY_REWARD} ${t.adEnergyReward}`);
+      }, AD_WATCH_DURATION);
+    }
   };
 
   const formatTime = (ms: number) => {
@@ -138,11 +157,11 @@ export function StatsBar() {
                   size="sm"
                   variant="outline"
                   onClick={handleWatchAd}
-                  disabled={!canWatchAd() || isWatchingAd}
+                  disabled={!canWatchAd() || isWatchingAd || isShowingAd}
                   className="h-7 px-2 text-xs border-accent text-accent hover:bg-accent/10"
                 >
                   <PlayCircle className="w-3.5 h-3.5 mr-1" />
-                  {isWatchingAd ? '...' : adCooldown > 0 ? formatTime(adCooldown) : `+${AD_ENERGY_REWARD}`}
+                  {isWatchingAd || isShowingAd ? '...' : adCooldown > 0 ? formatTime(adCooldown) : `+${AD_ENERGY_REWARD}`}
                 </Button>
               )}
             </div>
