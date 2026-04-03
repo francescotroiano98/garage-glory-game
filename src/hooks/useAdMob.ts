@@ -92,7 +92,7 @@ export function useAdMob() {
 
     setIsShowingAd(true);
     try {
-      const result = await mod.AdMob.showRewardedAd();
+      const result = await mod.AdMob.showRewardVideoAd();
       setIsAdLoaded(false);
       setIsShowingAd(false);
       // Preload next ad
