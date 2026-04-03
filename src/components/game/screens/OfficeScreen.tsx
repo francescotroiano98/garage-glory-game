@@ -169,7 +169,7 @@ export function OfficeScreen({ onCarBought }: OfficeScreenProps) {
             onClick={() => { setView('newspaper'); playSound('pageChange'); }}
             className="w-full p-8 bg-card/95 backdrop-blur-sm rounded-2xl border-2 border-border hover:border-primary/50 transition-all active:scale-[0.98] flex flex-row items-center gap-3 shadow-lg"
           >
-            <Newspaper className="w-8 h-8 text-primary" />
+            <Newspaper className="w-16 h-16 text-primary" />
             <div className="flex flex-col items-start">
               <span className="text-xl font-bold">{t.browseNewspaper}</span>
               <span className="text-sm text-muted-foreground">{t.findNextProject}</span>
@@ -193,7 +193,7 @@ export function OfficeScreen({ onCarBought }: OfficeScreenProps) {
               </div>
             )}
             <PhoneCall className={cn(
-              'w-8 h-8',
+              'w-16 h-18',
               pendingCalls > 0 ? 'text-green-500 animate-bounce' : 'text-muted-foreground'
             )} />
             <div className="flex flex-col items-start">
