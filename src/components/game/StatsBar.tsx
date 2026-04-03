@@ -127,14 +127,7 @@ export function StatsBar() {
   return (
     <>
       <div className="bg-card/95 backdrop-blur-sm border-b-2 border-border p-3 sticky top-0 z-50 shrink-0">
-        <div className="flex items-center justify-between gap-3">
-          {/* Left side: Money & Energy in column */}
-          <div className="flex flex-col gap-1.5">
-            {/* Money */}
-            <div className="flex items-center gap-1.5 bg-primary/15 px-2.5 py-1 rounded-lg border border-primary/30">
-              {currency === 'EUR' ? <Euro className="w-4 h-4 text-primary" /> : currency === 'GBP' ? <PoundSterling className="w-4 h-4 text-primary" /> : <DollarSign className="w-4 h-4 text-primary" />}
-              <span className="font-bold text-sm text-primary min-w-[60px]">{formatMoney(state.money)}</span>
-            </div>
+        <div className="flex items-center gap-1.5">
             <div className="flex flex-row gap-1.5">
               <Button
                   size="sm"
@@ -158,15 +151,20 @@ export function StatsBar() {
                     {isWatchingAd || isShowingAd ? '...' : adCooldown > 0 ? formatTime(adCooldown) : `+${AD_ENERGY_REWARD}`}
                 </Button>
               )}
-            </div>
-            {/* Energy + Recharge + Ad */}
-            <div className="flex items-center gap-1.5">
-              <div className="flex items-center gap-1.5 bg-yellow-500/15 px-2.5 py-1 rounded-lg border border-yellow-500/30">
-                <Zap className="w-4 h-4 text-yellow-500" />
-                <span className="text-sm font-bold text-yellow-600 min-w-[40px]">{state.energy}</span>
-              </div>
-            </div>
-            
+            </div>  
+            <div className="flex items-center gap-1.5 bg-yellow-500/15 px-2.5 py-1 rounded-lg border border-yellow-500/30">
+            <Zap className="w-4 h-4 text-yellow-500" />
+            <span className="text-sm font-bold text-yellow-600 min-w-[40px]">{state.energy}</span>
+          </div>
+        </div>
+        <div className="flex items-center justify-between gap-3">
+          {/* Left side: Money & Energy in column */}
+          <div className="flex flex-col gap-1.5">
+            {/* Money */}
+            <div className="flex items-center gap-1.5 bg-primary/15 px-2.5 py-1 rounded-lg border border-primary/30">
+              {currency === 'EUR' ? <Euro className="w-4 h-4 text-primary" /> : currency === 'GBP' ? <PoundSterling className="w-4 h-4 text-primary" /> : <DollarSign className="w-4 h-4 text-primary" />}
+              <span className="font-bold text-sm text-primary min-w-[60px]">{formatMoney(state.money)}</span>
+            </div>          
           </div>
 
           {/* Right side: Actions */}
