@@ -367,38 +367,38 @@ export function NewspaperScreen({ onCarBought }: NewspaperScreenProps) {
             </Select>
           </div>
         </div>
-
-        {garageFull && (
+        <div className="h-[calc(100svh-258px)] overflow-y-auto p-4 space-y-4">
+          {garageFull && (
           <div className="mx-4 mt-4 p-3 bg-destructive/20 border-2 border-destructive/50 rounded-lg backdrop-blur-sm">
             <p className="text-sm text-destructive font-medium">
               {t.garageFullMessage}
             </p>
           </div>
-        )}
-
-        <div className="h-[calc(100svh-362px)] overflow-y-auto p-4 space-y-4">
-          {filteredAds.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground bg-card/80 rounded-lg backdrop-blur-sm">
-              <Filter className="w-8 h-8 mx-auto mb-2 opacity-50" />
-              <p className="text-sm">No vehicles match your filters</p>
-            </div>
-          ) : (
-            filteredAds.map((ad) => (
-              <div key={ad.id} className="relative">
-                <CarCard
-                  car={ad.car}
-                  onClick={() => handleSelectAd(ad)}
-                  showDamages={false}
-                />
-                {ad.negotiable && (
-                  <div className="absolute top-2 right-2 flex items-center gap-1 text-xs text-primary bg-card/95 px-2 py-1 rounded-md border-2 font-medium">
-                    {t.negotiable}
-                  </div>
-                )}
-              </div>
-            ))
           )}
-        </div>
+          <div className="p-4 space-y-3">
+            {filteredAds.length === 0 ? (
+              <div className="text-center py-8 text-muted-foreground bg-card/80 rounded-lg backdrop-blur-sm">
+                <Filter className="w-8 h-8 mx-auto mb-2 opacity-50" />
+                <p className="text-sm">No vehicles match your filters</p>
+              </div>
+            ) : (
+              filteredAds.map((ad) => (
+                <div key={ad.id} className="relative">
+                  <CarCard
+                    car={ad.car}
+                    onClick={() => handleSelectAd(ad)}
+                    showDamages={false}
+                  />
+                  {ad.negotiable && (
+                    <div className="absolute top-2 right-2 flex items-center gap-1 text-xs text-primary bg-card/95 px-2 py-1 rounded-md border-2 font-medium">
+                      {t.negotiable}
+                    </div>
+                  )}
+                </div>
+              ))
+            )}
+          </div>
+        </div>        
       </div>
 
       <VehicleDetailDialog
