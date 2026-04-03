@@ -112,7 +112,7 @@ function GameContent() {
     return (
       <div className="h-[100svh] bg-background flex flex-col overflow-hidden">
         <StatsBar />
-        <div className="flex-1 min-h-0 overflow-y-auto">
+        <div className="flex-1 min-h-0">
           <RepairScreen
             carId={selectedCarId}
             onBack={handleBackFromRepair}
@@ -130,7 +130,7 @@ function GameContent() {
   return (
     <div className="h-[100svh] bg-background flex flex-col overflow-hidden">
       <StatsBar />
-      <div className="flex-1 min-h-0 overflow-y-auto">
+      <div className="flex-1 min-h-0">
         {currentScreen === 'garage' && (
           <GarageScreen
             onNavigateToOffice={() => setCurrentScreen('office')}
