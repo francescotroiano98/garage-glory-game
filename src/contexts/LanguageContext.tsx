@@ -322,6 +322,14 @@ interface Translations {
   collection: string;
   collectionDesc: string;
   comingSoon: string;
+  duplicates: string;
+  sellDuplicate: string;
+  packs: string;
+  openPack: string;
+  packOpened: string;
+  newCard: string;
+  duplicate: string;
+  buyPack: string;
 }
 
 const translations: Record<Language, Translations> = {
@@ -546,6 +554,14 @@ const translations: Record<Language, Translations> = {
     collectionDesc: 'Collect vehicle cards and complete your album!',
     comingSoon: 'Coming Soon',
     adEnergyReward: 'Energy received!',
+    duplicates: 'Duplicates',
+    sellDuplicate: 'Sell duplicate',
+    packs: 'Card Packs',
+    openPack: 'Open Pack',
+    packOpened: 'Pack opened!',
+    newCard: 'New card!',
+    duplicate: 'Duplicate',
+    buyPack: 'Buy Pack',
   },
   it: {
     settings: 'Impostazioni',
@@ -769,6 +785,14 @@ const translations: Record<Language, Translations> = {
     collectionDesc: 'Colleziona le carte dei veicoli e completa il tuo album!',
     comingSoon: 'Prossimamente',
     adEnergyReward: 'Energia ricevuta!',
+    duplicates: 'Doppioni',
+    sellDuplicate: 'Vendi doppione',
+    packs: 'Pacchetti Carte',
+    openPack: 'Apri Pacchetto',
+    packOpened: 'Pacchetto aperto!',
+    newCard: 'Nuova carta!',
+    duplicate: 'Doppione',
+    buyPack: 'Compra Pacchetto',
   },
 };
 

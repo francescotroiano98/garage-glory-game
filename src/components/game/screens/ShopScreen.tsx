@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { useGame } from '@/contexts/GameContext';
  import { useLanguage } from '@/contexts/LanguageContext';
 import { Button } from '@/components/ui/button';
@@ -6,12 +6,14 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ShoppingBag, Wrench, Search, Zap, Building, Check, Star, Plus, Settings } from 'lucide-react';
+import { ShoppingBag, Wrench, Search, Zap, Building, Check, Star, Plus, Settings, Package } from 'lucide-react';
 import { toast } from 'sonner';
  import { useSound } from '@/hooks/useSound';
 import { TOOL_UPGRADES, DIAGNOSTIC_UPGRADES, GARAGE_UPGRADES, ENERGY_UPGRADES, getXpForLevel } from '@/data/upgrades';
 import { PART_DEFINITIONS, PART_ICONS, CATEGORY_LABELS, getPartUpgradeCost } from '@/data/parts';
 import { PartType, PartCategory, MAX_LEVEL } from '@/types/game';
+import { PACK_TYPES, openPack, loadCollection, saveCollection, addCardsToCollection, CollectibleCard } from '@/data/cards';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
  import { getPartName } from '@/utils/partTranslations';
 
 const GARAGE_BAYS = GARAGE_UPGRADES.carBays;
@@ -44,10 +46,28 @@ const MAX_PART_LEVEL = 10;
 
 export function ShopScreen() {
   const { state, dispatch, canAfford, getToolLevelIndex, getNegotiationBonus, getDiySuccessChance } = useGame();
-   const { t } = useLanguage();
+   const { t, language, formatMoney } = useLanguage();
    const { playSound } = useSound();
   const [selectedPartCategory, setSelectedPartCategory] = useState<PartCategory>('mechanical');
   const [vehiclePartTab, setVehiclePartTab] = useState<VehiclePartTab>('car');
+  const [openedCards, setOpenedCards] = useState<CollectibleCard[] | null>(null);
+
+  const buyPack = useCallback((packId: string) => {
+    const pack = PACK_TYPES.find(p => p.id === packId);
+    if (!pack || !canAfford(pack.cost)) {
+      toast.error(t.notEnoughMoney);
+      playSound('error');
+      return;
+    }
+    dispatch({ type: 'SPEND_MONEY', payload: pack.cost });
+    const cards = openPack(pack);
+    const collection = loadCollection();
+    const newCollection = addCardsToCollection(collection, cards);
+    saveCollection(newCollection);
+    setOpenedCards(cards);
+    playSound('cashRegister');
+    toast.success(t.packOpened);
+  }, [canAfford, dispatch, playSound, t]);
 
   const buyToolUpgrade = (upgrade: typeof TOOL_UPGRADES[0]) => {
     if (!canAfford(upgrade.cost)) {
@@ -159,6 +179,67 @@ export function ShopScreen() {
         </div>
 
         <div className="h-[calc(100svh-258px)] overflow-y-auto p-4 space-y-4">
+
+        {/* Card Packs Section */}
+        <Card className="border-2 border-accent/30 bg-gradient-to-br from-accent/5 to-transparent">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base flex items-center gap-2">
+              <Package className="w-4 h-4 text-accent" />
+              {t.packs}
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            {PACK_TYPES.map(pack => (
+              <div key={pack.id} className="flex items-center gap-3 p-2 bg-secondary/30 rounded-lg">
+                <span className="text-2xl">{pack.icon}</span>
+                <div className="flex-1 min-w-0">
+                  <div className="font-medium text-sm">{language === 'it' ? pack.nameIt : pack.name}</div>
+                  <div className="text-[10px] text-muted-foreground">{language === 'it' ? pack.descriptionIt : pack.description}</div>
+                </div>
+                <Button
+                  size="sm"
+                  onClick={() => buyPack(pack.id)}
+                  disabled={!canAfford(pack.cost)}
+                  className="shrink-0 h-8"
+                >
+                  {formatMoney(pack.cost)}
+                </Button>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+
+        {/* Pack opening dialog */}
+        <Dialog open={!!openedCards} onOpenChange={() => setOpenedCards(null)}>
+          <DialogContent className="max-w-sm">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <Package className="w-5 h-5" />
+                {t.packOpened}
+              </DialogTitle>
+            </DialogHeader>
+            <div className="grid grid-cols-5 gap-2">
+              {openedCards?.map((card, i) => (
+                <div
+                  key={i}
+                  className={`aspect-[3/4] rounded-lg border-2 overflow-hidden flex flex-col ${
+                    card.rarity === 'gold' ? 'border-yellow-400 bg-gradient-to-br from-yellow-500/15 to-amber-500/15 shadow-[0_0_12px_rgba(234,179,8,0.4)]' :
+                    card.rarity === 'reverse' ? 'border-blue-400 bg-gradient-to-br from-blue-500/10 to-purple-500/10 shadow-[0_0_12px_rgba(59,130,246,0.3)]' :
+                    'border-border bg-card'
+                  }`}
+                >
+                  <div className="flex-1 flex items-center justify-center text-lg">
+                    {card.rarity === 'gold' ? '🏆' : card.rarity === 'reverse' ? '✨' : '🃏'}
+                  </div>
+                  <div className="bg-black/60 px-1 py-0.5">
+                    <span className="text-[7px] text-white truncate block text-center">{card.name}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </DialogContent>
+        </Dialog>
+
         {/* Skills Section */}
         <Card className="border-2 border-primary/30 bg-gradient-to-br from-primary/5 to-transparent">
           <CardHeader className="pb-2">
