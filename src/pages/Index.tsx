@@ -8,6 +8,7 @@ import { GarageScreen } from '@/components/game/screens/GarageScreen';
 import { OfficeScreen } from '@/components/game/screens/OfficeScreen';
 import { RepairScreen } from '@/components/game/screens/RepairScreen';
 import { ShopScreen } from '@/components/game/screens/ShopScreen';
+import { CollectionScreen } from '@/components/game/screens/CollectionScreen';
 import { SettingsScreen } from '@/components/game/screens/SettingsScreen';
 import { LeaderboardScreen } from '@/components/game/screens/LeaderboardScreen';
 import { WelcomeScreen } from '@/components/game/screens/WelcomeScreen';
