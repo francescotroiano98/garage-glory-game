@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useGame } from '@/contexts/GameContext';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { Zap, DollarSign, Gift, Trophy, Target, Star, ChevronDown, Euro, PoundSterling, PlayCircle } from 'lucide-react';
+import { Zap, DollarSign, Gift, Trophy, Target, Star, ChevronDown, Euro, PoundSterling, PlayCircle, Settings } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
