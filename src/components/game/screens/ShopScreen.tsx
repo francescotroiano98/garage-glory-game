@@ -220,6 +220,7 @@ export function ShopScreen() {
             </DialogHeader>
             <div className="grid grid-cols-5 gap-2">
               {openedCards?.map((card, i) => (
+                console.log(card);
                 <div
                   key={i}
                   className={`aspect-[3/4] rounded-lg border-2 overflow-hidden flex flex-col ${
@@ -229,19 +230,7 @@ export function ShopScreen() {
                   }`}
                 >
                   <div className="flex-1 flex items-center justify-center text-lg">
-                    <img
-                      src={`/images/cards/${card.vehicleCategory}/${card.imageVariant}.png`}
-                      alt={card.name}
-                      className="w-full h-full object-cover"
-                    />
-
-                    {/* Overlay rarità */}
-                    {card.rarity === 'gold' && (
-                      <div className="absolute inset-0 bg-gradient-to-br from-yellow-400/25 to-amber-500/20 pointer-events-none" />
-                    )}
-                    {card.rarity === 'reverse' && (
-                      <div className="absolute inset-0 bg-gradient-to-br from-blue-400/20 to-purple-500/20 pointer-events-none" />
-                    )}
+                    {card.rarity === 'gold' ? '🏆' : card.rarity === 'reverse' ? '✨' : '🃏'}
                   </div>
                   <div className="bg-black/60 px-1 py-0.5">
                     <span className="text-[7px] text-white truncate block text-center">{card.name}</span>
