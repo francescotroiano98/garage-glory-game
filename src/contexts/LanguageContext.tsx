@@ -319,6 +319,9 @@ interface Translations {
   watchAdForEnergy: string;
   watchingAd: string;
   adEnergyReward: string;
+  collection: string;
+  collectionDesc: string;
+  comingSoon: string;
 }
 
 const translations: Record<Language, Translations> = {
