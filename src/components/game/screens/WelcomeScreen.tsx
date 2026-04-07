@@ -62,7 +62,7 @@ export function WelcomeScreen({ onComplete }: WelcomeScreenProps) {
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <Card className="w-full max-w-sm border-2 border-primary/30 shadow-2xl">
-        <CardContent className="p-6 space-y-5">
+        <CardContent className="p-6 space-y-5 h-[90svh] overflow-y-auto">
           <div className="text-center">
             <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
               <Wrench className="w-10 h-10 text-primary" />
