@@ -212,10 +212,6 @@ export function SettingsScreen() {
             </CardContent>
           </Card>
         )}
-        <Button variant="outline" className="w-full border-2" onClick={signOut}>
-                <LogOut className="w-4 h-4 mr-2" />
-                {t.logOut}
-              </Button>
 
         {/* Reset */}
         <Card className="border-2 border-destructive/30">
