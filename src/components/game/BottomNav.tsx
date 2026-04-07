@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils';
 import { useGame } from '@/contexts/GameContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 
-type Screen = 'garage' | 'office' | 'shop' | 'leaderboard' | 'settings';
+type Screen = 'garage' | 'office' | 'collection' | 'shop' | 'leaderboard' | 'settings';
 
 interface BottomNavProps {
   currentScreen: Screen;
