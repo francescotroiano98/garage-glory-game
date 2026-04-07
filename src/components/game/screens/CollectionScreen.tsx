@@ -101,7 +101,7 @@ export function CollectionScreen() {
     setCollection(result.newState);
     saveCollection(result.newState);
     dispatch({ type: 'ADD_MONEY', payload: result.value });
-    playSound('coin');
+    playSound('purchase');
     toast.success(`+${formatMoney(result.value)}`);
     setSelectedCard(null);
   }, [collection, dispatch, playSound, formatMoney]);
