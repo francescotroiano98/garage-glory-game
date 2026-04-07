@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ShoppingBag, Wrench, Search, Zap, Building, Check, Star, Plus, Settings } from 'lucide-react';
+import { ShoppingBag, Wrench, Search, Zap, Building, Check, Star, Plus, Settings, Package } from 'lucide-react';
 import { toast } from 'sonner';
  import { useSound } from '@/hooks/useSound';
 import { TOOL_UPGRADES, DIAGNOSTIC_UPGRADES, GARAGE_UPGRADES, ENERGY_UPGRADES, getXpForLevel } from '@/data/upgrades';
