@@ -18,7 +18,7 @@ const AD_ENERGY_REWARD = 50;
 const AD_WATCH_DURATION = 5000; // 5 seconds simulated ad (web fallback)
 const AD_COOLDOWN = 120000; // 2 minutes between ads
 
-export function StatsBar() {
+export function StatsBar({ onOpenSettings }: { onOpenSettings?: () => void }) {
   const { 
     state, 
     dispatch, 
