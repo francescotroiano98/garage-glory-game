@@ -195,6 +195,7 @@ export function SettingsScreen() {
         </Card>
 
         {/* Account */}
+        {user && (
           <Card className="border-2">
             <CardHeader className="pb-2">
               <CardTitle className="text-base flex items-center gap-2">
@@ -210,6 +211,11 @@ export function SettingsScreen() {
               </Button>
             </CardContent>
           </Card>
+        )}
+        <Button variant="outline" className="w-full border-2" onClick={signOut}>
+                <LogOut className="w-4 h-4 mr-2" />
+                {t.logOut}
+              </Button>
 
         {/* Reset */}
         <Card className="border-2 border-destructive/30">
