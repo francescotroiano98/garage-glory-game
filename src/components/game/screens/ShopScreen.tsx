@@ -220,7 +220,6 @@ export function ShopScreen() {
             </DialogHeader>
             <div className="grid grid-cols-5 gap-2">
               {openedCards?.map((card, i) => (
-                console.log(card);
                 <div
                   key={i}
                   className={`aspect-[3/4] rounded-lg border-2 overflow-hidden flex flex-col ${
