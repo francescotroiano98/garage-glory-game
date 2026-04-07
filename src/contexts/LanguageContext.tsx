@@ -765,6 +765,9 @@ const translations: Record<Language, Translations> = {
     watchAd: 'Guarda Video',
     watchAdForEnergy: 'Guarda un video per ottenere energia!',
     watchingAd: 'In riproduzione...',
+    collection: 'Collezione',
+    collectionDesc: 'Colleziona le carte dei veicoli e completa il tuo album!',
+    comingSoon: 'Prossimamente',
     adEnergyReward: 'Energia ricevuta!',
   },
 };
