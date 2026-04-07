@@ -195,7 +195,6 @@ export function SettingsScreen() {
         </Card>
 
         {/* Account */}
-        {user && (
           <Card className="border-2">
             <CardHeader className="pb-2">
               <CardTitle className="text-base flex items-center gap-2">
@@ -211,7 +210,6 @@ export function SettingsScreen() {
               </Button>
             </CardContent>
           </Card>
-        )}
 
         {/* Reset */}
         <Card className="border-2 border-destructive/30">
