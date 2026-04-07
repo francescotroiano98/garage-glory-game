@@ -8,6 +8,7 @@ import { GarageScreen } from '@/components/game/screens/GarageScreen';
 import { OfficeScreen } from '@/components/game/screens/OfficeScreen';
 import { RepairScreen } from '@/components/game/screens/RepairScreen';
 import { ShopScreen } from '@/components/game/screens/ShopScreen';
+import { CollectionScreen } from '@/components/game/screens/CollectionScreen';
 import { SettingsScreen } from '@/components/game/screens/SettingsScreen';
 import { LeaderboardScreen } from '@/components/game/screens/LeaderboardScreen';
 import { WelcomeScreen } from '@/components/game/screens/WelcomeScreen';
@@ -111,7 +112,7 @@ function GameContent() {
   if (selectedCarId) {
     return (
       <div className="h-[100svh] bg-background flex flex-col overflow-hidden">
-        <StatsBar />
+        <StatsBar onOpenSettings={() => { setSelectedCarId(null); setCurrentScreen('settings'); }} />
         <div className="flex-1 min-h-0">
           <RepairScreen
             carId={selectedCarId}
@@ -129,7 +130,7 @@ function GameContent() {
 
   return (
     <div className="h-[100svh] bg-background flex flex-col overflow-hidden">
-      <StatsBar />
+      <StatsBar onOpenSettings={() => setCurrentScreen('settings')} />
       <div className="flex-1 min-h-0">
         {currentScreen === 'garage' && (
           <GarageScreen
@@ -141,6 +142,7 @@ function GameContent() {
           <OfficeScreen onCarBought={handleCarBought} />
         )}
         {currentScreen === 'shop' && <ShopScreen />}
+        {currentScreen === 'collection' && <CollectionScreen />}
         {currentScreen === 'leaderboard' && <LeaderboardScreen />}
         {currentScreen === 'settings' && <SettingsScreen />}
       </div>

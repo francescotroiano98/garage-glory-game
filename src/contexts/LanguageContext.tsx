@@ -319,6 +319,9 @@ interface Translations {
   watchAdForEnergy: string;
   watchingAd: string;
   adEnergyReward: string;
+  collection: string;
+  collectionDesc: string;
+  comingSoon: string;
 }
 
 const translations: Record<Language, Translations> = {
@@ -539,6 +542,9 @@ const translations: Record<Language, Translations> = {
     watchAd: 'Watch Ad',
     watchAdForEnergy: 'Watch an ad to get energy!',
     watchingAd: 'Watching...',
+    collection: 'Collection',
+    collectionDesc: 'Collect vehicle cards and complete your album!',
+    comingSoon: 'Coming Soon',
     adEnergyReward: 'Energy received!',
   },
   it: {
@@ -759,6 +765,9 @@ const translations: Record<Language, Translations> = {
     watchAd: 'Guarda Video',
     watchAdForEnergy: 'Guarda un video per ottenere energia!',
     watchingAd: 'In riproduzione...',
+    collection: 'Collezione',
+    collectionDesc: 'Colleziona le carte dei veicoli e completa il tuo album!',
+    comingSoon: 'Prossimamente',
     adEnergyReward: 'Energia ricevuta!',
   },
 };

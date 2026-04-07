@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useGame } from '@/contexts/GameContext';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { Zap, DollarSign, Gift, Trophy, Target, Star, ChevronDown, Euro, PoundSterling, PlayCircle } from 'lucide-react';
+import { Zap, DollarSign, Gift, Trophy, Target, Star, ChevronDown, Euro, PoundSterling, PlayCircle, Settings } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -18,7 +18,7 @@ const AD_ENERGY_REWARD = 50;
 const AD_WATCH_DURATION = 5000; // 5 seconds simulated ad (web fallback)
 const AD_COOLDOWN = 120000; // 2 minutes between ads
 
-export function StatsBar() {
+export function StatsBar({ onOpenSettings }: { onOpenSettings?: () => void }) {
   const { 
     state, 
     dispatch, 
@@ -227,6 +227,17 @@ export function StatsBar() {
                 </div>
               </PopoverContent>
             </Popover>
+
+            {onOpenSettings && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={onOpenSettings}
+                className="h-8 w-8 p-0"
+              >
+                <Settings className="w-4 h-4" />
+              </Button>
+            )}
           </div>
         </div>
       </div>

@@ -1,10 +1,10 @@
 import { ReactNode } from 'react';
-import { Home, Briefcase, Settings, ShoppingBag, Trophy } from 'lucide-react';
+import { Home, Briefcase, ShoppingBag, Trophy, Album } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useGame } from '@/contexts/GameContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 
-type Screen = 'garage' | 'office' | 'shop' | 'leaderboard' | 'settings';
+type Screen = 'garage' | 'office' | 'collection' | 'shop' | 'leaderboard' | 'settings';
 
 interface BottomNavProps {
   currentScreen: Screen;
@@ -20,9 +20,9 @@ export function BottomNav({ currentScreen, onNavigate }: BottomNavProps) {
   const navItems: { id: Screen; icon: ReactNode; label: string; badge?: number }[] = [
     { id: 'garage', icon: <Home className="w-5 h-5" />, label: t.garage },
     { id: 'office', icon: <Briefcase className="w-5 h-5" />, label: t.theOffice, badge: pendingCalls > 0 ? pendingCalls : undefined },
+    { id: 'collection', icon: <Album className="w-5 h-5" />, label: t.collection },
     { id: 'shop', icon: <ShoppingBag className="w-5 h-5" />, label: t.shop },
     { id: 'leaderboard', icon: <Trophy className="w-5 h-5" />, label: t.leaderboard },
-    { id: 'settings', icon: <Settings className="w-5 h-5" />, label: t.settings },
   ];
 
   return (
