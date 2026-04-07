@@ -1,5 +1,5 @@
 import { ReactNode } from 'react';
-import { Home, Briefcase, Settings, ShoppingBag, Trophy } from 'lucide-react';
+import { Home, Briefcase, ShoppingBag, Trophy, Album } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useGame } from '@/contexts/GameContext';
 import { useLanguage } from '@/contexts/LanguageContext';
