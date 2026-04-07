@@ -785,6 +785,14 @@ const translations: Record<Language, Translations> = {
     collectionDesc: 'Colleziona le carte dei veicoli e completa il tuo album!',
     comingSoon: 'Prossimamente',
     adEnergyReward: 'Energia ricevuta!',
+    duplicates: 'Doppioni',
+    sellDuplicate: 'Vendi doppione',
+    packs: 'Pacchetti Carte',
+    openPack: 'Apri Pacchetto',
+    packOpened: 'Pacchetto aperto!',
+    newCard: 'Nuova carta!',
+    duplicate: 'Doppione',
+    buyPack: 'Compra Pacchetto',
   },
 };
 
