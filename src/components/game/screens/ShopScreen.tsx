@@ -46,10 +46,28 @@ const MAX_PART_LEVEL = 10;
 
 export function ShopScreen() {
   const { state, dispatch, canAfford, getToolLevelIndex, getNegotiationBonus, getDiySuccessChance } = useGame();
-   const { t } = useLanguage();
+   const { t, language, formatMoney } = useLanguage();
    const { playSound } = useSound();
   const [selectedPartCategory, setSelectedPartCategory] = useState<PartCategory>('mechanical');
   const [vehiclePartTab, setVehiclePartTab] = useState<VehiclePartTab>('car');
+  const [openedCards, setOpenedCards] = useState<CollectibleCard[] | null>(null);
+
+  const buyPack = useCallback((packId: string) => {
+    const pack = PACK_TYPES.find(p => p.id === packId);
+    if (!pack || !canAfford(pack.cost)) {
+      toast.error(t.notEnoughMoney);
+      playSound('error');
+      return;
+    }
+    dispatch({ type: 'SPEND_MONEY', payload: pack.cost });
+    const cards = openPack(pack);
+    const collection = loadCollection();
+    const newCollection = addCardsToCollection(collection, cards);
+    saveCollection(newCollection);
+    setOpenedCards(cards);
+    playSound('cashRegister');
+    toast.success(t.packOpened);
+  }, [canAfford, dispatch, playSound, t]);
 
   const buyToolUpgrade = (upgrade: typeof TOOL_UPGRADES[0]) => {
     if (!canAfford(upgrade.cost)) {
