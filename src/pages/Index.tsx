@@ -142,6 +142,7 @@ function GameContent() {
           <OfficeScreen onCarBought={handleCarBought} />
         )}
         {currentScreen === 'shop' && <ShopScreen />}
+        {currentScreen === 'collection' && <CollectionScreen />}
         {currentScreen === 'leaderboard' && <LeaderboardScreen />}
         {currentScreen === 'settings' && <SettingsScreen />}
       </div>

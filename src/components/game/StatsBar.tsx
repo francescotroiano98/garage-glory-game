@@ -227,6 +227,17 @@ export function StatsBar({ onOpenSettings }: { onOpenSettings?: () => void }) {
                 </div>
               </PopoverContent>
             </Popover>
+
+            {onOpenSettings && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={onOpenSettings}
+                className="h-8 w-8 p-0"
+              >
+                <Settings className="w-4 h-4" />
+              </Button>
+            )}
           </div>
         </div>
       </div>
