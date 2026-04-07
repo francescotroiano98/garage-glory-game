@@ -542,6 +542,9 @@ const translations: Record<Language, Translations> = {
     watchAd: 'Watch Ad',
     watchAdForEnergy: 'Watch an ad to get energy!',
     watchingAd: 'Watching...',
+    collection: 'Collection',
+    collectionDesc: 'Collect vehicle cards and complete your album!',
+    comingSoon: 'Coming Soon',
     adEnergyReward: 'Energy received!',
   },
   it: {
