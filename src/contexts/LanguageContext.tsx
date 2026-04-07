@@ -322,6 +322,14 @@ interface Translations {
   collection: string;
   collectionDesc: string;
   comingSoon: string;
+  duplicates: string;
+  sellDuplicate: string;
+  packs: string;
+  openPack: string;
+  packOpened: string;
+  newCard: string;
+  duplicate: string;
+  buyPack: string;
 }
 
 const translations: Record<Language, Translations> = {
