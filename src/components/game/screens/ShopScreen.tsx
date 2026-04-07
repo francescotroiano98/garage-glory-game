@@ -228,6 +228,7 @@ export function ShopScreen() {
                     'border-border bg-card'
                   }`}
                 >
+                  <div>{card}</div>
                   <div className="flex-1 flex items-center justify-center text-lg">
                     {card.rarity === 'gold' ? '🏆' : card.rarity === 'reverse' ? '✨' : '🃏'}
                   </div>
