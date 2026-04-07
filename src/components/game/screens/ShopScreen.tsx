@@ -12,6 +12,8 @@ import { toast } from 'sonner';
 import { TOOL_UPGRADES, DIAGNOSTIC_UPGRADES, GARAGE_UPGRADES, ENERGY_UPGRADES, getXpForLevel } from '@/data/upgrades';
 import { PART_DEFINITIONS, PART_ICONS, CATEGORY_LABELS, getPartUpgradeCost } from '@/data/parts';
 import { PartType, PartCategory, MAX_LEVEL } from '@/types/game';
+import { PACK_TYPES, openPack, loadCollection, saveCollection, addCardsToCollection, CollectibleCard } from '@/data/cards';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
  import { getPartName } from '@/utils/partTranslations';
 
 const GARAGE_BAYS = GARAGE_UPGRADES.carBays;
