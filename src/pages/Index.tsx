@@ -112,7 +112,7 @@ function GameContent() {
   if (selectedCarId) {
     return (
       <div className="h-[100svh] bg-background flex flex-col overflow-hidden">
-        <StatsBar />
+        <StatsBar onOpenSettings={() => { setSelectedCarId(null); setCurrentScreen('settings'); }} />
         <div className="flex-1 min-h-0">
           <RepairScreen
             carId={selectedCarId}
