@@ -31,6 +31,7 @@ export function BottomNav({ currentScreen, onNavigate }: BottomNavProps) {
         {navItems.map((item) => (
           <button
             key={item.id}
+            data-tutorial-id={`tutorial-nav-${item.id}`}
             onClick={() => onNavigate(item.id)}
             className={cn(
               'flex flex-col items-center gap-0.5 px-2 py-2 rounded-lg transition-colors min-w-12 relative',
