@@ -1,4 +1,4 @@
-import { useState, useEffect, Component, ReactNode } from 'react';
+import { useState, useEffect, useCallback, Component, ReactNode } from 'react';
 import { GameProvider, useGame } from '@/contexts/GameContext';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 import { AuthProvider, useAuth } from '@/contexts/AuthContext';
@@ -59,7 +59,7 @@ function ProfileSync() {
         total_cars_sold: state.totalCarsSold,
         level: state.level,
       });
-    }, 5000); // Debounce 5s
+    }, 5000);
     return () => clearTimeout(timeout);
   }, [user, state.totalProfit, state.totalCarsSold, state.level]);
 
@@ -71,6 +71,9 @@ function GameContent() {
   const [selectedCarId, setSelectedCarId] = useState<string | null>(null);
   const [showTutorial, setShowTutorial] = useState(false);
   const [showWelcome, setShowWelcome] = useState(false);
+  const [tutorialAction, setTutorialAction] = useState<string | null>(null);
+  const { state, dispatch } = useGame();
+  const prevCarsCount = useState(state.carsInGarage.length)[0];
 
   useBackgroundMusic();
 
@@ -86,6 +89,52 @@ function GameContent() {
     }
   }, []);
 
+  // Track tutorial actions based on state changes
+  const handleNavigate = useCallback((screen: Screen) => {
+    setCurrentScreen(screen);
+    if (showTutorial) {
+      if (screen === 'office') setTutorialAction('navigate_office');
+      else if (screen === 'garage') setTutorialAction('navigate_garage');
+      else if (screen === 'shop') setTutorialAction('navigate_shop');
+      else if (screen === 'collection') setTutorialAction('navigate_collection');
+      // Clear action after a tick so it can be detected
+      setTimeout(() => setTutorialAction(null), 100);
+    }
+  }, [showTutorial]);
+
+  // Detect vehicle purchase
+  useEffect(() => {
+    if (showTutorial && state.carsInGarage.length > 0) {
+      setTutorialAction('buy_vehicle');
+      setTimeout(() => setTutorialAction(null), 100);
+    }
+  }, [state.carsInGarage.length, showTutorial]);
+
+  // Detect vehicle selection
+  const handleSelectCar = useCallback((carId: string) => {
+    setSelectedCarId(carId);
+    if (showTutorial) {
+      setTutorialAction('select_vehicle');
+      setTimeout(() => setTutorialAction(null), 100);
+    }
+  }, [showTutorial]);
+
+  // Detect repair (listen for repair queue changes)
+  useEffect(() => {
+    if (showTutorial && state.repairQueue.length > 0) {
+      setTutorialAction('repair_part');
+      setTimeout(() => setTutorialAction(null), 100);
+    }
+  }, [state.repairQueue.length, showTutorial]);
+
+  // Detect list for sale
+  useEffect(() => {
+    if (showTutorial && state.activeSales.length > 0) {
+      setTutorialAction('list_for_sale');
+      setTimeout(() => setTutorialAction(null), 100);
+    }
+  }, [state.activeSales.length, showTutorial]);
+
   const handleWelcomeComplete = (wantTutorial: boolean) => {
     localStorage.setItem(WELCOME_KEY, 'true');
     setShowWelcome(false);
@@ -99,9 +148,15 @@ function GameContent() {
   const handleTutorialComplete = () => {
     localStorage.setItem(TUTORIAL_KEY, 'true');
     setShowTutorial(false);
+    // Give bonus coins
+    dispatch({ type: 'ADD_MONEY', payload: 150 });
   };
 
-  const handleSelectCar = (carId: string) => setSelectedCarId(carId);
+  const handleTutorialNavigate = useCallback((screen: string) => {
+    setSelectedCarId(null);
+    setCurrentScreen(screen as Screen);
+  }, []);
+
   const handleBackFromRepair = () => setSelectedCarId(null);
   const handleCarBought = () => setCurrentScreen('garage');
 
@@ -113,7 +168,7 @@ function GameContent() {
     return (
       <div className="h-[100svh] bg-background flex flex-col overflow-hidden">
         <StatsBar onOpenSettings={() => { setSelectedCarId(null); setCurrentScreen('settings'); }} />
-        <div className="flex-1 min-h-0">
+        <div className="flex-1 min-h-0" data-tutorial-id="tutorial-repair-area">
           <RepairScreen
             carId={selectedCarId}
             onBack={handleBackFromRepair}
@@ -123,7 +178,14 @@ function GameContent() {
             }}
           />
         </div>
-        {showTutorial && <TutorialOverlay onComplete={handleTutorialComplete} />}
+        {showTutorial && (
+          <TutorialOverlay
+            onComplete={handleTutorialComplete}
+            currentScreen="repair"
+            tutorialStepCompleted={tutorialAction}
+            onRequestNavigate={handleTutorialNavigate}
+          />
+        )}
       </div>
     );
   }
@@ -134,7 +196,7 @@ function GameContent() {
       <div className="flex-1 min-h-0">
         {currentScreen === 'garage' && (
           <GarageScreen
-            onNavigateToOffice={() => setCurrentScreen('office')}
+            onNavigateToOffice={() => handleNavigate('office')}
             onSelectCar={handleSelectCar}
           />
         )}
@@ -146,8 +208,15 @@ function GameContent() {
         {currentScreen === 'leaderboard' && <LeaderboardScreen />}
         {currentScreen === 'settings' && <SettingsScreen />}
       </div>
-      <BottomNav currentScreen={currentScreen} onNavigate={setCurrentScreen} />
-      {showTutorial && <TutorialOverlay onComplete={handleTutorialComplete} />}
+      <BottomNav currentScreen={currentScreen} onNavigate={handleNavigate} />
+      {showTutorial && (
+        <TutorialOverlay
+          onComplete={handleTutorialComplete}
+          currentScreen={currentScreen}
+          tutorialStepCompleted={tutorialAction}
+          onRequestNavigate={handleTutorialNavigate}
+        />
+      )}
       <ProfileSync />
     </div>
   );
