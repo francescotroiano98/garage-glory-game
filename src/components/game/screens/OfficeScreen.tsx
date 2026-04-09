@@ -166,6 +166,7 @@ export function OfficeScreen({ onCarBought }: OfficeScreenProps) {
         <div className="h-[calc(100svh-258px)] overflow-y-auto p-4 space-y-4">
           {/* Newspaper Button */}
           <button
+            data-tutorial-id="tutorial-newspaper-btn"
             onClick={() => { setView('newspaper'); playSound('pageChange'); }}
             className="w-full p-8 bg-card/95 backdrop-blur-sm rounded-2xl border-2 border-border hover:border-primary/50 transition-all active:scale-[0.98] flex flex-row items-center gap-3 shadow-lg"
           >

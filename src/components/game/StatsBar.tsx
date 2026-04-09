@@ -126,7 +126,7 @@ export function StatsBar({ onOpenSettings }: { onOpenSettings?: () => void }) {
 
   return (
     <>
-      <div className="flex flex-col gap-1.5 bg-card/95 backdrop-blur-sm border-b-2 border-border p-3 sticky top-0 z-50 shrink-0">
+      <div data-tutorial-id="tutorial-stats-bar" className="flex flex-col gap-1.5 bg-card/95 backdrop-blur-sm border-b-2 border-border p-3 sticky top-0 z-50 shrink-0">
         <div className="flex items-center gap-1.5">
             <div className="flex flex-row gap-1.5">
               <Button
