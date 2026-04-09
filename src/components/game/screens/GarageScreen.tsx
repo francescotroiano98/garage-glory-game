@@ -114,14 +114,15 @@ export function GarageScreen({ onNavigateToOffice, onSelectCar }: GarageScreenPr
                 ) : null;
 
                 return (
-                  <CarCard
-                    key={car.id}
-                    car={car}
-                    onClick={() => onSelectCar(car.id)}
-                    showDamages={true}
-                    actionButton={actionButton}
-                    topBadge={topBadge}
-                  />
+                  <div key={car.id} data-tutorial-id="tutorial-car-card">
+                    <CarCard
+                      car={car}
+                      onClick={() => onSelectCar(car.id)}
+                      showDamages={true}
+                      actionButton={actionButton}
+                      topBadge={topBadge}
+                    />
+                  </div>
                 );
               })}
               
