@@ -16,26 +16,19 @@ export function SettingsScreen() {
 
   const handleReset = () => {
     if (confirm(t.resetConfirm)) {
-      // Clear every game-related key (anything we own), so nothing
-      // (collection, garage, tutorial flags, etc.) survives the reset.
-      const keysToRemove: string[] = [];
-      for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        if (!key) continue;
-        if (
-          key.startsWith('car_mechanic_') ||
-          key.startsWith('game_') ||
-          key.startsWith('cardCollection') ||
-          key.startsWith('tutorial') ||
-          key.startsWith('welcome')
-        ) {
-          keysToRemove.push(key);
-        }
-      }
-      keysToRemove.forEach(k => localStorage.removeItem(k));
-      // Also clear sessionStorage just in case
+      // Wipe everything we may have stored (game save, collection,
+      // challenges, tutorial flags, music, etc.).
+      try { localStorage.clear(); } catch {}
       try { sessionStorage.clear(); } catch {}
-      window.location.reload();
+      // Block any pending React effects from re-saving state in the
+      // microtasks between this call and the actual reload.
+      try {
+        const noop = () => {};
+        (localStorage as unknown as { setItem: typeof noop }).setItem = noop;
+        (localStorage as unknown as { removeItem: typeof noop }).removeItem = noop;
+      } catch {}
+      // Hard reload to a clean state
+      window.location.replace(window.location.pathname + window.location.search);
     }
   };
 
