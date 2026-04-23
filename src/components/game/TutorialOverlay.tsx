@@ -330,69 +330,6 @@ export function TutorialOverlay({ onComplete, currentScreen, tutorialStepComplet
           </div>
         </div>
       )}
-
-      {/* Debug overlay */}
-      <DebugPanel
-        open={debugOpen}
-        onToggle={() => setDebugOpen(o => !o)}
-        phase={phase}
-        currentScreen={currentScreen}
-        spotlightIndex={spotlightIndex}
-        totalSteps={SPOTLIGHT_STEPS.length}
-        step={currentStep}
-        targetRect={targetRect}
-        lastAction={tutorialStepCompleted ?? null}
-      />
     </>
-  );
-}
-
-interface DebugPanelProps {
-  open: boolean;
-  onToggle: () => void;
-  phase: string;
-  currentScreen: string;
-  spotlightIndex: number;
-  totalSteps: number;
-  step: SpotlightStep | null;
-  targetRect: DOMRect | null;
-  lastAction: string | null;
-}
-
-function DebugPanel({ open, onToggle, phase, currentScreen, spotlightIndex, totalSteps, step, targetRect, lastAction }: DebugPanelProps) {
-  const selector = step ? `[data-tutorial-id="${step.targetId}"]` : '—';
-  const elExists = step ? !!document.querySelector(selector) : false;
-  const rectStr = targetRect
-    ? `x:${Math.round(targetRect.left)} y:${Math.round(targetRect.top)} w:${Math.round(targetRect.width)} h:${Math.round(targetRect.height)}`
-    : 'null';
-
-  return (
-    <div className="fixed bottom-2 left-2 z-[110] pointer-events-auto font-mono text-[10px]">
-      <button
-        onClick={onToggle}
-        className="bg-black/80 text-green-400 border border-green-500/60 rounded px-2 py-1 mb-1 block"
-      >
-        {open ? '🐛 hide debug' : '🐛 show debug'}
-      </button>
-      {open && (
-        <div className="bg-black/85 text-green-300 border border-green-500/40 rounded p-2 max-w-[280px] space-y-0.5 leading-tight">
-          <div><span className="text-green-500">phase:</span> {phase}</div>
-          <div><span className="text-green-500">screen:</span> {currentScreen}</div>
-          <div><span className="text-green-500">step:</span> {spotlightIndex + 1}/{totalSteps} {step ? `(${step.id})` : ''}</div>
-          <div><span className="text-green-500">selector:</span> {selector}</div>
-          <div>
-            <span className="text-green-500">element:</span>{' '}
-            <span className={elExists ? 'text-green-300' : 'text-red-400'}>
-              {elExists ? 'FOUND' : 'NOT FOUND'}
-            </span>
-          </div>
-          <div><span className="text-green-500">rect:</span> {rectStr}</div>
-          <div><span className="text-green-500">required:</span> {step?.requiredAction ?? '—'}</div>
-          <div><span className="text-green-500">lastAction:</span> {lastAction ?? '—'}</div>
-          <div><span className="text-green-500">navigateTo:</span> {step?.navigateTo ?? '—'}</div>
-          <div><span className="text-green-500">tooltipPos:</span> {step?.tooltipPosition ?? 'bottom'}</div>
-        </div>
-      )}
-    </div>
   );
 }
