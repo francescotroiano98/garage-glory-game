@@ -216,7 +216,7 @@ export function TutorialOverlay({ onComplete, currentScreen, tutorialStepComplet
     <>
       {/* Overlay with cutout */}
       <div className="fixed inset-0 z-[100] pointer-events-none">
-        <svg className="w-full h-full pointer-events-auto" onClick={isAcknowledge ? undefined : undefined}>
+        <svg className="w-full h-full pointer-events-none">
           <defs>
             <mask id="tutorial-mask">
               <rect x="0" y="0" width="100%" height="100%" fill="white" />
@@ -236,7 +236,7 @@ export function TutorialOverlay({ onComplete, currentScreen, tutorialStepComplet
             x="0" y="0" width="100%" height="100%"
             fill="rgba(0,0,0,0.75)"
             mask="url(#tutorial-mask)"
-            className="pointer-events-auto"
+            className="pointer-events-none"
           />
         </svg>
 
@@ -253,17 +253,9 @@ export function TutorialOverlay({ onComplete, currentScreen, tutorialStepComplet
           />
         )}
 
-        {/* Allow clicks through the cutout */}
-        {targetRect && !isAcknowledge && (
-          <div
-            className="absolute pointer-events-auto"
-            style={{
-              top: targetRect.top - padding,
-              left: targetRect.left - padding,
-              width: targetRect.width + padding * 2,
-              height: targetRect.height + padding * 2,
-            }}
-          />
+        {/* For acknowledge steps, block clicks everywhere (user must use the Next button) */}
+        {isAcknowledge && (
+          <div className="absolute inset-0 pointer-events-auto" />
         )}
       </div>
 
