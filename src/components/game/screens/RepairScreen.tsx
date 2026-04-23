@@ -148,7 +148,7 @@ export function RepairScreen({ carId, onBack, onNavigateToOffice }: RepairScreen
       <div className="relative z-10 flex flex-col h-full">
         <div className="relative p-4 py-5 border-b border-border bg-card/95 backdrop-blur-sm shrink-0 sticky top-0 z-20">
           <div className="flex items-start gap-3">
-            <Button variant="ghost" size="icon" onClick={onBack} className="shrink-0">
+            <Button variant="ghost" size="icon" onClick={onBack} className="shrink-0" data-tutorial-id="tutorial-repair-back">
               <ArrowLeft className="w-5 h-5" />
             </Button>
             <div className="flex-1 min-w-0">

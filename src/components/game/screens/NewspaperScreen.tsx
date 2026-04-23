@@ -194,6 +194,7 @@ function VehicleDetailDialog({
             disabled={!canAfford(negotiatePrice) || garageFull}
             className="flex-1"
             size="sm"
+            data-tutorial-id="tutorial-buy-now-btn"
           >
             {t.buyNow}
           </Button>
@@ -386,8 +387,8 @@ export function NewspaperScreen({ onCarBought }: NewspaperScreenProps) {
                 <p className="text-sm">No vehicles match your filters</p>
               </div>
             ) : (
-              filteredAds.map((ad) => (
-                <div key={ad.id} className="relative">
+              filteredAds.map((ad, idx) => (
+                <div key={ad.id} className="relative" data-tutorial-id={idx === 0 ? 'tutorial-vehicle-listing' : undefined}>
                   <CarCard
                     car={ad.car}
                     onClick={() => handleSelectAd(ad)}
