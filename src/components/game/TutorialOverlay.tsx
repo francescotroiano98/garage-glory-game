@@ -157,6 +157,17 @@ export function TutorialOverlay({ onComplete, currentScreen, tutorialStepComplet
             </div>
           </div>
         </div>
+        <DebugPanel
+          open={debugOpen}
+          onToggle={() => setDebugOpen(o => !o)}
+          phase={phase}
+          currentScreen={currentScreen}
+          spotlightIndex={introIndex}
+          totalSteps={INTRO_SLIDES.length}
+          step={null}
+          targetRect={null}
+          lastAction={null}
+        />
       </div>
     );
   }
