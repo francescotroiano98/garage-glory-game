@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
-import { INTRO_SLIDES, SPOTLIGHT_STEPS, SpotlightStep } from '@/data/tutorial';
+import { INTRO_SLIDES, SPOTLIGHT_STEPS } from '@/data/tutorial';
 import { ChevronRight, X, Coins, CheckCircle2 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 
@@ -18,7 +18,6 @@ export function TutorialOverlay({ onComplete, currentScreen, tutorialStepComplet
   const [targetRect, setTargetRect] = useState<DOMRect | null>(null);
   const [showReward, setShowReward] = useState<number | null>(null);
   const [animateIn, setAnimateIn] = useState(true);
-  const [debugOpen, setDebugOpen] = useState(true);
   const { language, t } = useLanguage();
   const observerRef = useRef<MutationObserver | null>(null);
 
@@ -66,6 +65,17 @@ export function TutorialOverlay({ onComplete, currentScreen, tutorialStepComplet
       handleAdvanceSpotlight();
     }
   }, [tutorialStepCompleted]);
+
+  // For "click_target" steps, advance when the target element is clicked
+  useEffect(() => {
+    if (phase !== 'spotlight' || !currentStep) return;
+    if (currentStep.requiredAction !== 'click_target') return;
+    const el = document.querySelector(`[data-tutorial-id="${currentStep.targetId}"]`);
+    if (!el) return;
+    const handler = () => handleAdvanceSpotlight();
+    el.addEventListener('click', handler, { once: true });
+    return () => el.removeEventListener('click', handler);
+  }, [phase, spotlightIndex, currentStep, targetRect]);
 
   const handleAdvanceSpotlight = () => {
     const step = SPOTLIGHT_STEPS[spotlightIndex];
@@ -157,17 +167,6 @@ export function TutorialOverlay({ onComplete, currentScreen, tutorialStepComplet
             </div>
           </div>
         </div>
-        <DebugPanel
-          open={debugOpen}
-          onToggle={() => setDebugOpen(o => !o)}
-          phase={phase}
-          currentScreen={currentScreen}
-          spotlightIndex={introIndex}
-          totalSteps={INTRO_SLIDES.length}
-          step={null}
-          targetRect={null}
-          lastAction={null}
-        />
       </div>
     );
   }
@@ -182,45 +181,44 @@ export function TutorialOverlay({ onComplete, currentScreen, tutorialStepComplet
 
   // Calculate tooltip position
   const getTooltipStyle = (): React.CSSProperties => {
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    const tooltipW = Math.min(320, vw - 24);
+    const estTooltipH = 200; // rough estimate; auto-adjusted by clamp
+    const margin = 12;
+    const safeTop = 8;
+    const safeBottom = 8;
+
     if (!targetRect) {
       return { top: '50%', left: '50%', transform: 'translate(-50%, -50%)' };
     }
 
-    const pos = currentStep.tooltipPosition || 'bottom';
-    const margin = 16;
+    // Pick best vertical placement: prefer requested side, but flip if not enough space
+    const requested = currentStep.tooltipPosition || 'bottom';
+    const spaceAbove = targetRect.top - safeTop;
+    const spaceBelow = vh - targetRect.bottom - safeBottom;
+    let placeBelow: boolean;
+    if (requested === 'top') {
+      placeBelow = spaceAbove < estTooltipH && spaceBelow > spaceAbove;
+    } else {
+      placeBelow = spaceBelow >= estTooltipH || spaceBelow >= spaceAbove;
+    }
 
-    switch (pos) {
-      case 'top':
-        return {
-          bottom: `${window.innerHeight - targetRect.top + margin}px`,
-          left: `${Math.max(16, Math.min(targetRect.left + targetRect.width / 2 - 160, window.innerWidth - 336))}px`,
-          width: '320px',
-        };
-      case 'bottom':
-        return {
-          top: `${targetRect.bottom + margin}px`,
-          left: `${Math.max(16, Math.min(targetRect.left + targetRect.width / 2 - 160, window.innerWidth - 336))}px`,
-          width: '320px',
-        };
-      case 'left':
-        return {
-          top: `${targetRect.top}px`,
-          right: `${window.innerWidth - targetRect.left + margin}px`,
-          width: '280px',
-        };
-      case 'right':
-        return {
-          top: `${targetRect.top}px`,
-          left: `${targetRect.right + margin}px`,
-          width: '280px',
-        };
-      default:
-        return {
-          top: `${targetRect.bottom + margin}px`,
-          left: '50%',
-          transform: 'translateX(-50%)',
-          width: '320px',
-        };
+    // Horizontal: center on target, clamped to viewport
+    const left = Math.max(
+      12,
+      Math.min(
+        targetRect.left + targetRect.width / 2 - tooltipW / 2,
+        vw - tooltipW - 12,
+      ),
+    );
+
+    if (placeBelow) {
+      const top = Math.min(targetRect.bottom + margin, vh - estTooltipH - safeBottom);
+      return { top: `${Math.max(safeTop, top)}px`, left: `${left}px`, width: `${tooltipW}px`, maxHeight: `${vh - top - safeBottom}px`, overflowY: 'auto' };
+    } else {
+      const bottom = Math.max(safeBottom, vh - targetRect.top + margin);
+      return { bottom: `${bottom}px`, left: `${left}px`, width: `${tooltipW}px`, maxHeight: `${vh - bottom - safeTop}px`, overflowY: 'auto' };
     }
   };
 
@@ -331,69 +329,6 @@ export function TutorialOverlay({ onComplete, currentScreen, tutorialStepComplet
           </div>
         </div>
       )}
-
-      {/* Debug overlay */}
-      <DebugPanel
-        open={debugOpen}
-        onToggle={() => setDebugOpen(o => !o)}
-        phase={phase}
-        currentScreen={currentScreen}
-        spotlightIndex={spotlightIndex}
-        totalSteps={SPOTLIGHT_STEPS.length}
-        step={currentStep}
-        targetRect={targetRect}
-        lastAction={tutorialStepCompleted ?? null}
-      />
     </>
-  );
-}
-
-interface DebugPanelProps {
-  open: boolean;
-  onToggle: () => void;
-  phase: string;
-  currentScreen: string;
-  spotlightIndex: number;
-  totalSteps: number;
-  step: SpotlightStep | null;
-  targetRect: DOMRect | null;
-  lastAction: string | null;
-}
-
-function DebugPanel({ open, onToggle, phase, currentScreen, spotlightIndex, totalSteps, step, targetRect, lastAction }: DebugPanelProps) {
-  const selector = step ? `[data-tutorial-id="${step.targetId}"]` : '—';
-  const elExists = step ? !!document.querySelector(selector) : false;
-  const rectStr = targetRect
-    ? `x:${Math.round(targetRect.left)} y:${Math.round(targetRect.top)} w:${Math.round(targetRect.width)} h:${Math.round(targetRect.height)}`
-    : 'null';
-
-  return (
-    <div className="fixed bottom-2 left-2 z-[110] pointer-events-auto font-mono text-[10px]">
-      <button
-        onClick={onToggle}
-        className="bg-black/80 text-green-400 border border-green-500/60 rounded px-2 py-1 mb-1 block"
-      >
-        {open ? '🐛 hide debug' : '🐛 show debug'}
-      </button>
-      {open && (
-        <div className="bg-black/85 text-green-300 border border-green-500/40 rounded p-2 max-w-[280px] space-y-0.5 leading-tight">
-          <div><span className="text-green-500">phase:</span> {phase}</div>
-          <div><span className="text-green-500">screen:</span> {currentScreen}</div>
-          <div><span className="text-green-500">step:</span> {spotlightIndex + 1}/{totalSteps} {step ? `(${step.id})` : ''}</div>
-          <div><span className="text-green-500">selector:</span> {selector}</div>
-          <div>
-            <span className="text-green-500">element:</span>{' '}
-            <span className={elExists ? 'text-green-300' : 'text-red-400'}>
-              {elExists ? 'FOUND' : 'NOT FOUND'}
-            </span>
-          </div>
-          <div><span className="text-green-500">rect:</span> {rectStr}</div>
-          <div><span className="text-green-500">required:</span> {step?.requiredAction ?? '—'}</div>
-          <div><span className="text-green-500">lastAction:</span> {lastAction ?? '—'}</div>
-          <div><span className="text-green-500">navigateTo:</span> {step?.navigateTo ?? '—'}</div>
-          <div><span className="text-green-500">tooltipPos:</span> {step?.tooltipPosition ?? 'bottom'}</div>
-        </div>
-      )}
-    </div>
   );
 }

@@ -18,7 +18,7 @@ export interface SpotlightStep {
   descEn: string;
   descIt: string;
   icon: string;
-  requiredAction?: 'navigate_office' | 'buy_vehicle' | 'navigate_garage' | 'select_vehicle' | 'repair_part' | 'list_for_sale' | 'navigate_shop' | 'navigate_collection' | 'acknowledge';
+  requiredAction?: 'navigate_office' | 'buy_vehicle' | 'navigate_garage' | 'select_vehicle' | 'repair_part' | 'list_for_sale' | 'navigate_shop' | 'navigate_collection' | 'acknowledge' | 'click_target';
   tooltipPosition?: 'top' | 'bottom' | 'left' | 'right';
   navigateTo?: string; // screen to navigate to before showing this step
   rewardCoins?: number;
@@ -82,9 +82,31 @@ export const SPOTLIGHT_STEPS: SpotlightStep[] = [
     titleIt: 'Sfoglia e Compra',
     descEn: 'Open the newspaper ads and buy your first vehicle! Look for one within your budget.',
     descIt: 'Apri gli annunci del giornale e compra il tuo primo veicolo! Cercane uno nel tuo budget.',
-    requiredAction: 'buy_vehicle',
+    requiredAction: 'click_target',
     tooltipPosition: 'bottom',
     navigateTo: 'office',
+  },
+  {
+    id: 'step_select_listing',
+    targetId: 'tutorial-vehicle-listing',
+    icon: '🚙',
+    titleEn: 'Pick a Vehicle',
+    titleIt: 'Scegli un Veicolo',
+    descEn: 'Tap on a vehicle listing to see its details and price.',
+    descIt: 'Tocca un annuncio per vederne dettagli e prezzo.',
+    requiredAction: 'click_target',
+    tooltipPosition: 'bottom',
+  },
+  {
+    id: 'step_buy_now',
+    targetId: 'tutorial-buy-now-btn',
+    icon: '💰',
+    titleEn: 'Buy It Now',
+    titleIt: 'Comprala Ora',
+    descEn: 'Hit "Buy Now" to add this vehicle to your garage!',
+    descIt: 'Premi "Compra ora" per aggiungere il veicolo al tuo garage!',
+    requiredAction: 'buy_vehicle',
+    tooltipPosition: 'top',
   },
   {
     id: 'step_go_garage',
@@ -120,6 +142,17 @@ export const SPOTLIGHT_STEPS: SpotlightStep[] = [
     descIt: 'Scegli una parte danneggiata e riparala! Usa Riparazione Pro (garantita) o Fai da Te (più economico ma può fallire).',
     requiredAction: 'repair_part',
     tooltipPosition: 'top',
+  },
+  {
+    id: 'step_back_to_garage',
+    targetId: 'tutorial-repair-back',
+    icon: '↩️',
+    titleEn: 'Back to Garage',
+    titleIt: 'Torna al Garage',
+    descEn: 'Tap the back arrow to return to your garage.',
+    descIt: 'Tocca la freccia indietro per tornare al tuo garage.',
+    requiredAction: 'click_target',
+    tooltipPosition: 'bottom',
   },
   {
     id: 'step_shop',
