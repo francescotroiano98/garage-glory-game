@@ -181,45 +181,44 @@ export function TutorialOverlay({ onComplete, currentScreen, tutorialStepComplet
 
   // Calculate tooltip position
   const getTooltipStyle = (): React.CSSProperties => {
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    const tooltipW = Math.min(320, vw - 24);
+    const estTooltipH = 200; // rough estimate; auto-adjusted by clamp
+    const margin = 12;
+    const safeTop = 8;
+    const safeBottom = 8;
+
     if (!targetRect) {
       return { top: '50%', left: '50%', transform: 'translate(-50%, -50%)' };
     }
 
-    const pos = currentStep.tooltipPosition || 'bottom';
-    const margin = 16;
+    // Pick best vertical placement: prefer requested side, but flip if not enough space
+    const requested = currentStep.tooltipPosition || 'bottom';
+    const spaceAbove = targetRect.top - safeTop;
+    const spaceBelow = vh - targetRect.bottom - safeBottom;
+    let placeBelow: boolean;
+    if (requested === 'top') {
+      placeBelow = spaceAbove < estTooltipH && spaceBelow > spaceAbove;
+    } else {
+      placeBelow = spaceBelow >= estTooltipH || spaceBelow >= spaceAbove;
+    }
 
-    switch (pos) {
-      case 'top':
-        return {
-          bottom: `${window.innerHeight - targetRect.top + margin}px`,
-          left: `${Math.max(16, Math.min(targetRect.left + targetRect.width / 2 - 160, window.innerWidth - 336))}px`,
-          width: '320px',
-        };
-      case 'bottom':
-        return {
-          top: `${targetRect.bottom + margin}px`,
-          left: `${Math.max(16, Math.min(targetRect.left + targetRect.width / 2 - 160, window.innerWidth - 336))}px`,
-          width: '320px',
-        };
-      case 'left':
-        return {
-          top: `${targetRect.top}px`,
-          right: `${window.innerWidth - targetRect.left + margin}px`,
-          width: '280px',
-        };
-      case 'right':
-        return {
-          top: `${targetRect.top}px`,
-          left: `${targetRect.right + margin}px`,
-          width: '280px',
-        };
-      default:
-        return {
-          top: `${targetRect.bottom + margin}px`,
-          left: '50%',
-          transform: 'translateX(-50%)',
-          width: '320px',
-        };
+    // Horizontal: center on target, clamped to viewport
+    const left = Math.max(
+      12,
+      Math.min(
+        targetRect.left + targetRect.width / 2 - tooltipW / 2,
+        vw - tooltipW - 12,
+      ),
+    );
+
+    if (placeBelow) {
+      const top = Math.min(targetRect.bottom + margin, vh - estTooltipH - safeBottom);
+      return { top: `${Math.max(safeTop, top)}px`, left: `${left}px`, width: `${tooltipW}px`, maxHeight: `${vh - top - safeBottom}px`, overflowY: 'auto' };
+    } else {
+      const bottom = Math.max(safeBottom, vh - targetRect.top + margin);
+      return { bottom: `${bottom}px`, left: `${left}px`, width: `${tooltipW}px`, maxHeight: `${vh - bottom - safeTop}px`, overflowY: 'auto' };
     }
   };
 
