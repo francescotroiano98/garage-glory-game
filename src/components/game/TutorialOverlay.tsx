@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
-import { INTRO_SLIDES, SPOTLIGHT_STEPS, SpotlightStep } from '@/data/tutorial';
+import { INTRO_SLIDES, SPOTLIGHT_STEPS } from '@/data/tutorial';
 import { ChevronRight, X, Coins, CheckCircle2 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 
@@ -18,7 +18,6 @@ export function TutorialOverlay({ onComplete, currentScreen, tutorialStepComplet
   const [targetRect, setTargetRect] = useState<DOMRect | null>(null);
   const [showReward, setShowReward] = useState<number | null>(null);
   const [animateIn, setAnimateIn] = useState(true);
-  const [debugOpen, setDebugOpen] = useState(true);
   const { language, t } = useLanguage();
   const observerRef = useRef<MutationObserver | null>(null);
 
