@@ -16,16 +16,25 @@ export function SettingsScreen() {
 
   const handleReset = () => {
     if (confirm(t.resetConfirm)) {
-      localStorage.removeItem('car_mechanic_save');
-      localStorage.removeItem('car_mechanic_save_v3');
-      localStorage.removeItem('car_mechanic_challenges');
-      localStorage.removeItem('car_mechanic_tutorial_done');
-      localStorage.removeItem('car_mechanic_welcome_done');
-      localStorage.removeItem('game_sound_muted');
-      localStorage.removeItem('game_music_playing');
-      localStorage.removeItem('game_sfx_volume');
-      localStorage.removeItem('game_music_volume');
-      localStorage.removeItem('game_player_name');
+      // Clear every game-related key (anything we own), so nothing
+      // (collection, garage, tutorial flags, etc.) survives the reset.
+      const keysToRemove: string[] = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (!key) continue;
+        if (
+          key.startsWith('car_mechanic_') ||
+          key.startsWith('game_') ||
+          key.startsWith('cardCollection') ||
+          key.startsWith('tutorial') ||
+          key.startsWith('welcome')
+        ) {
+          keysToRemove.push(key);
+        }
+      }
+      keysToRemove.forEach(k => localStorage.removeItem(k));
+      // Also clear sessionStorage just in case
+      try { sessionStorage.clear(); } catch {}
       window.location.reload();
     }
   };
