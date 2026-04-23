@@ -164,13 +164,15 @@ function GameContent() {
     return <WelcomeScreen onComplete={handleWelcomeComplete} />;
   }
 
-  if (selectedCarId) {
-    return (
-      <div className="h-[100svh] bg-background flex flex-col overflow-hidden">
-        <StatsBar onOpenSettings={() => { setSelectedCarId(null); setCurrentScreen('settings'); }} />
+  const isRepairView = !!selectedCarId;
+
+  return (
+    <div className="h-[100svh] bg-background flex flex-col overflow-hidden">
+      <StatsBar onOpenSettings={() => { setSelectedCarId(null); setCurrentScreen('settings'); }} />
+      {isRepairView ? (
         <div className="flex-1 min-h-0" data-tutorial-id="tutorial-repair-area">
           <RepairScreen
-            carId={selectedCarId}
+            carId={selectedCarId!}
             onBack={handleBackFromRepair}
             onNavigateToOffice={() => {
               setSelectedCarId(null);
@@ -178,41 +180,30 @@ function GameContent() {
             }}
           />
         </div>
-        {showTutorial && (
-          <TutorialOverlay
-            onComplete={handleTutorialComplete}
-            currentScreen="repair"
-            tutorialStepCompleted={tutorialAction}
-            onRequestNavigate={handleTutorialNavigate}
-          />
-        )}
-      </div>
-    );
-  }
-
-  return (
-    <div className="h-[100svh] bg-background flex flex-col overflow-hidden">
-      <StatsBar onOpenSettings={() => setCurrentScreen('settings')} />
-      <div className="flex-1 min-h-0">
-        {currentScreen === 'garage' && (
-          <GarageScreen
-            onNavigateToOffice={() => handleNavigate('office')}
-            onSelectCar={handleSelectCar}
-          />
-        )}
-        {currentScreen === 'office' && (
-          <OfficeScreen onCarBought={handleCarBought} />
-        )}
-        {currentScreen === 'shop' && <ShopScreen />}
-        {currentScreen === 'collection' && <CollectionScreen />}
-        {currentScreen === 'leaderboard' && <LeaderboardScreen />}
-        {currentScreen === 'settings' && <SettingsScreen />}
-      </div>
-      <BottomNav currentScreen={currentScreen} onNavigate={handleNavigate} />
+      ) : (
+        <>
+          <div className="flex-1 min-h-0">
+            {currentScreen === 'garage' && (
+              <GarageScreen
+                onNavigateToOffice={() => handleNavigate('office')}
+                onSelectCar={handleSelectCar}
+              />
+            )}
+            {currentScreen === 'office' && (
+              <OfficeScreen onCarBought={handleCarBought} />
+            )}
+            {currentScreen === 'shop' && <ShopScreen />}
+            {currentScreen === 'collection' && <CollectionScreen />}
+            {currentScreen === 'leaderboard' && <LeaderboardScreen />}
+            {currentScreen === 'settings' && <SettingsScreen />}
+          </div>
+          <BottomNav currentScreen={currentScreen} onNavigate={handleNavigate} />
+        </>
+      )}
       {showTutorial && (
         <TutorialOverlay
           onComplete={handleTutorialComplete}
-          currentScreen={currentScreen}
+          currentScreen={isRepairView ? 'repair' : currentScreen}
           tutorialStepCompleted={tutorialAction}
           onRequestNavigate={handleTutorialNavigate}
         />
