@@ -24,10 +24,8 @@ export function SettingsScreen() {
       // microtasks between this call and the actual reload.
       try {
         const noop = () => {};
-        // @ts-expect-error – intentional override until the page reloads
-        localStorage.setItem = noop;
-        // @ts-expect-error – intentional override until the page reloads
-        localStorage.removeItem = noop;
+        (localStorage as unknown as { setItem: typeof noop }).setItem = noop;
+        (localStorage as unknown as { removeItem: typeof noop }).removeItem = noop;
       } catch {}
       // Hard reload to a clean state
       window.location.replace(window.location.pathname + window.location.search);
