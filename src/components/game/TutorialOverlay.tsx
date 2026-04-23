@@ -66,6 +66,17 @@ export function TutorialOverlay({ onComplete, currentScreen, tutorialStepComplet
     }
   }, [tutorialStepCompleted]);
 
+  // For "click_target" steps, advance when the target element is clicked
+  useEffect(() => {
+    if (phase !== 'spotlight' || !currentStep) return;
+    if (currentStep.requiredAction !== 'click_target') return;
+    const el = document.querySelector(`[data-tutorial-id="${currentStep.targetId}"]`);
+    if (!el) return;
+    const handler = () => handleAdvanceSpotlight();
+    el.addEventListener('click', handler, { once: true });
+    return () => el.removeEventListener('click', handler);
+  }, [phase, spotlightIndex, currentStep, targetRect]);
+
   const handleAdvanceSpotlight = () => {
     const step = SPOTLIGHT_STEPS[spotlightIndex];
     if (step?.rewardCoins) {
@@ -156,17 +167,6 @@ export function TutorialOverlay({ onComplete, currentScreen, tutorialStepComplet
             </div>
           </div>
         </div>
-        <DebugPanel
-          open={debugOpen}
-          onToggle={() => setDebugOpen(o => !o)}
-          phase={phase}
-          currentScreen={currentScreen}
-          spotlightIndex={introIndex}
-          totalSteps={INTRO_SLIDES.length}
-          step={null}
-          targetRect={null}
-          lastAction={null}
-        />
       </div>
     );
   }
