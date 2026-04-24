@@ -225,35 +225,13 @@ export function TutorialOverlay({ onComplete, currentScreen, tutorialStepComplet
   return (
     <>
       {/* Overlay with cutout */}
-      <div className="fixed inset-0 z-[100] pointer-events-none">
-        <svg className="w-full h-full pointer-events-none">
-          <defs>
-            <mask id="tutorial-mask">
-              <rect x="0" y="0" width="100%" height="100%" fill="white" />
-              {targetRect && (
-                <rect
-                  x={targetRect.left - padding}
-                  y={targetRect.top - padding}
-                  width={targetRect.width + padding * 2}
-                  height={targetRect.height + padding * 2}
-                  rx="12"
-                  fill="black"
-                />
-              )}
-            </mask>
-          </defs>
-          <rect
-            x="0" y="0" width="100%" height="100%"
-            fill="rgba(0,0,0,0.75)"
-            mask="url(#tutorial-mask)"
-            className="pointer-events-none"
-          />
-        </svg>
+        {/* Overlay visivo (NON blocca click) */}
+        <div className="fixed inset-0 z-[100] bg-black/70 pointer-events-none" />
 
-        {/* Glowing border around target */}
+        {/* Glow target */}
         {targetRect && (
           <div
-            className="absolute border-2 border-primary rounded-xl pointer-events-none animate-pulse shadow-[0_0_20px_rgba(var(--primary),0.4)]"
+            className="fixed z-[101] border-2 border-primary rounded-xl pointer-events-none animate-pulse shadow-[0_0_20px_rgba(var(--primary),0.4)]"
             style={{
               top: targetRect.top - padding,
               left: targetRect.left - padding,
@@ -263,11 +241,10 @@ export function TutorialOverlay({ onComplete, currentScreen, tutorialStepComplet
           />
         )}
 
-        {/* For acknowledge steps, block clicks everywhere (user must use the Next button) */}
+        {/* SOLO per acknowledge: blocca click */}
         {isAcknowledge && (
-          <div className="absolute inset-0 pointer-events-auto" />
+          <div className="fixed inset-0 z-[102] pointer-events-auto" />
         )}
-      </div>
 
       {/* Tooltip */}
       <div
