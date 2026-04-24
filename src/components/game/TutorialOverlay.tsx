@@ -225,13 +225,13 @@ export function TutorialOverlay({ onComplete, currentScreen, tutorialStepComplet
   return (
     <>
       {/* Overlay with cutout */}
-        {/* Overlay visivo (NON blocca click) */}
+        {/* Overlay scuro (NON blocca click) */}
         <div className="fixed inset-0 z-[100] bg-black/70 pointer-events-none" />
 
-        {/* Glow target */}
+        {/* Highlight target */}
         {targetRect && (
           <div
-            className="fixed z-[101] border-2 border-primary rounded-xl pointer-events-none animate-pulse shadow-[0_0_20px_rgba(var(--primary),0.4)]"
+            className="fixed z-[101] border-2 border-primary rounded-xl pointer-events-none animate-pulse"
             style={{
               top: targetRect.top - padding,
               left: targetRect.left - padding,
@@ -241,9 +241,12 @@ export function TutorialOverlay({ onComplete, currentScreen, tutorialStepComplet
           />
         )}
 
-        {/* SOLO per acknowledge: blocca click */}
+        {/* SOLO per acknowledge */}
         {isAcknowledge && (
-          <div className="fixed inset-0 z-[102] pointer-events-auto" />
+          <div
+            className="fixed inset-0 z-[102]"
+            onClick={(e) => e.stopPropagation()}
+          />
         )}
 
       {/* Tooltip */}
