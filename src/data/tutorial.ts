@@ -130,7 +130,6 @@ export const SPOTLIGHT_STEPS: SpotlightStep[] = [
     descIt: 'Tocca il tuo veicolo per aprire la schermata di riparazione e vedere cosa va sistemato!',
     requiredAction: 'select_vehicle',
     tooltipPosition: 'bottom',
-    navigateTo: 'garage',
   },
   {
     id: 'step_repair',
