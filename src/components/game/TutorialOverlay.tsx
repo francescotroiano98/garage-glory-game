@@ -51,6 +51,9 @@ export function TutorialOverlay({ onComplete, currentScreen, tutorialStepComplet
   // Navigate to correct screen for step
   useEffect(() => {
     if (phase === 'spotlight' && currentStep?.navigateTo && onRequestNavigate) {
+      // Don't pull the user out of the repair view when the step just wants 'garage'
+      // (repair is reached from garage and is part of the same flow).
+      if (currentScreen === 'repair' && currentStep.navigateTo === 'garage') return;
       if (currentScreen !== currentStep.navigateTo) {
         onRequestNavigate(currentStep.navigateTo);
       }
