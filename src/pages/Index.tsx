@@ -170,7 +170,7 @@ function GameContent() {
     <div className="h-[100svh] bg-background flex flex-col overflow-hidden">
       <StatsBar onOpenSettings={() => { setSelectedCarId(null); setCurrentScreen('settings'); }} />
       {isRepairView ? (
-        <div className="flex-1 min-h-0" data-tutorial-id="tutorial-repair-area">
+        <div className="flex-1 min-h-0">
           <RepairScreen
             carId={selectedCarId!}
             onBack={handleBackFromRepair}
