@@ -1,4 +1,5 @@
 import { PartDamage } from '@/types/game';
+import { motion } from 'framer-motion';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
@@ -71,7 +72,12 @@ export function PartRepairCard({
 
   if (damage.repaired) {
     return (
-       <div className="flex items-center gap-3 p-3 bg-card/95 backdrop-blur-sm rounded-lg border-2 border-primary/50">
+       <motion.div
+         initial={{ scale: 0.96, opacity: 0 }}
+         animate={{ scale: 1, opacity: 1 }}
+         transition={{ type: 'spring', stiffness: 320, damping: 18 }}
+         className="flex items-center gap-3 p-3 bg-card/95 backdrop-blur-sm rounded-lg border-2 border-primary/50 shadow-glow-success/0 animate-bounce-success"
+       >
         <span className="text-xl">{partIcon}</span>
         <div className="flex-1">
           <span className="font-medium text-primary">
@@ -79,17 +85,17 @@ export function PartRepairCard({
           </span>
         </div>
         <Check className="w-5 h-5 text-primary" />
-      </div>
+      </motion.div>
     );
   }
 
   return (
     <div className={cn(
-      'flex flex-col gap-2 p-3 rounded-lg border-2 bg-card/95 backdrop-blur-sm',
-      isRepairing ? 'border-accent shadow-md' : 'border-border'
+      'flex flex-col gap-2 p-3 rounded-lg border-2 bg-card/95 backdrop-blur-sm transition-shadow',
+      isRepairing ? 'border-accent shadow-industrial-lg' : 'border-border shadow-industrial'
     )}>
       <div className="flex items-center gap-3">
-        <span className="text-2xl">{partIcon}</span>
+        <span className={cn("text-2xl inline-block", isRepairing && "animate-wrench-spin origin-center")}>{partIcon}</span>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
             <span className="font-semibold truncate">
