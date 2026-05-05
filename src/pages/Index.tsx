@@ -14,6 +14,7 @@ import { LeaderboardScreen } from '@/components/game/screens/LeaderboardScreen';
 import { WelcomeScreen } from '@/components/game/screens/WelcomeScreen';
 import { TutorialOverlay } from '@/components/game/TutorialOverlay';
 import { useBackgroundMusic } from '@/hooks/useSound';
+import { ScreenTransition } from '@/components/ui/screen-transition';
 
 class GameErrorBoundary extends Component<{ children: ReactNode }, { hasError: boolean }> {
   constructor(props: { children: ReactNode }) {
@@ -171,31 +172,35 @@ function GameContent() {
       <StatsBar onOpenSettings={() => { setSelectedCarId(null); setCurrentScreen('settings'); }} />
       {isRepairView ? (
         <div className="flex-1 min-h-0">
-          <RepairScreen
-            carId={selectedCarId!}
-            onBack={handleBackFromRepair}
-            onNavigateToOffice={() => {
-              setSelectedCarId(null);
-              setCurrentScreen('office');
-            }}
-          />
+          <ScreenTransition screenKey={`repair-${selectedCarId}`} direction="depth">
+            <RepairScreen
+              carId={selectedCarId!}
+              onBack={handleBackFromRepair}
+              onNavigateToOffice={() => {
+                setSelectedCarId(null);
+                setCurrentScreen('office');
+              }}
+            />
+          </ScreenTransition>
         </div>
       ) : (
         <>
           <div className="flex-1 min-h-0">
-            {currentScreen === 'garage' && (
-              <GarageScreen
-                onNavigateToOffice={() => handleNavigate('office')}
-                onSelectCar={handleSelectCar}
-              />
-            )}
-            {currentScreen === 'office' && (
-              <OfficeScreen onCarBought={handleCarBought} />
-            )}
-            {currentScreen === 'shop' && <ShopScreen />}
-            {currentScreen === 'collection' && <CollectionScreen />}
-            {currentScreen === 'leaderboard' && <LeaderboardScreen />}
-            {currentScreen === 'settings' && <SettingsScreen />}
+            <ScreenTransition screenKey={currentScreen} direction="depth">
+              {currentScreen === 'garage' && (
+                <GarageScreen
+                  onNavigateToOffice={() => handleNavigate('office')}
+                  onSelectCar={handleSelectCar}
+                />
+              )}
+              {currentScreen === 'office' && (
+                <OfficeScreen onCarBought={handleCarBought} />
+              )}
+              {currentScreen === 'shop' && <ShopScreen />}
+              {currentScreen === 'collection' && <CollectionScreen />}
+              {currentScreen === 'leaderboard' && <LeaderboardScreen />}
+              {currentScreen === 'settings' && <SettingsScreen />}
+            </ScreenTransition>
           </div>
           <BottomNav currentScreen={currentScreen} onNavigate={handleNavigate} />
         </>

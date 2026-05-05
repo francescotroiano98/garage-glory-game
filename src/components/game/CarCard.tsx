@@ -5,6 +5,7 @@ import { cn } from '@/lib/utils';
 import { CheckCircle } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { CATEGORY_DISPLAY_NAMES, VEHICLE_NAME_IT } from '@/utils/partTranslations';
+import { motion } from 'framer-motion';
 
 interface CarCardProps {
   car: Car;
@@ -58,10 +59,14 @@ export function CarCard({
   const categoryName = CATEGORY_DISPLAY_NAMES[language]?.[car.category] || car.category;
 
   return (
+    <motion.div
+      whileTap={onClick ? { scale: 0.97 } : undefined}
+      transition={{ type: 'spring', stiffness: 380, damping: 24 }}
+    >
     <Card
       className={cn(
-        'relative border-2 bg-card/95 backdrop-blur-sm',
-        onClick && 'cursor-pointer active:scale-[0.99]',
+        'relative border-2 bg-card/95 backdrop-blur-sm shadow-industrial transition-shadow',
+        onClick && 'cursor-pointer hover:shadow-industrial-lg',
         compact ? 'p-2' : ''
       )}
       onClick={onClick}
@@ -122,5 +127,6 @@ export function CarCard({
         </div>
       </CardContent>
     </Card>
+    </motion.div>
   );
 }

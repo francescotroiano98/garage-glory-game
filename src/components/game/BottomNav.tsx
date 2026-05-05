@@ -3,6 +3,8 @@ import { Home, Briefcase, ShoppingBag, Trophy, Album } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useGame } from '@/contexts/GameContext';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useHaptics } from '@/hooks/useHaptics';
+import { motion } from 'framer-motion';
 
 type Screen = 'garage' | 'office' | 'collection' | 'shop' | 'leaderboard' | 'settings';
 
@@ -14,6 +16,7 @@ interface BottomNavProps {
 export function BottomNav({ currentScreen, onNavigate }: BottomNavProps) {
   const { state } = useGame();
   const { t } = useLanguage();
+  const { trigger } = useHaptics();
   
   const pendingCalls = state.activeSales.filter(s => s.customer).length;
 
@@ -26,17 +29,19 @@ export function BottomNav({ currentScreen, onNavigate }: BottomNavProps) {
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-card border-t border-border z-50">
+    <nav className="fixed bottom-0 left-0 right-0 bg-card/95 backdrop-blur-md border-t-2 border-border z-50 shadow-industrial-lg">
       <div className="flex items-center justify-around py-2 px-2 max-w-md mx-auto">
         {navItems.map((item) => (
-          <button
+          <motion.button
             key={item.id}
             data-tutorial-id={`tutorial-nav-${item.id}`}
-            onClick={() => onNavigate(item.id)}
+            onClick={() => { trigger('selection'); onNavigate(item.id); }}
+            whileTap={{ scale: 0.88 }}
+            transition={{ type: 'spring', stiffness: 500, damping: 22 }}
             className={cn(
-              'flex flex-col items-center gap-0.5 px-2 py-2 rounded-lg transition-colors min-w-12 relative',
+              'flex flex-col items-center gap-0.5 px-2 py-2 rounded-lg transition-colors min-w-12 relative touch-manipulation',
               currentScreen === item.id
-                ? 'bg-primary/10 text-primary'
+                ? 'bg-primary/15 text-primary shadow-industrial'
                 : 'text-muted-foreground hover:text-foreground hover:bg-accent'
             )}
           >
@@ -47,7 +52,7 @@ export function BottomNav({ currentScreen, onNavigate }: BottomNavProps) {
                 {item.badge}
               </span>
             )}
-          </button>
+          </motion.button>
         ))}
       </div>
     </nav>

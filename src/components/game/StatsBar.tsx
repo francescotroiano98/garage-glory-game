@@ -13,6 +13,10 @@ import { useSound } from '@/hooks/useSound';
 import { useAdMob } from '@/hooks/useAdMob';
 import { DailyChallengesDialog } from './DailyChallengesDialog';
 import { toast } from 'sonner';
+import { AnimatedCounter } from '@/components/ui/animated-counter';
+import { useRef } from 'react';
+import { cn } from '@/lib/utils';
+import { useHaptics } from '@/hooks/useHaptics';
 
 const AD_ENERGY_REWARD = 50;
 const AD_WATCH_DURATION = 5000; // 5 seconds simulated ad (web fallback)
@@ -124,6 +128,23 @@ export function StatsBar({ onOpenSettings }: { onOpenSettings?: () => void }) {
   const showAdButton = state.energy < 100 || !canCollectEnergyBonus();
   const adCooldown = getAdCooldownRemaining();
 
+  // Bounce + glow when money increases (sale reward)
+  const prevMoneyRef = useRef(state.money);
+  const [moneyPulse, setMoneyPulse] = useState(false);
+  const { trigger: hapticTrigger } = useHaptics();
+  useEffect(() => {
+    const delta = state.money - prevMoneyRef.current;
+    if (delta > 0) {
+      setMoneyPulse(true);
+      // Strong haptic only on big rewards (sales)
+      if (delta >= 500) hapticTrigger('success');
+      const t = setTimeout(() => setMoneyPulse(false), 600);
+      return () => clearTimeout(t);
+    }
+    prevMoneyRef.current = state.money;
+  }, [state.money]);
+  useEffect(() => { prevMoneyRef.current = state.money; }, [state.money]);
+
   return (
     <>
       <div data-tutorial-id="tutorial-stats-bar" className="flex flex-col gap-1.5 bg-card/95 backdrop-blur-sm border-b-2 border-border p-3 sticky top-0 z-50 shrink-0">
@@ -161,9 +182,12 @@ export function StatsBar({ onOpenSettings }: { onOpenSettings?: () => void }) {
           {/* Left side: Money & Energy in column */}
           <div className="flex flex-col gap-1.5">
             {/* Money */}
-            <div className="flex items-center gap-1.5 bg-primary/15 px-2.5 py-1 rounded-lg border border-primary/30">
+            <div className={cn(
+              "flex items-center gap-1.5 bg-primary/15 px-2.5 py-1 rounded-lg border border-primary/30 transition-shadow",
+              moneyPulse && "animate-bounce-success shadow-glow-success"
+            )}>
               {currency === 'EUR' ? <Euro className="w-4 h-4 text-primary" /> : currency === 'GBP' ? <PoundSterling className="w-4 h-4 text-primary" /> : <DollarSign className="w-4 h-4 text-primary" />}
-              <span className="font-bold text-sm text-primary min-w-[60px]">{formatMoney(state.money)}</span>
+              <AnimatedCounter value={state.money} className="font-bold text-sm text-primary min-w-[60px]" />
             </div>          
           </div>
 

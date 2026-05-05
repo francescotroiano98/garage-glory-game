@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { Slider } from '@/components/ui/slider';
 import { Car as CarIcon, Wrench, Loader2, DollarSign, Tag, Briefcase } from 'lucide-react';
 import garageBg from '@/assets/garage-bg.jpg';
+import { AnimatePresence, motion } from 'framer-motion';
 
 interface GarageScreenProps {
   onNavigateToOffice: () => void;
@@ -89,6 +90,7 @@ export function GarageScreen({ onNavigateToOffice, onSelectCar }: GarageScreenPr
             </div>
           ) : (
             <div className="space-y-3">
+              <AnimatePresence initial={false} mode="popLayout">
               {carsInGarage.map((car) => {
                 const hasDamages = car.damages.some(d => !d.repaired);
                 const allRepaired = !hasDamages;
@@ -114,7 +116,15 @@ export function GarageScreen({ onNavigateToOffice, onSelectCar }: GarageScreenPr
                 ) : null;
 
                 return (
-                  <div key={car.id} data-tutorial-id="tutorial-car-card">
+                  <motion.div
+                    key={car.id}
+                    layout
+                    data-tutorial-id="tutorial-car-card"
+                    initial={{ opacity: 0, y: 16, scale: 0.98 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, x: 80, scale: 0.9, transition: { duration: 0.45, ease: [0.4, 0, 0.2, 1] } }}
+                    transition={{ type: 'spring', stiffness: 280, damping: 26 }}
+                  >
                     <CarCard
                       car={car}
                       onClick={() => onSelectCar(car.id)}
@@ -122,9 +132,10 @@ export function GarageScreen({ onNavigateToOffice, onSelectCar }: GarageScreenPr
                       actionButton={actionButton}
                       topBadge={topBadge}
                     />
-                  </div>
+                  </motion.div>
                 );
               })}
+              </AnimatePresence>
               
               {Array.from({ length: emptySlots }).map((_, i) => (
                 <div
