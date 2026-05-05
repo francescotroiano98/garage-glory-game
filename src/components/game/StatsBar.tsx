@@ -15,6 +15,7 @@ import { DailyChallengesDialog } from './DailyChallengesDialog';
 import { toast } from 'sonner';
 import { AnimatedCounter } from '@/components/ui/animated-counter';
 import { useRef } from 'react';
+import { cn } from '@/lib/utils';
 
 const AD_ENERGY_REWARD = 50;
 const AD_WATCH_DURATION = 5000; // 5 seconds simulated ad (web fallback)
