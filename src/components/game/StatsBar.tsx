@@ -16,6 +16,7 @@ import { toast } from 'sonner';
 import { AnimatedCounter } from '@/components/ui/animated-counter';
 import { useRef } from 'react';
 import { cn } from '@/lib/utils';
+import { useHaptics } from '@/hooks/useHaptics';
 
 const AD_ENERGY_REWARD = 50;
 const AD_WATCH_DURATION = 5000; // 5 seconds simulated ad (web fallback)
@@ -130,9 +131,13 @@ export function StatsBar({ onOpenSettings }: { onOpenSettings?: () => void }) {
   // Bounce + glow when money increases (sale reward)
   const prevMoneyRef = useRef(state.money);
   const [moneyPulse, setMoneyPulse] = useState(false);
+  const { trigger: hapticTrigger } = useHaptics();
   useEffect(() => {
-    if (state.money > prevMoneyRef.current) {
+    const delta = state.money - prevMoneyRef.current;
+    if (delta > 0) {
       setMoneyPulse(true);
+      // Strong haptic only on big rewards (sales)
+      if (delta >= 500) hapticTrigger('success');
       const t = setTimeout(() => setMoneyPulse(false), 600);
       return () => clearTimeout(t);
     }
