@@ -48,10 +48,10 @@ export function GarageScreen({ onNavigateToOffice, onSelectCar }: GarageScreenPr
   const handleListForSale = () => {
     if (!sellCar) return;
     const totalInv = (sellCar.purchasePrice || sellCar.askingPrice) + (sellCar.totalRepairCost || 0);
-    if (sellPrice < totalInv) {
-      // warn but allow — shake to signal loss
+    if (sellPrice < totalInv * 0.7) {
+      // hard guard against catastrophic loss — shake & block
       setShakeDialog(true);
-      trigger('warning');
+      trigger('error');
       setTimeout(() => setShakeDialog(false), 450);
       return;
     }
