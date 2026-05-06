@@ -203,7 +203,6 @@
   /* Error shake helper (used on invalid actions) */
   .anim-shake { animation: shake-x 0.4s ease-in-out; }
 }
-}
 
 /* Custom scrollbar for retro feel */
 ::-webkit-scrollbar {
