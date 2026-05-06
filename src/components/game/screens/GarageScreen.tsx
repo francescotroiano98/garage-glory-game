@@ -9,6 +9,8 @@ import { Slider } from '@/components/ui/slider';
 import { Car as CarIcon, Wrench, Loader2, DollarSign, Tag, Briefcase } from 'lucide-react';
 import garageBg from '@/assets/garage-bg.jpg';
 import { AnimatePresence, motion } from 'framer-motion';
+import { ConfettiBurst } from '@/components/ui/confetti-burst';
+import { useHaptics } from '@/hooks/useHaptics';
 
 interface GarageScreenProps {
   onNavigateToOffice: () => void;
@@ -24,6 +26,9 @@ export function GarageScreen({ onNavigateToOffice, onSelectCar }: GarageScreenPr
   const [showSellDialog, setShowSellDialog] = useState(false);
   const [sellCarId, setSellCarId] = useState<string | null>(null);
   const [sellPrice, setSellPrice] = useState(0);
+  const [confetti, setConfetti] = useState(false);
+  const [shakeDialog, setShakeDialog] = useState(false);
+  const { trigger } = useHaptics();
 
   const sellCar = sellCarId ? carsInGarage.find(c => c.id === sellCarId) : null;
   const sellTotalInvestment = sellCar ? (sellCar.purchasePrice || sellCar.askingPrice) + (sellCar.totalRepairCost || 0) : 0;
@@ -42,7 +47,17 @@ export function GarageScreen({ onNavigateToOffice, onSelectCar }: GarageScreenPr
 
   const handleListForSale = () => {
     if (!sellCar) return;
+    const totalInv = (sellCar.purchasePrice || sellCar.askingPrice) + (sellCar.totalRepairCost || 0);
+    if (sellPrice < totalInv * 0.7) {
+      // hard guard against catastrophic loss — shake & block
+      setShakeDialog(true);
+      trigger('error');
+      setTimeout(() => setShakeDialog(false), 450);
+      return;
+    }
     dispatch({ type: 'LIST_CAR_FOR_SALE', payload: { carId: sellCar.id, askingPrice: sellPrice } });
+    trigger('success');
+    setConfetti(true);
     setShowSellDialog(false);
     setSellCarId(null);
   };
@@ -53,7 +68,7 @@ export function GarageScreen({ onNavigateToOffice, onSelectCar }: GarageScreenPr
       <div className="fixed inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${garageBg})` }} />
       
       <div className="relative z-10 flex flex-col h-full">
-        <div className="p-4 py-5 border-b-2 border-border bg-card/95 backdrop-blur-sm shrink-0 sticky top-0 z-20">
+        <div className="relative p-4 py-5 border-b-2 border-border bg-card/95 backdrop-blur-sm shrink-0 sticky top-0 z-20 texture-grain brushed-metal">
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-2xl font-bold flex items-center gap-2">
@@ -152,7 +167,7 @@ export function GarageScreen({ onNavigateToOffice, onSelectCar }: GarageScreenPr
     </div>
 
     <Dialog open={showSellDialog} onOpenChange={setShowSellDialog}>
-      <DialogContent className="max-w-[calc(100vw-2rem)] sm:max-w-sm p-4">
+      <DialogContent className={`max-w-[calc(100vw-2rem)] sm:max-w-sm p-4 ${shakeDialog ? 'anim-shake' : ''}`}>
         <DialogHeader>
           <DialogTitle>{t.listForSale} {sellCar?.name}</DialogTitle>
         </DialogHeader>
@@ -200,6 +215,7 @@ export function GarageScreen({ onNavigateToOffice, onSelectCar }: GarageScreenPr
         </DialogFooter>
       </DialogContent>
     </Dialog>
+    {confetti && <ConfettiBurst onDone={() => setConfetti(false)} />}
     </>
   );
 }
