@@ -68,7 +68,7 @@ export function GarageScreen({ onNavigateToOffice, onSelectCar }: GarageScreenPr
       <div className="fixed inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${garageBg})` }} />
       
       <div className="relative z-10 flex flex-col h-full">
-        <div className="p-4 py-5 border-b-2 border-border bg-card/95 backdrop-blur-sm shrink-0 sticky top-0 z-20">
+        <div className="relative p-4 py-5 border-b-2 border-border bg-card/95 backdrop-blur-sm shrink-0 sticky top-0 z-20 texture-grain brushed-metal">
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-2xl font-bold flex items-center gap-2">
