@@ -167,7 +167,7 @@ export function GarageScreen({ onNavigateToOffice, onSelectCar }: GarageScreenPr
     </div>
 
     <Dialog open={showSellDialog} onOpenChange={setShowSellDialog}>
-      <DialogContent className="max-w-[calc(100vw-2rem)] sm:max-w-sm p-4">
+      <DialogContent className={`max-w-[calc(100vw-2rem)] sm:max-w-sm p-4 ${shakeDialog ? 'anim-shake' : ''}`}>
         <DialogHeader>
           <DialogTitle>{t.listForSale} {sellCar?.name}</DialogTitle>
         </DialogHeader>
