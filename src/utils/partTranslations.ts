@@ -143,6 +143,52 @@ export const VEHICLE_NAME_IT: Record<string, string> = {
   'Day Cab': 'Cabina Giornaliera', 'Regional Hauler': 'Trasportatore Regionale', 'Light Semi': 'Semirimorchio Leggero',
   'Long Hauler': 'Trasportatore Lungo Raggio', 'Cross Country': 'Attraversa Paesi',
   'Heavy Duty': 'Mezzo Pesante', 'Titan Hauler': 'Trasportatore Titano', 'Road Beast': 'Bestia della Strada',
+
+  // === Expansion pack — Cars ===
+  'Scrapyard Special': 'Speciale Sfasciacarrozze', 'Forgotten Wreck': 'Relitto Dimenticato',
+  'Backyard Project': 'Progetto da Cortile', 'Smoky Commuter': 'Pendolare Fumante',
+  'Thrifty Hatch': 'Utilitaria Risparmiosa', 'Daily Driver': 'Auto Quotidiana',
+  'Pocket Rocket': 'Razzo Tascabile', 'Tiny Tourer': 'Piccola Turismo',
+  'Zippy Hatch': 'Utilitaria Scattante', 'Suburban Hatch': 'Utilitaria Suburbana',
+  'Executive Saloon': 'Berlina Dirigente', 'Heritage Sedan': 'Berlina Storica',
+  'Cargo Wagon': 'Familiare da Carico', 'Vintage Estate': 'Familiare d\'Epoca',
+  'Boulevard Coupe': 'Coupé da Boulevard', 'Twin-Turbo Coupe': 'Coupé Bi-Turbo',
+  'Trail Compact': 'Compatto da Sentiero', 'Weekend SUV': 'SUV del Weekend',
+  'Outback Cruiser': 'Cruiser Outback', 'Heritage SUV': 'SUV Storico',
+  'Frontier SUV': 'SUV Frontiera', 'Pioneer SUV': 'SUV Pioniere',
+  'Hybrid Crossover': 'Crossover Ibrido', 'Apex Crossover': 'Crossover Apex',
+  'Big Block Bruiser': 'Bruto Big Block', 'Detroit Iron': 'Ferro di Detroit',
+  'Apex Coupe': 'Coupé Apex', 'Canyon Carver': 'Scolpisci Canyon',
+  'Targa Master': 'Maestro Targa', 'Carbon Edition': 'Edizione Carbonio',
+  'Diplomat Sedan': 'Berlina Diplomatica', 'Chairman Edition': 'Edizione Presidenziale',
+  'Royal Tourer': 'Turismo Reale', 'Imperial Coupe': 'Coupé Imperiale',
+  'Crown Limousine': 'Limousine Corona', 'Sapphire Sedan': 'Berlina Zaffiro',
+  'Carbon Predator': 'Predatore in Carbonio', 'Silver Arrow': 'Freccia d\'Argento',
+  'Phantom Hyper': 'Phantom Hyper', 'Apex One-Off': 'Apex Esemplare Unico',
+
+  // === Expansion pack — Motorcycles ===
+  'Garage Find Vespa': 'Vespa Trovata in Garage', 'Sidecar Relic': 'Reliquia con Sidecar',
+  'Eco Scooter': 'Scooter Ecologico', 'Maxi Scooter': 'Maxi Scooter',
+  'Custom 125': 'Custom 125', 'Cruiser 125': 'Cruiser 125',
+  'Cafe Naked': 'Naked Café', 'Roadster Naked': 'Naked Roadster',
+  'Sport Tourer': 'Sport Turismo', 'Bagger': 'Bagger',
+  'Desert Adventure': 'Avventura nel Deserto', 'Big Bore Adventure': 'Avventura Maxi Cilindrata',
+  'Trail Enduro': 'Enduro da Trail', 'Hard Enduro': 'Hard Enduro',
+  'Track Day Special': 'Speciale Track Day', 'World SBK': 'World SBK',
+  'Brat Style': 'Stile Brat', 'Bobber Custom': 'Bobber Custom',
+  'Carbon Superbike': 'Superbike in Carbonio', 'MotoGP Replica': 'Replica MotoGP',
+
+  // === Expansion pack — Trucks ===
+  'Barn Find Pickup': 'Pickup Trovato in Fienile', 'Country Hauler': 'Trasportatore di Campagna',
+  'Off-road Pickup': 'Pickup Fuoristrada', 'Twin Cab Pickup': 'Pickup Doppia Cabina',
+  'Refrigerated Van': 'Furgone Refrigerato', 'Crew Van': 'Furgone Equipaggio',
+  'Express Delivery': 'Consegna Express', 'Last Mile Van': 'Furgone Ultimo Miglio',
+  'Dropside Flatbed': 'Pianale Ribaltabile', 'Crane Flatbed': 'Pianale con Gru',
+  'Refrigerated Box': 'Box Refrigerato', 'Tail-lift Box': 'Box con Sponda Idraulica',
+  'Flatbed Tow': 'Carro Attrezzi Pianale', 'Wheel Lift Tow': 'Carro Attrezzi Solleva-Ruote',
+  'Sleeper Cab': 'Cabina con Cuccetta', 'Urban Semi': 'Semirimorchio Urbano',
+  'Reefer Semi': 'Semirimorchio Frigo', 'Tanker Semi': 'Semirimorchio Cisterna',
+  'Logging Truck': 'Camion Trasporto Tronchi', 'Mining Hauler': 'Trasportatore Minerario',
 };
 
 // Challenge title/description translations
