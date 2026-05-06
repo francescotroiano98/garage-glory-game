@@ -9,6 +9,8 @@ import { Slider } from '@/components/ui/slider';
 import { Car as CarIcon, Wrench, Loader2, DollarSign, Tag, Briefcase } from 'lucide-react';
 import garageBg from '@/assets/garage-bg.jpg';
 import { AnimatePresence, motion } from 'framer-motion';
+import { ConfettiBurst } from '@/components/ui/confetti-burst';
+import { useHaptics } from '@/hooks/useHaptics';
 
 interface GarageScreenProps {
   onNavigateToOffice: () => void;
@@ -24,6 +26,9 @@ export function GarageScreen({ onNavigateToOffice, onSelectCar }: GarageScreenPr
   const [showSellDialog, setShowSellDialog] = useState(false);
   const [sellCarId, setSellCarId] = useState<string | null>(null);
   const [sellPrice, setSellPrice] = useState(0);
+  const [confetti, setConfetti] = useState(false);
+  const [shakeDialog, setShakeDialog] = useState(false);
+  const { trigger } = useHaptics();
 
   const sellCar = sellCarId ? carsInGarage.find(c => c.id === sellCarId) : null;
   const sellTotalInvestment = sellCar ? (sellCar.purchasePrice || sellCar.askingPrice) + (sellCar.totalRepairCost || 0) : 0;
@@ -42,7 +47,17 @@ export function GarageScreen({ onNavigateToOffice, onSelectCar }: GarageScreenPr
 
   const handleListForSale = () => {
     if (!sellCar) return;
+    const totalInv = (sellCar.purchasePrice || sellCar.askingPrice) + (sellCar.totalRepairCost || 0);
+    if (sellPrice < totalInv) {
+      // warn but allow — shake to signal loss
+      setShakeDialog(true);
+      trigger('warning');
+      setTimeout(() => setShakeDialog(false), 450);
+      return;
+    }
     dispatch({ type: 'LIST_CAR_FOR_SALE', payload: { carId: sellCar.id, askingPrice: sellPrice } });
+    trigger('success');
+    setConfetti(true);
     setShowSellDialog(false);
     setSellCarId(null);
   };
@@ -200,6 +215,7 @@ export function GarageScreen({ onNavigateToOffice, onSelectCar }: GarageScreenPr
         </DialogFooter>
       </DialogContent>
     </Dialog>
+    {confetti && <ConfettiBurst onDone={() => setConfetti(false)} />}
     </>
   );
 }
