@@ -156,6 +156,19 @@
   .vintage-glow {
     box-shadow: 0 0 20px hsl(var(--primary) / 0.3);
   }
+
+  /* Industrial hybrid utilities */
+  .bg-gradient-orange { background-image: var(--gradient-orange); }
+  .bg-gradient-blue { background-image: var(--gradient-blue); }
+  .bg-gradient-metal { background-image: var(--gradient-metal); }
+  .text-shadow-metal {
+    text-shadow: 0 1px 0 hsl(var(--metal-dark) / 0.45), 0 -1px 0 hsl(0 0% 100% / 0.15);
+  }
+  .metal-surface {
+    background-image: var(--gradient-metal);
+    border: 1px solid hsl(var(--metal-dark) / 0.35);
+    box-shadow: var(--shadow-md), inset 0 1px 0 hsl(0 0% 100% / 0.35);
+  }
 }
 
 /* Custom scrollbar for retro feel */
