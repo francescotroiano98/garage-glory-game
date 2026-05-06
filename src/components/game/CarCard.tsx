@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { Car } from '@/types/game';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -45,7 +46,7 @@ function getVehicleIcon(vehicleType?: string): string {
   return '🚗';
 }
 
-export function CarCard({
+function CarCardImpl({
   car, onClick, showPrice = true, showDamages = true,
   compact = false, actionButton, topBadge,
 }: CarCardProps) {
@@ -130,3 +131,16 @@ export function CarCard({
     </motion.div>
   );
 }
+
+export const CarCard = memo(CarCardImpl, (prev, next) => {
+  // Re-render only if visible props actually changed
+  return (
+    prev.car === next.car &&
+    prev.compact === next.compact &&
+    prev.showPrice === next.showPrice &&
+    prev.showDamages === next.showDamages &&
+    prev.actionButton === next.actionButton &&
+    prev.topBadge === next.topBadge &&
+    prev.onClick === next.onClick
+  );
+});
