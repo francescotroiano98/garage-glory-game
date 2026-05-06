@@ -127,6 +127,28 @@ export const TRUCK_TEMPLATES: Array<{ name: string; category: TruckCategory; bas
   { name: 'Heavy Duty', category: 'truck_heavy', baseValue: 55000 },
   { name: 'Titan Hauler', category: 'truck_heavy', baseValue: 60000 },
   { name: 'Road Beast', category: 'truck_heavy', baseValue: 50000 },
+
+  // === Expansion pack ===
+  { name: 'Barn Find Pickup', category: 'truck_old_pickup', baseValue: 280 },
+  { name: 'Country Hauler', category: 'truck_old_pickup', baseValue: 320 },
+  { name: 'Off-road Pickup', category: 'truck_pickup', baseValue: 1300 },
+  { name: 'Twin Cab Pickup', category: 'truck_pickup', baseValue: 1500 },
+  { name: 'Refrigerated Van', category: 'truck_van', baseValue: 2700 },
+  { name: 'Crew Van', category: 'truck_van', baseValue: 2900 },
+  { name: 'Express Delivery', category: 'truck_delivery', baseValue: 4200 },
+  { name: 'Last Mile Van', category: 'truck_delivery', baseValue: 4400 },
+  { name: 'Dropside Flatbed', category: 'truck_flatbed', baseValue: 6200 },
+  { name: 'Crane Flatbed', category: 'truck_flatbed', baseValue: 6700 },
+  { name: 'Refrigerated Box', category: 'truck_box', baseValue: 8200 },
+  { name: 'Tail-lift Box', category: 'truck_box', baseValue: 8700 },
+  { name: 'Flatbed Tow', category: 'truck_tow', baseValue: 12500 },
+  { name: 'Wheel Lift Tow', category: 'truck_tow', baseValue: 13500 },
+  { name: 'Sleeper Cab', category: 'truck_semi_light', baseValue: 21000 },
+  { name: 'Urban Semi', category: 'truck_semi_light', baseValue: 23000 },
+  { name: 'Reefer Semi', category: 'truck_semi', baseValue: 36000 },
+  { name: 'Tanker Semi', category: 'truck_semi', baseValue: 39000 },
+  { name: 'Logging Truck', category: 'truck_heavy', baseValue: 56000 },
+  { name: 'Mining Hauler', category: 'truck_heavy', baseValue: 65000 },
 ];
 
 // Get truck categories available at a given level

@@ -203,6 +203,68 @@ export const CAR_TEMPLATES: Array<{ name: string; category: CarCategory; baseVal
   { name: 'Hypercar', category: 'supercar', baseValue: 150000 },
   { name: 'Ultimate Machine', category: 'supercar', baseValue: 180000 },
   { name: 'Legend Edition', category: 'supercar', baseValue: 200000 },
+
+  // === Expansion pack (more variety per category) ===
+  // Junker
+  { name: 'Scrapyard Special', category: 'junker', baseValue: 260 },
+  { name: 'Forgotten Wreck', category: 'junker', baseValue: 320 },
+  // Beater
+  { name: 'Backyard Project', category: 'beater', baseValue: 520 },
+  { name: 'Smoky Commuter', category: 'beater', baseValue: 600 },
+  // Economy
+  { name: 'Thrifty Hatch', category: 'economy', baseValue: 880 },
+  { name: 'Daily Driver', category: 'economy', baseValue: 920 },
+  // Compact
+  { name: 'Pocket Rocket', category: 'compact', baseValue: 1150 },
+  { name: 'Tiny Tourer', category: 'compact', baseValue: 1080 },
+  // Hatchback
+  { name: 'Zippy Hatch', category: 'hatchback', baseValue: 1350 },
+  { name: 'Suburban Hatch', category: 'hatchback', baseValue: 1450 },
+  // Sedan
+  { name: 'Executive Saloon', category: 'sedan', baseValue: 2100 },
+  { name: 'Heritage Sedan', category: 'sedan', baseValue: 2300 },
+  // Wagon
+  { name: 'Cargo Wagon', category: 'wagon', baseValue: 2500 },
+  { name: 'Vintage Estate', category: 'wagon', baseValue: 2700 },
+  // Coupe
+  { name: 'Boulevard Coupe', category: 'coupe', baseValue: 3100 },
+  { name: 'Twin-Turbo Coupe', category: 'coupe', baseValue: 3700 },
+  // Suv small
+  { name: 'Trail Compact', category: 'suv_small', baseValue: 3700 },
+  { name: 'Weekend SUV', category: 'suv_small', baseValue: 3900 },
+  // Suv mid
+  { name: 'Outback Cruiser', category: 'suv_mid', baseValue: 4700 },
+  { name: 'Heritage SUV', category: 'suv_mid', baseValue: 4900 },
+  // Suv large
+  { name: 'Frontier SUV', category: 'suv_large', baseValue: 6200 },
+  { name: 'Pioneer SUV', category: 'suv_large', baseValue: 6800 },
+  // Crossover
+  { name: 'Hybrid Crossover', category: 'crossover', baseValue: 7800 },
+  { name: 'Apex Crossover', category: 'crossover', baseValue: 8200 },
+  // Muscle
+  { name: 'Big Block Bruiser', category: 'muscle', baseValue: 9200 },
+  { name: 'Detroit Iron', category: 'muscle', baseValue: 9700 },
+  // Sports
+  { name: 'Apex Coupe', category: 'sports', baseValue: 12500 },
+  { name: 'Canyon Carver', category: 'sports', baseValue: 13500 },
+  // Sports premium
+  { name: 'Targa Master', category: 'sports_premium', baseValue: 18500 },
+  { name: 'Carbon Edition', category: 'sports_premium', baseValue: 19500 },
+  // Luxury entry
+  { name: 'Diplomat Sedan', category: 'luxury_entry', baseValue: 26000 },
+  { name: 'Chairman Edition', category: 'luxury_entry', baseValue: 28500 },
+  // Luxury mid
+  { name: 'Royal Tourer', category: 'luxury_mid', baseValue: 36000 },
+  { name: 'Imperial Coupe', category: 'luxury_mid', baseValue: 39000 },
+  // Luxury full
+  { name: 'Crown Limousine', category: 'luxury_full', baseValue: 52000 },
+  { name: 'Sapphire Sedan', category: 'luxury_full', baseValue: 58000 },
+  // Exotic
+  { name: 'Carbon Predator', category: 'exotic', baseValue: 85000 },
+  { name: 'Silver Arrow', category: 'exotic', baseValue: 95000 },
+  // Supercar
+  { name: 'Phantom Hyper', category: 'supercar', baseValue: 170000 },
+  { name: 'Apex One-Off', category: 'supercar', baseValue: 220000 },
 ];
 
 // Parts by category for damage generation

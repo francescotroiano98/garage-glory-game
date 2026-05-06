@@ -127,6 +127,28 @@ export const MOTO_TEMPLATES: Array<{ name: string; category: MotorcycleCategory;
   { name: 'Hypersport', category: 'moto_superbike', baseValue: 30000 },
   { name: 'Ultimate Racer', category: 'moto_superbike', baseValue: 35000 },
   { name: 'Legend Bike', category: 'moto_superbike', baseValue: 40000 },
+
+  // === Expansion pack ===
+  { name: 'Garage Find Vespa', category: 'moto_old_scooter', baseValue: 140 },
+  { name: 'Sidecar Relic', category: 'moto_old_scooter', baseValue: 200 },
+  { name: 'Eco Scooter', category: 'moto_scooter', baseValue: 420 },
+  { name: 'Maxi Scooter', category: 'moto_scooter', baseValue: 500 },
+  { name: 'Custom 125', category: 'moto_125', baseValue: 780 },
+  { name: 'Cruiser 125', category: 'moto_125', baseValue: 820 },
+  { name: 'Cafe Naked', category: 'moto_naked', baseValue: 2100 },
+  { name: 'Roadster Naked', category: 'moto_naked', baseValue: 2400 },
+  { name: 'Sport Tourer', category: 'moto_touring', baseValue: 4300 },
+  { name: 'Bagger', category: 'moto_touring', baseValue: 4700 },
+  { name: 'Desert Adventure', category: 'moto_adventure', baseValue: 6800 },
+  { name: 'Big Bore Adventure', category: 'moto_adventure', baseValue: 7200 },
+  { name: 'Trail Enduro', category: 'moto_enduro', baseValue: 5200 },
+  { name: 'Hard Enduro', category: 'moto_enduro', baseValue: 5800 },
+  { name: 'Track Day Special', category: 'moto_supersport', baseValue: 15500 },
+  { name: 'World SBK', category: 'moto_supersport', baseValue: 17000 },
+  { name: 'Brat Style', category: 'moto_caferacer', baseValue: 12500 },
+  { name: 'Bobber Custom', category: 'moto_caferacer', baseValue: 13500 },
+  { name: 'Carbon Superbike', category: 'moto_superbike', baseValue: 32000 },
+  { name: 'MotoGP Replica', category: 'moto_superbike', baseValue: 45000 },
 ];
 
 // Get motorcycle categories available at a given level
