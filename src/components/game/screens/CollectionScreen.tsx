@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
-import { Album, Sparkles, Star, Filter, Coins, Package } from 'lucide-react';
+import { Album, Sparkles, Star, Filter, Coins, Package, Recycle } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useGame } from '@/contexts/GameContext';
 import { useSound } from '@/hooks/useSound';
@@ -7,12 +7,12 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { toast } from 'sonner';
 import {
   CollectionState, loadCollection, saveCollection,
   parseCardId, getCardName, getCollectionStats,
-  sellDuplicate, CARD_SELL_VALUES, CardRarity,
+  sellDuplicate, sellAllDuplicates, CARD_SELL_VALUES, CardRarity,
   ALL_CARD_CATEGORIES,
 } from '@/data/cards';
 import { CATEGORY_NAMES, VehicleCategory } from '@/types/game';
@@ -31,9 +31,9 @@ function getCardImage(category: VehicleCategory, variant: number): string | unde
 }
 
 const RARITY_STYLES: Record<CardRarity, string> = {
-  base: 'border-border bg-card',
-  reverse: 'border-blue-400 bg-gradient-to-br from-blue-500/10 to-purple-500/10 shadow-[0_0_12px_rgba(59,130,246,0.3)]',
-  gold: 'border-yellow-400 bg-gradient-to-br from-yellow-500/15 to-amber-500/15 shadow-[0_0_16px_rgba(234,179,8,0.4)]',
+  base: 'border-border bg-card card-sheen',
+  reverse: 'border-blue-400 bg-gradient-to-br from-blue-500/15 to-purple-500/15 card-holo card-sheen',
+  gold: 'border-yellow-400 bg-gradient-to-br from-yellow-500/20 to-amber-500/20 card-gold card-sheen',
 };
 
 const RARITY_LABEL: Record<CardRarity, string> = {
@@ -46,12 +46,13 @@ type FilterTab = 'all' | 'cars' | 'moto' | 'trucks';
 
 export function CollectionScreen() {
   const { t, language, formatMoney } = useLanguage();
-  const { dispatch } = useGame();
+  const { dispatch, updateChallengeProgress } = useGame();
   const { playSound } = useSound();
   const [collection, setCollection] = useState<CollectionState>(loadCollection);
   const [filter, setFilter] = useState<FilterTab>('all');
   const [rarityFilter, setRarityFilter] = useState<CardRarity | 'all'>('all');
   const [selectedCard, setSelectedCard] = useState<string | null>(null);
+  const [showSellAllConfirm, setShowSellAllConfirm] = useState(false);
 
   // Sync collection from localStorage on focus
   useEffect(() => {
@@ -103,8 +104,36 @@ export function CollectionScreen() {
     dispatch({ type: 'ADD_MONEY', payload: result.value });
     playSound('purchase');
     toast.success(`+${formatMoney(result.value)}`);
+    updateChallengeProgress('sell_card_duplicates', 1);
     setSelectedCard(null);
-  }, [collection, dispatch, playSound, formatMoney]);
+  }, [collection, dispatch, playSound, formatMoney, updateChallengeProgress]);
+
+  // Preview total earnings if user sells every duplicate at once
+  const sellAllPreview = useMemo(() => {
+    let value = 0;
+    let count = 0;
+    for (const [cardId, owned] of Object.entries(collection.ownedCards)) {
+      if (owned.quantity > 1) {
+        const extras = owned.quantity - 1;
+        const { rarity } = parseCardId(cardId);
+        value += CARD_SELL_VALUES[rarity] * extras;
+        count += extras;
+      }
+    }
+    return { value, count };
+  }, [collection]);
+
+  const handleSellAllDuplicates = useCallback(() => {
+    const result = sellAllDuplicates(collection);
+    if (result.count === 0) return;
+    setCollection(result.newState);
+    saveCollection(result.newState);
+    dispatch({ type: 'ADD_MONEY', payload: result.value });
+    playSound('purchase');
+    toast.success(`${language === 'it' ? 'Venduti' : 'Sold'} ${result.count} → +${formatMoney(result.value)}`);
+    updateChallengeProgress('sell_card_duplicates', result.count);
+    setShowSellAllConfirm(false);
+  }, [collection, dispatch, playSound, formatMoney, language, updateChallengeProgress]);
 
   const selectedCardData = selectedCard ? (() => {
     const { category, variant, rarity } = parseCardId(selectedCard);
@@ -121,9 +150,24 @@ export function CollectionScreen() {
             <Album className="w-5 h-5 text-primary" />
             <h1 className="text-lg font-bold">{t.collection}</h1>
           </div>
-          <Badge variant="outline" className="text-xs">
-            {stats.completionPercent}%
-          </Badge>
+          <div className="flex items-center gap-2">
+            <Badge variant="outline" className="text-xs">
+              {stats.completionPercent}%
+            </Badge>
+            <Button
+              size="sm"
+              variant="outline"
+              className="h-7 px-2 text-[10px]"
+              disabled={sellAllPreview.count === 0}
+              onClick={() => setShowSellAllConfirm(true)}
+            >
+              <Recycle className="w-3 h-3 mr-1" />
+              {language === 'it' ? 'Vendi doppioni' : 'Sell duplicates'}
+              {sellAllPreview.count > 0 && (
+                <span className="ml-1 text-primary font-bold">+{formatMoney(sellAllPreview.value)}</span>
+              )}
+            </Button>
+          </div>
         </div>
         <Progress value={stats.completionPercent} className="h-2" />
         <div className="flex gap-2 text-[10px] text-muted-foreground">
@@ -164,13 +208,15 @@ export function CollectionScreen() {
 
       {/* Scrollable card grid */}
       <div className="flex-1 min-h-0 overflow-y-auto px-3 pb-20">
-        <div className="grid grid-cols-3 gap-2">
+        <div className="binder-page rounded-xl p-3 grid grid-cols-3 gap-3">
           {allCards.map(card => (
             <button
               key={card.id}
               onClick={() => card.owned && setSelectedCard(card.id)}
-              className={`relative aspect-[3/4] rounded-lg border-2 overflow-hidden transition-all ${
-                card.owned ? RARITY_STYLES[card.rarity] + ' cursor-pointer active:scale-95' : 'border-border/30 bg-muted/30 opacity-40'
+              className={`relative aspect-[3/4] rounded-lg border-2 overflow-hidden ${
+                card.owned
+                  ? `${RARITY_STYLES[card.rarity]} card-3d cursor-pointer`
+                  : 'binder-slot border-dashed border-border/30 opacity-70'
               }`}
             >
               {card.owned ? (
@@ -178,38 +224,64 @@ export function CollectionScreen() {
                   <img
                     src={getCardImage(card.category, card.variant)}
                     alt={getCardName(card.category, card.variant)}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-cover relative z-[1]"
                   />
-                  {card.rarity === 'gold' && (
-                    <div className="absolute inset-0 bg-gradient-to-br from-yellow-400/20 to-transparent pointer-events-none" />
-                  )}
-                  {card.rarity === 'reverse' && (
-                    <div className="absolute inset-0 bg-gradient-to-br from-blue-400/15 to-purple-400/15 pointer-events-none" />
-                  )}
-                  <div className="absolute bottom-0 left-0 right-0 bg-black/60 px-1 py-0.5">
+                  <div className="absolute bottom-0 left-0 right-0 bg-black/70 px-1 py-0.5 z-[2]">
                     <span className="text-[8px] text-white font-medium truncate block">{CATEGORY_NAMES[card.category]}</span>
                   </div>
                   {card.quantity > 1 && (
-                    <span className="absolute top-0.5 right-0.5 bg-primary text-primary-foreground text-[8px] w-4 h-4 rounded-full flex items-center justify-center font-bold">
+                    <span className="absolute top-0.5 right-0.5 bg-primary text-primary-foreground text-[8px] w-4 h-4 rounded-full flex items-center justify-center font-bold z-[3] shadow">
                       {card.quantity}
                     </span>
                   )}
                   {card.rarity === 'gold' && (
-                    <Star className="absolute top-0.5 left-0.5 w-3 h-3 text-yellow-400 fill-yellow-400" />
+                    <Star className="absolute top-0.5 left-0.5 w-3 h-3 text-yellow-300 fill-yellow-400 z-[3] drop-shadow" />
                   )}
                   {card.rarity === 'reverse' && (
-                    <Sparkles className="absolute top-0.5 left-0.5 w-3 h-3 text-blue-400" />
+                    <Sparkles className="absolute top-0.5 left-0.5 w-3 h-3 text-blue-200 z-[3] drop-shadow" />
                   )}
                 </>
               ) : (
                 <div className="w-full h-full flex items-center justify-center">
-                  <span className="text-lg text-muted-foreground/30">?</span>
+                  <span className="text-lg text-muted-foreground/50">?</span>
                 </div>
               )}
             </button>
           ))}
         </div>
       </div>
+
+      {/* Sell-all duplicates confirmation */}
+      <Dialog open={showSellAllConfirm} onOpenChange={setShowSellAllConfirm}>
+        <DialogContent className="max-w-xs">
+          <DialogHeader>
+            <DialogTitle className="text-base flex items-center gap-2">
+              <Recycle className="w-4 h-4 text-primary" />
+              {language === 'it' ? 'Vendi tutti i doppioni?' : 'Sell all duplicates?'}
+            </DialogTitle>
+            <DialogDescription className="text-xs">
+              {language === 'it'
+                ? `Verranno venduti ${sellAllPreview.count} doppioni (1 copia di ogni carta resta nella collezione).`
+                : `${sellAllPreview.count} duplicate cards will be sold (1 copy of each card stays in your collection).`}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex items-center justify-between p-2 bg-secondary/40 rounded-md">
+            <span className="text-xs text-muted-foreground">
+              {language === 'it' ? 'Guadagno totale' : 'Total earnings'}
+            </span>
+            <span className="font-bold text-primary">{formatMoney(sellAllPreview.value)}</span>
+          </div>
+          <DialogFooter className="flex gap-2">
+            <Button variant="outline" size="sm" className="flex-1" onClick={() => setShowSellAllConfirm(false)}>
+              {language === 'it' ? 'Annulla' : 'Cancel'}
+            </Button>
+            <Button size="sm" className="flex-1" onClick={handleSellAllDuplicates}>
+              <Coins className="w-3 h-3 mr-1" />
+              {language === 'it' ? 'Vendi' : 'Sell'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Card detail dialog */}
       <Dialog open={!!selectedCard} onOpenChange={() => setSelectedCard(null)}>
