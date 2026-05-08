@@ -72,7 +72,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const updateProfile = async (data: { total_profit?: number; total_cars_sold?: number; level?: number }) => {
     if (!user) return;
-    await supabase.from('profiles').update(data).eq('user_id', user.id);
+    // Stats are validated server-side via the sync-profile edge function to prevent
+    // client-side tampering of leaderboard rankings.
+    await supabase.functions.invoke('sync-profile', {
+      body: {
+        total_profit: data.total_profit ?? 0,
+        total_cars_sold: data.total_cars_sold ?? 0,
+        level: data.level ?? 1,
+      },
+    });
   };
 
   return (
