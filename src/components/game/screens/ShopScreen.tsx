@@ -13,14 +13,9 @@ import { TOOL_UPGRADES, DIAGNOSTIC_UPGRADES, GARAGE_UPGRADES, ENERGY_UPGRADES, g
 import { PART_DEFINITIONS, PART_ICONS, CATEGORY_LABELS, getPartUpgradeCost } from '@/data/parts';
 import { PartType, PartCategory, MAX_LEVEL } from '@/types/game';
 import { PACK_TYPES, openPack, loadCollection, saveCollection, addCardsToCollection, CollectibleCard } from '@/data/cards';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { PackOpeningAnimation } from '@/components/game/PackOpeningAnimation';
-import { isVehicleCompleted, getCompletedVehiclesCount } from '@/data/cards';
+import { getCompletedVehiclesCount } from '@/data/cards';
 import { getPartName } from '@/utils/partTranslations';
-import { parseCardId, getCardName } from '@/data/cards';
-import { CAR_IMAGES } from '@/data/cars';
-import { MOTO_IMAGES } from '@/data/motorcycles';
-import { TRUCK_IMAGES } from '@/data/trucks';
 
 const GARAGE_BAYS = GARAGE_UPGRADES.carBays;
 const GARAGE_EQUIPMENT = GARAGE_UPGRADES.specialEquipment;
@@ -49,19 +44,6 @@ const TRUCK_PARTS: Record<PartCategory, PartType[]> = {
 type VehiclePartTab = 'car' | 'moto' | 'truck';
 
 const MAX_PART_LEVEL = 10;
-
-function getCardImage(category: any, variant: number): string | undefined {
-  const carImages = CAR_IMAGES[category as keyof typeof CAR_IMAGES];
-  if (carImages) return carImages[variant - 1];
-
-  const motoImages = MOTO_IMAGES[category as keyof typeof MOTO_IMAGES];
-  if (motoImages) return motoImages[variant - 1];
-
-  const truckImages = TRUCK_IMAGES[category as keyof typeof TRUCK_IMAGES];
-  if (truckImages) return truckImages[variant - 1];
-
-  return undefined;
-}
 
 export function ShopScreen() {
   const { state, dispatch, canAfford, getToolLevelIndex, getNegotiationBonus, getDiySuccessChance, updateChallengeProgress } = useGame();
