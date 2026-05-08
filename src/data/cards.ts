@@ -1,4 +1,5 @@
 import { VehicleCategory, CATEGORY_NAMES } from '@/types/game';
+import { getVehicleNameByImage } from './vehicleNames';
 
 export type CardRarity = 'base' | 'reverse' | 'gold';
 
@@ -111,7 +112,7 @@ export function parseCardId(cardId: string): { category: VehicleCategory; varian
 }
 
 export function getCardName(category: VehicleCategory, variant: number): string {
-  return `${CATEGORY_NAMES[category]} #${variant}`;
+  return getVehicleNameByImage(category, variant);
 }
 
 export function getTotalUniqueCards(): number {
@@ -205,6 +206,52 @@ export function sellDuplicate(state: CollectionState, cardId: string): { newStat
   
   return { newState, value };
 }
+
+// Sell ALL extra copies (qty > 1) at once. Always keeps 1 of each card.
+export function sellAllDuplicates(
+  state: CollectionState,
+): { newState: CollectionState; value: number; count: number } {
+  let value = 0;
+  let count = 0;
+  const newOwned: Record<string, OwnedCard> = { ...state.ownedCards };
+  for (const [cardId, owned] of Object.entries(state.ownedCards)) {
+    if (owned.quantity > 1) {
+      const extras = owned.quantity - 1;
+      const { rarity } = parseCardId(cardId);
+      value += CARD_SELL_VALUES[rarity] * extras;
+      count += extras;
+      newOwned[cardId] = { ...owned, quantity: 1 };
+    }
+  }
+  return { newState: { ...state, ownedCards: newOwned }, value, count };
+}
+
+/** A vehicle "model" (category + image variant) is completed when the player
+ * owns the base, reverse, AND gold card for that variant. */
+export function isVehicleCompleted(
+  state: CollectionState,
+  category: VehicleCategory,
+  variant: number,
+): boolean {
+  return (
+    !!state.ownedCards[getCardId(category, variant, 'base')] &&
+    !!state.ownedCards[getCardId(category, variant, 'reverse')] &&
+    !!state.ownedCards[getCardId(category, variant, 'gold')]
+  );
+}
+
+export function getCompletedVehiclesCount(state: CollectionState): number {
+  let n = 0;
+  for (const cat of ALL_CARD_CATEGORIES) {
+    for (let v = 1; v <= 10; v++) {
+      if (isVehicleCompleted(state, cat, v)) n++;
+    }
+  }
+  return n;
+}
+
+/** Discount applied on vehicle purchase price when its model is fully collected. */
+export const COLLECTION_COMPLETION_DISCOUNT = 0.15;
 
 export function getCollectionStats(state: CollectionState) {
   const uniqueCards = Object.keys(state.ownedCards).length;
