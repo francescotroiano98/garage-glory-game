@@ -394,6 +394,11 @@ export function NewspaperScreen({ onCarBought }: NewspaperScreenProps) {
                     onClick={() => handleSelectAd(ad)}
                     showDamages={false}
                   />
+                  {ad.car.collectionBonus && (
+                    <div className="absolute top-2 left-2 flex items-center gap-1 text-[10px] bg-yellow-500/90 text-black px-1.5 py-0.5 rounded-md font-bold border border-yellow-300 shadow">
+                      🏆 -15%
+                    </div>
+                  )}
                   {ad.negotiable && (
                     <div className="absolute top-2 right-2 flex items-center gap-1 text-xs text-primary bg-card/95 px-2 py-1 rounded-md border-2 font-medium">
                       {t.negotiable}
