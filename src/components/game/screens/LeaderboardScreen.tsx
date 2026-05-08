@@ -10,12 +10,11 @@ interface LeaderboardEntry {
   total_profit: number;
   total_cars_sold: number;
   level: number;
-  user_id: string;
 }
 
 export function LeaderboardScreen() {
   const { t, formatMoney } = useLanguage();
-  const { user } = useAuth();
+  const { username: myUsername } = useAuth();
   const [entries, setEntries] = useState<LeaderboardEntry[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -24,12 +23,8 @@ export function LeaderboardScreen() {
   }, []);
 
   const loadLeaderboard = async () => {
-    const { data } = await supabase
-      .from('profiles')
-      .select('username, total_profit, total_cars_sold, level, user_id')
-      .order('total_profit', { ascending: false })
-      .limit(50);
-    if (data) setEntries(data);
+    const { data } = await supabase.rpc('get_leaderboard');
+    if (data) setEntries(data as LeaderboardEntry[]);
     setLoading(false);
   };
 
@@ -57,15 +52,15 @@ export function LeaderboardScreen() {
         ) : (
           entries.map((entry, i) => (
             <Card
-              key={entry.user_id}
-              className={`border-2 ${entry.user_id === user?.id ? 'border-primary bg-primary/5' : ''}`}
+              key={`${entry.username}-${i}`}
+              className={`border-2 ${entry.username === myUsername ? 'border-primary bg-primary/5' : ''}`}
             >
               <CardContent className="p-3 flex items-center gap-3">
                 {getRankIcon(i)}
                 <div className="flex-1 min-w-0">
                   <p className="font-bold text-sm truncate">
                     {entry.username}
-                    {entry.user_id === user?.id && <span className="text-primary ml-1">({t.you})</span>}
+                    {entry.username === myUsername && <span className="text-primary ml-1">({t.you})</span>}
                   </p>
                   <p className="text-xs text-muted-foreground">
                     Lv.{entry.level} • {entry.total_cars_sold} {t.vehiclesSold}
