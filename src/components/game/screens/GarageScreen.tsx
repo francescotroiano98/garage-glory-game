@@ -90,7 +90,8 @@ export function GarageScreen({ onNavigateToOffice, onSelectCar }: GarageScreenPr
           )}
         </div>
         <div className="overflow-y-auto p-4"
-             style={{ height: `calc(100svh - ${repairQueue.length > 0 ? 295 : 258}px)`}}
+        
+             style={{ height: `calc(100svh - ${repairQueue.length > 0 ? 315 : 258}px)`}}
         >
           {carsInGarage.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-64 text-center bg-card/95 backdrop-blur-sm rounded-xl border-2 border-dashed border-border">
