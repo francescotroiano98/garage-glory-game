@@ -14,6 +14,8 @@ import { PART_DEFINITIONS, PART_ICONS, CATEGORY_LABELS, getPartUpgradeCost } fro
 import { PartType, PartCategory, MAX_LEVEL } from '@/types/game';
 import { PACK_TYPES, openPack, loadCollection, saveCollection, addCardsToCollection, CollectibleCard } from '@/data/cards';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { PackOpeningAnimation } from '@/components/game/PackOpeningAnimation';
+import { isVehicleCompleted, getCompletedVehiclesCount } from '@/data/cards';
 import { getPartName } from '@/utils/partTranslations';
 import { parseCardId, getCardName } from '@/data/cards';
 import { CAR_IMAGES } from '@/data/cars';
@@ -62,12 +64,13 @@ function getCardImage(category: any, variant: number): string | undefined {
 }
 
 export function ShopScreen() {
-  const { state, dispatch, canAfford, getToolLevelIndex, getNegotiationBonus, getDiySuccessChance } = useGame();
+  const { state, dispatch, canAfford, getToolLevelIndex, getNegotiationBonus, getDiySuccessChance, updateChallengeProgress } = useGame();
    const { t, language, formatMoney } = useLanguage();
    const { playSound } = useSound();
   const [selectedPartCategory, setSelectedPartCategory] = useState<PartCategory>('mechanical');
   const [vehiclePartTab, setVehiclePartTab] = useState<VehiclePartTab>('car');
   const [openedCards, setOpenedCards] = useState<CollectibleCard[] | null>(null);
+  const [openedPackIcon, setOpenedPackIcon] = useState<string>('📦');
 
   const buyPack = useCallback((packId: string) => {
     const pack = PACK_TYPES.find(p => p.id === packId);
@@ -79,12 +82,24 @@ export function ShopScreen() {
     dispatch({ type: 'SPEND_MONEY', payload: pack.cost });
     const cards = openPack(pack);
     const collection = loadCollection();
+    // Track newly-obtained cards & newly-completed vehicles for challenges
+    const ownedBefore = collection.ownedCards;
+    const newCards = cards.filter(c => !ownedBefore[c.id]).length;
+    const rareCards = cards.filter(c => c.rarity !== 'base').length;
+    const completedBefore = getCompletedVehiclesCount(collection);
     const newCollection = addCardsToCollection(collection, cards);
+    const completedAfter = getCompletedVehiclesCount(newCollection);
     saveCollection(newCollection);
+    setOpenedPackIcon(pack.icon);
     setOpenedCards(cards);
     playSound('cashRegister');
-    toast.success(t.packOpened);
-  }, [canAfford, dispatch, playSound, t]);
+    // Daily/weekly challenge hooks
+    updateChallengeProgress('open_packs', 1);
+    if (newCards > 0) updateChallengeProgress('obtain_new_cards', newCards);
+    if (rareCards > 0) updateChallengeProgress('obtain_rare_cards', rareCards);
+    const newlyCompleted = completedAfter - completedBefore;
+    if (newlyCompleted > 0) updateChallengeProgress('complete_vehicles', newlyCompleted);
+  }, [canAfford, dispatch, playSound, t, updateChallengeProgress]);
 
   const buyToolUpgrade = (upgrade: typeof TOOL_UPGRADES[0]) => {
     if (!canAfford(upgrade.cost)) {
@@ -226,53 +241,12 @@ export function ShopScreen() {
           </CardContent>
         </Card>
 
-        {/* Pack opening dialog */}
-        <Dialog open={!!openedCards} onOpenChange={() => setOpenedCards(null)}>
-          <DialogContent className="max-w-sm">
-            <DialogHeader>
-              <DialogTitle className="flex items-center gap-2">
-                <Package className="w-5 h-5" />
-                {t.packOpened}
-              </DialogTitle>
-            </DialogHeader>
-            <div className="grid grid-cols-5 gap-2">
-              {openedCards?.map((card, i) => {
-                const { category, variant } = parseCardId(card.id);
-                const image = getCardImage(category, variant);
-                return (
-                  <div
-                    key={i}
-                    className={`aspect-[3/4] rounded-lg border-2 overflow-hidden flex flex-col ${
-                      card.rarity === 'gold'
-                        ? 'border-yellow-400 bg-gradient-to-br from-yellow-500/15 to-amber-500/15'
-                        : card.rarity === 'reverse'
-                        ? 'border-blue-400 bg-gradient-to-br from-blue-500/10 to-purple-500/10'
-                        : 'border-border bg-card'
-                    }`}
-                  >
-                    <div className="flex-1 relative">
-                      {image ? (
-                        <img
-                          src={image}
-                          alt={card.name}
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        <div className="flex items-center justify-center h-full">?</div>
-                      )}
-                    </div>
-
-                    <div className="bg-black/60 px-1 py-0.5">
-                      <span className="text-[7px] text-white truncate block text-center">
-                        {card.name}
-                      </span>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </DialogContent>
-        </Dialog>
+        {/* Pack opening animation */}
+        <PackOpeningAnimation
+          cards={openedCards}
+          packIcon={openedPackIcon}
+          onClose={() => setOpenedCards(null)}
+        />
 
         {/* Skills Section */}
         <Card className="border-2 border-primary/30 bg-gradient-to-br from-primary/5 to-transparent">
