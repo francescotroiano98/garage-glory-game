@@ -1,6 +1,8 @@
 import { Car, TruckCategory, PartDamage, DamageLevel, PartType, PartCategory, TRUCK_CATEGORY_UNLOCK_LEVEL } from '@/types/game';
 import { PART_DEFINITIONS } from './parts';
 import { DAMAGE_MULTIPLIERS } from './cars';
+import { getVehicleNameByImage } from './vehicleNames';
+import { loadCollection, isVehicleCompleted, COLLECTION_COMPLETION_DISCOUNT } from './cards';
 
 // Import truck images - 10 per style
 import pickup1 from '@/assets/trucks/pickup-1.png';
@@ -232,11 +234,13 @@ export function generateTruck(level: number): Car {
   const images = TRUCK_IMAGES[template.category];
   
   const priceVariance = 0.75 + Math.random() * 0.35;
-  const askingPrice = Math.round(currentValue * priceVariance);
-  
+  let askingPrice = Math.round(currentValue * priceVariance);
+  const collectionBonus = isVehicleCompleted(loadCollection(), template.category, imageVariant + 1);
+  if (collectionBonus) askingPrice = Math.round(askingPrice * (1 - COLLECTION_COMPLETION_DISCOUNT));
+
   return {
     id: `truck_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-    name: template.name,
+    name: getVehicleNameByImage(template.category, imageVariant + 1),
     vehicleType: 'truck',
     category: template.category,
     image: images[imageVariant],
@@ -248,6 +252,7 @@ export function generateTruck(level: number): Car {
     currentValue,
     isInGarage: false,
     listedForSale: false,
+    collectionBonus,
   };
 }
 

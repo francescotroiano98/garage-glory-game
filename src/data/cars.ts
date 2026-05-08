@@ -1,5 +1,7 @@
 import { Car, CarCategory, PartDamage, DamageLevel, PartType, PartCategory, getCategoriesForLevel, CATEGORY_UNLOCK_LEVEL, VehicleType } from '@/types/game';
 import { PART_DEFINITIONS } from './parts';
+import { getVehicleNameByImage } from './vehicleNames';
+import { loadCollection, isVehicleCompleted, COLLECTION_COMPLETION_DISCOUNT } from './cards';
 
 // Import car images - 10 per category for variety
 // Economy images (junker, beater, economy, compact, hatchback)
@@ -354,11 +356,15 @@ export function generateCar(level: number): Car {
   
   // Asking price varies
   const priceVariance = 0.75 + Math.random() * 0.35;
-  const askingPrice = Math.round(currentValue * priceVariance);
-  
+  let askingPrice = Math.round(currentValue * priceVariance);
+
+  // Collection completion bonus: discount on already-collected models
+  const collectionBonus = isVehicleCompleted(loadCollection(), template.category, imageVariant + 1);
+  if (collectionBonus) askingPrice = Math.round(askingPrice * (1 - COLLECTION_COMPLETION_DISCOUNT));
+
   return {
     id: `car_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-    name: template.name,
+    name: getVehicleNameByImage(template.category, imageVariant + 1),
     vehicleType: 'car' as VehicleType,
     category: template.category,
     image: images[imageVariant],
@@ -370,6 +376,7 @@ export function generateCar(level: number): Car {
     currentValue,
     isInGarage: false,
     listedForSale: false,
+    collectionBonus,
   };
 }
 

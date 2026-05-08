@@ -122,6 +122,8 @@ export interface Car {
   isInGarage: boolean;
   listedForSale: boolean;
   saleStartTime?: number;
+  /** True when the player has fully collected this model (base + reverse + gold). */
+  collectionBonus?: boolean;
 }
 
 // Progression Types - More levels for harder progression
