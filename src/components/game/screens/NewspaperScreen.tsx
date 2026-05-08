@@ -103,6 +103,9 @@ function VehicleDetailDialog({
             <div className="flex-1 min-w-0">
               <p className="font-bold text-sm truncate">{ad.car.name}</p>
               <p className="text-lg font-bold text-primary">{formatMoney(ad.car.askingPrice)}</p>
+              {ad.car.collectionBonus && (
+                <p className="text-[10px] font-bold text-yellow-500">🏆 Collection bonus −15%</p>
+              )}
             </div>
           </div>
 
