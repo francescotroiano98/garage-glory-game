@@ -10,7 +10,6 @@ interface LeaderboardEntry {
   total_profit: number;
   total_cars_sold: number;
   level: number;
-  user_id: string;
 }
 
 export function LeaderboardScreen() {
@@ -24,12 +23,8 @@ export function LeaderboardScreen() {
   }, []);
 
   const loadLeaderboard = async () => {
-    const { data } = await supabase
-      .from('profiles')
-      .select('username, total_profit, total_cars_sold, level, user_id')
-      .order('total_profit', { ascending: false })
-      .limit(50);
-    if (data) setEntries(data);
+    const { data } = await supabase.rpc('get_leaderboard');
+    if (data) setEntries(data as LeaderboardEntry[]);
     setLoading(false);
   };
 
