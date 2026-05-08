@@ -164,7 +164,7 @@ export function CollectionScreen() {
 
       {/* Scrollable card grid */}
       <div className="flex-1 min-h-0 overflow-y-auto px-3 pb-20">
-        <div className="grid grid-cols-4 gap-2">
+        <div className="grid grid-cols-3 gap-2">
           {allCards.map(card => (
             <button
               key={card.id}
