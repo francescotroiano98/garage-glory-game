@@ -4,7 +4,10 @@ export interface DailyChallenge {
   title: string;
   description: string;
   icon: string;
-  type: 'sell_cars' | 'earn_profit' | 'repair_parts' | 'diy_repairs' | 'buy_cars';
+  type:
+    | 'sell_cars' | 'earn_profit' | 'repair_parts' | 'diy_repairs' | 'buy_cars'
+    | 'open_packs' | 'obtain_new_cards' | 'sell_card_duplicates'
+    | 'obtain_rare_cards' | 'complete_vehicles';
   target: number;
   reward: number;
   rewardType: 'money' | 'energy' | 'xp';
@@ -39,6 +42,13 @@ const DAILY_CHALLENGE_TEMPLATES: Omit<DailyChallenge, 'id'>[] = [
   // Buy challenges
   { title: 'Shopper', description: 'Buy 2 cars today', icon: '📰', type: 'buy_cars', target: 2, reward: 300, rewardType: 'money' },
    { title: 'Collector', description: 'Buy 3 cars today', icon: '🎯', type: 'buy_cars', target: 3, reward: 500, rewardType: 'money' },
+
+  // Card / Collection daily challenges
+  { title: 'Pack Opener', description: 'Open 1 card pack', icon: '📦', type: 'open_packs', target: 1, reward: 200, rewardType: 'money' },
+  { title: 'Pack Hunter', description: 'Open 3 card packs', icon: '🎁', type: 'open_packs', target: 3, reward: 800, rewardType: 'money' },
+  { title: 'New Finds', description: 'Get 3 new cards', icon: '🆕', type: 'obtain_new_cards', target: 3, reward: 30, rewardType: 'xp' },
+  { title: 'Card Sweep', description: 'Sell 5 duplicate cards', icon: '♻️', type: 'sell_card_duplicates', target: 5, reward: 250, rewardType: 'money' },
+  { title: 'Rare Pull', description: 'Get 1 Reverse or Gold card', icon: '✨', type: 'obtain_rare_cards', target: 1, reward: 50, rewardType: 'xp' },
 ];
  
  // Weekly challenge templates (harder, bigger rewards)
@@ -48,6 +58,10 @@ const DAILY_CHALLENGE_TEMPLATES: Omit<DailyChallenge, 'id'>[] = [
    { title: 'Repair Marathon', description: 'Repair 40 parts this week', icon: '🔩', type: 'repair_parts', target: 40, reward: 200, rewardType: 'energy', isWeekly: true },
    { title: 'DIY Champion', description: 'Complete 15 DIY repairs this week', icon: '🏆', type: 'diy_repairs', target: 15, reward: 150, rewardType: 'xp', isWeekly: true },
    { title: 'Market Hunter', description: 'Buy 8 cars this week', icon: '📰', type: 'buy_cars', target: 8, reward: 1500, rewardType: 'money', isWeekly: true },
+   { title: 'Collector\'s Week', description: 'Open 10 card packs this week', icon: '📦', type: 'open_packs', target: 10, reward: 2000, rewardType: 'money', isWeekly: true },
+   { title: 'Set Builder', description: 'Complete 1 vehicle (base+reverse+gold)', icon: '🏆', type: 'complete_vehicles', target: 1, reward: 3000, rewardType: 'money', isWeekly: true },
+   { title: 'Master Collector', description: 'Complete 3 vehicles this week', icon: '👑', type: 'complete_vehicles', target: 3, reward: 8000, rewardType: 'money', isWeekly: true },
+   { title: 'Rare Hunter', description: 'Get 5 Reverse/Gold cards this week', icon: '💎', type: 'obtain_rare_cards', target: 5, reward: 250, rewardType: 'xp', isWeekly: true },
  ];
 
 export interface DailyChallengeProgress {
