@@ -1,6 +1,8 @@
 import { Car, MotorcycleCategory, PartDamage, DamageLevel, PartType, PartCategory, MOTO_CATEGORY_UNLOCK_LEVEL } from '@/types/game';
 import { PART_DEFINITIONS } from './parts';
 import { DAMAGE_MULTIPLIERS } from './cars';
+import { getVehicleNameByImage } from './vehicleNames';
+import { loadCollection, isVehicleCompleted, COLLECTION_COMPLETION_DISCOUNT } from './cards';
 
 // Import motorcycle images - 10 per category
 import scooter1 from '@/assets/motorcycles/scooter-1.png';
@@ -233,11 +235,13 @@ export function generateMotorcycle(level: number): Car {
   const images = MOTO_IMAGES[template.category];
   
   const priceVariance = 0.75 + Math.random() * 0.35;
-  const askingPrice = Math.round(currentValue * priceVariance);
-  
+  let askingPrice = Math.round(currentValue * priceVariance);
+  const collectionBonus = isVehicleCompleted(loadCollection(), template.category, imageVariant + 1);
+  if (collectionBonus) askingPrice = Math.round(askingPrice * (1 - COLLECTION_COMPLETION_DISCOUNT));
+
   return {
     id: `moto_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-    name: template.name,
+    name: getVehicleNameByImage(template.category, imageVariant + 1),
     vehicleType: 'motorcycle',
     category: template.category,
     image: images[imageVariant],
@@ -249,6 +253,7 @@ export function generateMotorcycle(level: number): Car {
     currentValue,
     isInGarage: false,
     listedForSale: false,
+    collectionBonus,
   };
 }
 
