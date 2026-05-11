@@ -10,7 +10,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { generateCar } from '@/data/cars';
 import { generateMotorcycle } from '@/data/motorcycles';
 import { generateTruck } from '@/data/trucks';
-import { NewspaperAd, Car, CATEGORY_NAMES, VehicleCategory } from '@/types/game';
+import { NewspaperAd, Car, VehicleCategory } from '@/types/game';
+import { CATEGORY_DISPLAY_NAMES } from '@/utils/partTranslations';
 import { getCategoriesForLevel } from '@/types/game';
 import { getMotoCategoriesForLevel } from '@/data/motorcycles';
 import { getTruckCategoriesForLevel } from '@/data/trucks';
@@ -209,7 +210,7 @@ function VehicleDetailDialog({
 
 export function NewspaperScreen({ onCarBought }: NewspaperScreenProps) {
   const { state, dispatch, canAfford, hasEnergy, getVisibilityChance, getNegotiationBonus, updateChallengeProgress } = useGame();
-  const { t, formatMoney } = useLanguage();
+  const { t, language, formatMoney } = useLanguage();
   const [ads, setAds] = useState<NewspaperAd[]>([]);
   const [selectedAd, setSelectedAd] = useState<NewspaperAd | null>(null);
   const [negotiatePrice, setNegotiatePrice] = useState(0);
@@ -364,7 +365,7 @@ export function NewspaperScreen({ onCarBought }: NewspaperScreenProps) {
                 <SelectItem value="all">{t.allCategories}</SelectItem>
                 {availableCategories.map(cat => (
                   <SelectItem key={cat} value={cat}>
-                    {CATEGORY_NAMES[cat]}
+                    {CATEGORY_DISPLAY_NAMES[language][cat]}
                   </SelectItem>
                 ))}
               </SelectContent>

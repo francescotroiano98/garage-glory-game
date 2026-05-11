@@ -1,5 +1,8 @@
 import { VehicleCategory, CATEGORY_NAMES } from '@/types/game';
 import { getVehicleNameByImage } from './vehicleNames';
+import packBaseImg from '@/assets/pack-base.png';
+import packPremiumImg from '@/assets/pack-premium.png';
+import packLegendaryImg from '@/assets/pack-legendary.png';
 
 export type CardRarity = 'base' | 'reverse' | 'gold';
 
@@ -29,6 +32,7 @@ export interface PackType {
   goldMultiplier: number; // multiplier on gold chance
   reverseMultiplier: number; // multiplier on reverse chance
   icon: string;
+  image?: string;
 }
 
 export const PACK_TYPES: PackType[] = [
@@ -44,6 +48,7 @@ export const PACK_TYPES: PackType[] = [
     goldMultiplier: 1,
     reverseMultiplier: 1,
     icon: '📦',
+    image: packBaseImg,
   },
   {
     id: 'premium',
@@ -57,6 +62,7 @@ export const PACK_TYPES: PackType[] = [
     goldMultiplier: 1.5,
     reverseMultiplier: 2,
     icon: '💎',
+    image: packPremiumImg,
   },
   {
     id: 'legendary',
@@ -70,6 +76,7 @@ export const PACK_TYPES: PackType[] = [
     goldMultiplier: 3,
     reverseMultiplier: 2,
     icon: '👑',
+    image: packLegendaryImg,
   },
 ];
 

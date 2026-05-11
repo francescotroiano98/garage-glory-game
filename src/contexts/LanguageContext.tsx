@@ -327,6 +327,7 @@ interface Translations {
   packs: string;
   openPack: string;
   packOpened: string;
+  swipeToOpen: string;
   newCard: string;
   duplicate: string;
   buyPack: string;
@@ -559,6 +560,7 @@ const translations: Record<Language, Translations> = {
     packs: 'Card Packs',
     openPack: 'Open Pack',
     packOpened: 'Pack opened!',
+    swipeToOpen: 'Swipe to open →',
     newCard: 'New card!',
     duplicate: 'Duplicate',
     buyPack: 'Buy Pack',
@@ -790,6 +792,7 @@ const translations: Record<Language, Translations> = {
     packs: 'Pacchetti Carte',
     openPack: 'Apri Pacchetto',
     packOpened: 'Pacchetto aperto!',
+    swipeToOpen: 'Trascina per aprire →',
     newCard: 'Nuova carta!',
     duplicate: 'Doppione',
     buyPack: 'Compra Pacchetto',

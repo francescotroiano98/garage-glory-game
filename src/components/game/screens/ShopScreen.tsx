@@ -53,6 +53,7 @@ export function ShopScreen() {
   const [vehiclePartTab, setVehiclePartTab] = useState<VehiclePartTab>('car');
   const [openedCards, setOpenedCards] = useState<CollectibleCard[] | null>(null);
   const [openedPackIcon, setOpenedPackIcon] = useState<string>('📦');
+  const [openedPackImage, setOpenedPackImage] = useState<string | undefined>(undefined);
 
   const buyPack = useCallback((packId: string) => {
     const pack = PACK_TYPES.find(p => p.id === packId);
@@ -73,6 +74,7 @@ export function ShopScreen() {
     const completedAfter = getCompletedVehiclesCount(newCollection);
     saveCollection(newCollection);
     setOpenedPackIcon(pack.icon);
+    setOpenedPackImage(pack.image);
     setOpenedCards(cards);
     playSound('cashRegister');
     // Daily/weekly challenge hooks
@@ -205,7 +207,18 @@ export function ShopScreen() {
           <CardContent className="space-y-2">
             {PACK_TYPES.map(pack => (
               <div key={pack.id} className="flex items-center gap-3 p-2 bg-secondary/30 rounded-lg">
-                <span className="text-2xl">{pack.icon}</span>
+                {pack.image ? (
+                  <img
+                    src={pack.image}
+                    alt={pack.name}
+                    width={48}
+                    height={66}
+                    loading="lazy"
+                    className="w-12 h-auto object-contain drop-shadow"
+                  />
+                ) : (
+                  <span className="text-2xl">{pack.icon}</span>
+                )}
                 <div className="flex-1 min-w-0">
                   <div className="font-medium text-sm">{language === 'it' ? pack.nameIt : pack.name}</div>
                   <div className="text-[10px] text-muted-foreground">{language === 'it' ? pack.descriptionIt : pack.description}</div>
@@ -227,6 +240,7 @@ export function ShopScreen() {
         <PackOpeningAnimation
           cards={openedCards}
           packIcon={openedPackIcon}
+          packImage={openedPackImage}
           onClose={() => setOpenedCards(null)}
         />
 
