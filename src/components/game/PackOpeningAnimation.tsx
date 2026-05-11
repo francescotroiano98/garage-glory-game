@@ -31,7 +31,24 @@ export function PackOpeningAnimation({ cards, packIcon = '📦', packImage, onCl
   const [phase, setPhase] = useState<Phase>('swipe');
   const [revealIndex, setRevealIndex] = useState(0);
   const [ripProgress, setRipProgress] = useState(0); // 0-1
-  const dragRef = useRef<{ active: boolean; startX: number }>({ active: false, startX: 0 });
+  const dragRef = useRef<{ active: boolean; startX: number; lastTickAt: number }>({
+    active: false, startX: 0, lastTickAt: 0,
+  });
+
+  // Pre-computed jagged tear path used as clip-path on the top half.
+  // The bottom edge of the top half becomes a zig-zag line.
+  const tearClipPath = useRef<string>('');
+  if (!tearClipPath.current) {
+    const teeth = 22;
+    const pts: string[] = ['0% 0%', '100% 0%'];
+    for (let i = teeth; i >= 0; i--) {
+      const x = (i / teeth) * 100;
+      // Alternating tooth height (in % of container height)
+      const y = 100 - (i % 2 === 0 ? 0 : 6 + Math.random() * 4);
+      pts.push(`${x.toFixed(2)}% ${y.toFixed(2)}%`);
+    }
+    tearClipPath.current = `polygon(${pts.join(', ')})`;
+  }
 
   // Reset state whenever a new pack arrives
   useEffect(() => {
@@ -46,18 +63,26 @@ export function PackOpeningAnimation({ cards, packIcon = '📦', packImage, onCl
 
   const onPointerDown = (e: React.PointerEvent) => {
     if (phase !== 'swipe') return;
-    dragRef.current = { active: true, startX: e.clientX };
+    dragRef.current = { active: true, startX: e.clientX, lastTickAt: 0 };
     (e.target as Element).setPointerCapture?.(e.pointerId);
+    try { playSound('paperRip'); } catch {}
   };
   const onPointerMove = (e: React.PointerEvent) => {
     if (!dragRef.current.active || phase !== 'swipe') return;
     const dx = Math.max(0, e.clientX - dragRef.current.startX);
-    const p = Math.min(1, dx / 220);
+    const p = Math.min(1, dx / 260);
     setRipProgress(p);
+    // Re-trigger short rip crackles at progress checkpoints
+    const tick = Math.floor(p * 4);
+    if (tick > dragRef.current.lastTickAt) {
+      dragRef.current.lastTickAt = tick;
+      try { playSound('paperRip'); } catch {}
+    }
     if (p >= 1) {
       dragRef.current.active = false;
       setPhase('ripping');
-      try { playSound('purchase'); } catch {}
+      try { playSound('paperRip'); } catch {}
+      setTimeout(() => { try { playSound('purchase'); } catch {} }, 200);
       setTimeout(() => setPhase('reveal'), 600);
     }
   };
@@ -109,38 +134,38 @@ export function PackOpeningAnimation({ cards, packIcon = '📦', packImage, onCl
             onPointerCancel={onPointerUp}
             style={{ width: 220, height: 300 }}
           >
-            {/* Top half (gets pulled) */}
+            {/* Top half (gets pulled away with a torn zig-zag edge) */}
             <div
-              className="absolute inset-x-0 top-0 h-1/2 overflow-hidden"
+              className="absolute inset-x-0 top-0 h-[52%]"
               style={{
-                transform: `translateX(${ripProgress * 180}px) rotate(${ripProgress * 8}deg)`,
+                transform: `translate(${ripProgress * 220}px, ${ripProgress * -30}px) rotate(${ripProgress * 14}deg)`,
                 transition: dragRef.current.active ? 'none' : 'transform 200ms ease',
                 transformOrigin: 'bottom left',
+                clipPath: tearClipPath.current,
+                WebkitClipPath: tearClipPath.current,
+                filter: ripProgress > 0 ? 'drop-shadow(0 6px 8px rgba(0,0,0,0.45))' : undefined,
               }}
             >
               {packImage ? (
-                <img src={packImage} alt="" className="w-full h-[300px] object-contain drop-shadow-[0_8px_20px_rgba(0,0,0,0.5)]" />
+                <img src={packImage} alt="" className="w-full h-[300px] object-contain" />
               ) : (
                 <div className="w-full h-[300px] flex items-center justify-center text-[120px]">{packIcon}</div>
               )}
-              {/* Jagged tear edge */}
-              <div
-                className="absolute bottom-0 left-0 right-0 h-2"
-                style={{
-                  background:
-                    'linear-gradient(45deg, transparent 33%, hsl(var(--background)) 33%, hsl(var(--background)) 66%, transparent 66%), linear-gradient(-45deg, transparent 33%, hsl(var(--background)) 33%, hsl(var(--background)) 66%, transparent 66%)',
-                  backgroundSize: '8px 8px',
-                  opacity: ripProgress,
-                }}
-              />
             </div>
-            {/* Bottom half (stays) */}
-            <div className="absolute inset-x-0 bottom-0 h-1/2 overflow-hidden">
+
+            {/* Bottom half (stays) — also clipped with the inverse tear */}
+            <div
+              className="absolute inset-x-0 bottom-0 h-1/2"
+              style={{
+                clipPath:
+                  'polygon(0% 100%, 100% 100%, 100% 12%, 95% 6%, 90% 14%, 85% 4%, 80% 12%, 75% 6%, 70% 14%, 65% 4%, 60% 12%, 55% 6%, 50% 14%, 45% 4%, 40% 12%, 35% 6%, 30% 14%, 25% 4%, 20% 12%, 15% 6%, 10% 14%, 5% 4%, 0% 12%)',
+              }}
+            >
               {packImage ? (
                 <img
                   src={packImage}
                   alt=""
-                  className="w-full h-[300px] object-contain drop-shadow-[0_8px_20px_rgba(0,0,0,0.5)]"
+                  className="w-full h-[300px] object-contain"
                   style={{ transform: 'translateY(-50%)' }}
                 />
               ) : (
@@ -150,11 +175,47 @@ export function PackOpeningAnimation({ cards, packIcon = '📦', packImage, onCl
               )}
             </div>
 
+            {/* Light leak through the tear */}
+            {ripProgress > 0.05 && (
+              <div
+                className="absolute left-0 right-0 pointer-events-none"
+                style={{
+                  top: '46%',
+                  height: 16,
+                  background:
+                    'radial-gradient(ellipse at center, rgba(255,240,180,0.95), rgba(255,240,180,0) 70%)',
+                  opacity: Math.min(1, ripProgress * 1.4),
+                  filter: 'blur(4px)',
+                }}
+              />
+            )}
+
+            {/* Tiny paper shred particles flying off */}
+            {ripProgress > 0.15 && (
+              <>
+                {[...Array(6)].map((_, i) => (
+                  <span
+                    key={i}
+                    className="absolute block bg-card/90 rounded-sm"
+                    style={{
+                      top: '48%',
+                      left: `${20 + i * 12}%`,
+                      width: 4 + (i % 3),
+                      height: 6,
+                      transform: `translate(${ripProgress * (40 + i * 8)}px, ${ripProgress * (-20 - i * 4)}px) rotate(${ripProgress * (60 + i * 30)}deg)`,
+                      opacity: ripProgress,
+                      transition: dragRef.current.active ? 'none' : 'transform 200ms ease, opacity 200ms ease',
+                    }}
+                  />
+                ))}
+              </>
+            )}
+
             {/* Swipe hint arrow */}
             {ripProgress < 0.05 && (
-              <div className="absolute -top-10 left-1/2 -translate-x-1/2 text-white/90 text-xs flex items-center gap-1 animate-pulse">
-                <span>👉</span>
+              <div className="absolute -top-10 left-1/2 -translate-x-1/2 text-white/90 text-xs flex items-center gap-1 animate-pulse whitespace-nowrap">
                 <span>{t.swipeToOpen}</span>
+                <span>👉</span>
               </div>
             )}
           </div>
