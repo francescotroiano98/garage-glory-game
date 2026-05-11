@@ -210,7 +210,7 @@ function VehicleDetailDialog({
 
 export function NewspaperScreen({ onCarBought }: NewspaperScreenProps) {
   const { state, dispatch, canAfford, hasEnergy, getVisibilityChance, getNegotiationBonus, updateChallengeProgress } = useGame();
-  const { t, formatMoney } = useLanguage();
+  const { t, language, formatMoney } = useLanguage();
   const [ads, setAds] = useState<NewspaperAd[]>([]);
   const [selectedAd, setSelectedAd] = useState<NewspaperAd | null>(null);
   const [negotiatePrice, setNegotiatePrice] = useState(0);
