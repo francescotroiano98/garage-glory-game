@@ -29,6 +29,7 @@ export interface PackType {
   goldMultiplier: number; // multiplier on gold chance
   reverseMultiplier: number; // multiplier on reverse chance
   icon: string;
+  image?: string;
 }
 
 export const PACK_TYPES: PackType[] = [
