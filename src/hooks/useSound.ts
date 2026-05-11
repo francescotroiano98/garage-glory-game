@@ -18,6 +18,7 @@ import notificationSfx from '@/assets/audio/sfx/notification.wav';
 import levelUpSfx from '@/assets/audio/sfx/level-up.wav';
 import achievementSfx from '@/assets/audio/sfx/achievement.wav';
 import energyBonusSfx from '@/assets/audio/sfx/energy-bonus.wav';
+import paperRipSfx from '@/assets/audio/sfx/paper-rip.wav';
 
 const SOUNDS = {
   repair: repairSfx,
@@ -39,6 +40,7 @@ const SOUNDS = {
   skillUp: energyBonusSfx,
   error: errorSfx,
   inspect: clickSfx,
+  paperRip: paperRipSfx,
 };
 
 type SoundType = keyof typeof SOUNDS;
