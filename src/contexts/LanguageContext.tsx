@@ -327,6 +327,7 @@ interface Translations {
   packs: string;
   openPack: string;
   packOpened: string;
+  swipeToOpen: string;
   newCard: string;
   duplicate: string;
   buyPack: string;
