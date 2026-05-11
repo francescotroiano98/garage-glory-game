@@ -154,7 +154,7 @@ export function PackOpeningAnimation({ cards, packIcon = '📦', packImage, onCl
             {ripProgress < 0.05 && (
               <div className="absolute -top-10 left-1/2 -translate-x-1/2 text-white/90 text-xs flex items-center gap-1 animate-pulse">
                 <span>👉</span>
-                <span>{(t as any).swipeToOpen ?? 'Swipe to open →'}</span>
+                <span>{t.swipeToOpen}</span>
               </div>
             )}
           </div>
