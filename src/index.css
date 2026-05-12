@@ -341,6 +341,12 @@
 .anim-card-flip-in { animation: card-flip-in 0.55s cubic-bezier(.2,.8,.2,1) both; transform-style: preserve-3d; }
 .anim-sparkle-burst { animation: sparkle-burst 0.9s ease-out forwards; }
 
+@keyframes sheen-slide {
+  0%   { transform: translateX(-120%); }
+  100% { transform: translateX(420%); }
+}
+.anim-sheen-slide { animation: sheen-slide 1.6s ease-in-out infinite; }
+
 /* Custom scrollbar for retro feel */
 ::-webkit-scrollbar {
   width: 8px;
