@@ -3,6 +3,12 @@ import { getVehicleNameByImage } from './vehicleNames';
 import packBaseImg from '@/assets/pack-base.png';
 import packPremiumImg from '@/assets/pack-premium.png';
 import packLegendaryImg from '@/assets/pack-legendary.png';
+import packMegaBaseImg from '@/assets/pack-mega-base.png';
+import packMegaPremiumImg from '@/assets/pack-mega-premium.png';
+import packMegaGoldImg from '@/assets/pack-mega-gold.png';
+import { getCategoriesForLevel } from '@/types/game';
+import { getMotoCategoriesForLevel } from './motorcycles';
+import { getTruckCategoriesForLevel } from './trucks';
 
 export type CardRarity = 'base' | 'reverse' | 'gold';
 
@@ -33,6 +39,8 @@ export interface PackType {
   reverseMultiplier: number; // multiplier on reverse chance
   icon: string;
   image?: string;
+  /** When set, every card in the pack is forced to this rarity (used by MEGA packs). */
+  forcedRarity?: CardRarity;
 }
 
 export const PACK_TYPES: PackType[] = [
@@ -77,6 +85,52 @@ export const PACK_TYPES: PackType[] = [
     reverseMultiplier: 2,
     icon: '👑',
     image: packLegendaryImg,
+  },
+  // ────────── MEGA packs ──────────
+  {
+    id: 'mega_base',
+    name: 'MEGA Base Pack',
+    nameIt: 'MEGA Pacchetto Base',
+    description: '20 guaranteed Base cards',
+    descriptionIt: '20 carte Base garantite',
+    cost: 4000,
+    cardCount: 20,
+    guaranteedReverse: false,
+    goldMultiplier: 0,
+    reverseMultiplier: 0,
+    icon: '📦',
+    image: packMegaBaseImg,
+    forcedRarity: 'base',
+  },
+  {
+    id: 'mega_premium',
+    name: 'MEGA Premium Pack',
+    nameIt: 'MEGA Pacchetto Premium',
+    description: '20 guaranteed Reverse cards',
+    descriptionIt: '20 carte Reverse garantite',
+    cost: 20000,
+    cardCount: 20,
+    guaranteedReverse: true,
+    goldMultiplier: 0,
+    reverseMultiplier: 0,
+    icon: '💎',
+    image: packMegaPremiumImg,
+    forcedRarity: 'reverse',
+  },
+  {
+    id: 'mega_gold',
+    name: 'MEGA Gold Pack',
+    nameIt: 'MEGA Pacchetto Gold',
+    description: '20 guaranteed Gold cards',
+    descriptionIt: '20 carte Gold garantite',
+    cost: 75000,
+    cardCount: 20,
+    guaranteedReverse: false,
+    goldMultiplier: 0,
+    reverseMultiplier: 0,
+    icon: '👑',
+    image: packMegaGoldImg,
+    forcedRarity: 'gold',
   },
 ];
 
@@ -130,20 +184,34 @@ export function getTotalBaseCards(): number {
   return ALL_CARD_CATEGORIES.length * 10;
 }
 
-// Generate cards from a pack opening
-export function openPack(pack: PackType): CollectibleCard[] {
+// Generate cards from a pack opening.
+// `playerLevel` (when provided) restricts the category pool to vehicles the
+// player has unlocked, so cards stay relevant to the player's progression.
+export function openPack(pack: PackType, playerLevel: number = 1): CollectibleCard[] {
   const cards: CollectibleCard[] = [];
+
+  // Restrict to categories unlocked at the player's current level
+  const unlocked: VehicleCategory[] = [
+    ...getCategoriesForLevel(playerLevel),
+    ...getMotoCategoriesForLevel(playerLevel),
+    ...getTruckCategoriesForLevel(playerLevel),
+  ];
+  const pool: VehicleCategory[] = unlocked.length > 0
+    ? (unlocked.filter(c => ALL_CARD_CATEGORIES.includes(c)) as VehicleCategory[])
+    : ALL_CARD_CATEGORIES;
 
   for (let i = 0; i < pack.cardCount; i++) {
     // If last card and pack guarantees reverse, force it
     const forceReverse = pack.guaranteedReverse && i === pack.cardCount - 1 && 
       !cards.some(c => c.rarity !== 'base');
 
-    const category = ALL_CARD_CATEGORIES[Math.floor(Math.random() * ALL_CARD_CATEGORIES.length)];
+    const category = pool[Math.floor(Math.random() * pool.length)];
     const variant = Math.floor(Math.random() * 10) + 1;
     
     let rarity: CardRarity = 'base';
-    if (forceReverse) {
+    if (pack.forcedRarity) {
+      rarity = pack.forcedRarity;
+    } else if (forceReverse) {
       rarity = 'reverse';
     } else {
       const roll = Math.random();
@@ -259,6 +327,24 @@ export function getCompletedVehiclesCount(state: CollectionState): number {
 
 /** Discount applied on vehicle purchase price when its model is fully collected. */
 export const COLLECTION_COMPLETION_DISCOUNT = 0.15;
+
+/** Stacking discount based on which rarities of a model the player owns:
+ *  base −5%, reverse −10%, base+reverse −15%, gold −15%, base+gold −20%,
+ *  reverse+gold −25%, all three −30%. */
+export function getCollectionDiscount(
+  state: CollectionState,
+  category: VehicleCategory,
+  variant: number,
+): number {
+  const hasBase = !!state.ownedCards[getCardId(category, variant, 'base')];
+  const hasReverse = !!state.ownedCards[getCardId(category, variant, 'reverse')];
+  const hasGold = !!state.ownedCards[getCardId(category, variant, 'gold')];
+  return (
+    (hasBase ? 0.05 : 0) +
+    (hasReverse ? 0.10 : 0) +
+    (hasGold ? 0.15 : 0)
+  );
+}
 
 export function getCollectionStats(state: CollectionState) {
   const uniqueCards = Object.keys(state.ownedCards).length;
