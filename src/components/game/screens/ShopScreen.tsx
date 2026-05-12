@@ -63,7 +63,7 @@ export function ShopScreen() {
       return;
     }
     dispatch({ type: 'SPEND_MONEY', payload: pack.cost });
-    const cards = openPack(pack);
+    const cards = openPack(pack, state.level);
     const collection = loadCollection();
     // Track newly-obtained cards & newly-completed vehicles for challenges
     const ownedBefore = collection.ownedCards;

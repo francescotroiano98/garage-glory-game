@@ -1,7 +1,7 @@
 import { Car, CarCategory, PartDamage, DamageLevel, PartType, PartCategory, getCategoriesForLevel, CATEGORY_UNLOCK_LEVEL, VehicleType } from '@/types/game';
 import { PART_DEFINITIONS } from './parts';
 import { getVehicleNameByImage } from './vehicleNames';
-import { loadCollection, isVehicleCompleted, COLLECTION_COMPLETION_DISCOUNT } from './cards';
+import { loadCollection, getCollectionDiscount } from './cards';
 
 // Import car images - 10 per category for variety
 // Economy images (junker, beater, economy, compact, hatchback)
@@ -358,9 +358,9 @@ export function generateCar(level: number): Car {
   const priceVariance = 0.75 + Math.random() * 0.35;
   let askingPrice = Math.round(currentValue * priceVariance);
 
-  // Collection completion bonus: discount on already-collected models
-  const collectionBonus = isVehicleCompleted(loadCollection(), template.category, imageVariant + 1);
-  if (collectionBonus) askingPrice = Math.round(askingPrice * (1 - COLLECTION_COMPLETION_DISCOUNT));
+  // Stacking collection discount based on owned card variants of this model
+  const collectionBonus = getCollectionDiscount(loadCollection(), template.category, imageVariant + 1);
+  if (collectionBonus > 0) askingPrice = Math.round(askingPrice * (1 - collectionBonus));
 
   return {
     id: `car_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,

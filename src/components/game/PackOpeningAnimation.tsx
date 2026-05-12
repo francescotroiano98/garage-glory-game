@@ -35,20 +35,32 @@ export function PackOpeningAnimation({ cards, packIcon = '📦', packImage, onCl
     active: false, startX: 0, lastTickAt: 0,
   });
 
-  // Pre-computed jagged tear path used as clip-path on the top half.
-  // The bottom edge of the top half becomes a zig-zag line.
+  // Tear sits in the upper third of the pack so the player rips off a thinner top strip
+  // (more realistic, and the shiny swipe indicator stays in a comfortable thumb zone).
+  const TEAR_TOP_PCT = 28; // % of container height where the tear runs
+  const TEAR_AMPLITUDE = 5; // tooth height in %
+  // Pre-computed jagged tear path used as clip-path on the top strip.
   const tearClipPath = useRef<string>('');
+  const tearClipPathBottom = useRef<string>('');
   if (!tearClipPath.current) {
     const teeth = 22;
-    const pts: string[] = ['0% 0%', '100% 0%'];
+    const top: string[] = ['0% 0%', '100% 0%'];
+    const bot: string[] = [];
     for (let i = teeth; i >= 0; i--) {
       const x = (i / teeth) * 100;
-      // Alternating tooth height (in % of container height)
-      const y = 100 - (i % 2 === 0 ? 0 : 6 + Math.random() * 4);
-      pts.push(`${x.toFixed(2)}% ${y.toFixed(2)}%`);
+      const y = TEAR_TOP_PCT - (i % 2 === 0 ? 0 : TEAR_AMPLITUDE - Math.random() * 2);
+      top.push(`${x.toFixed(2)}% ${y.toFixed(2)}%`);
     }
-    tearClipPath.current = `polygon(${pts.join(', ')})`;
+    for (let i = 0; i <= teeth; i++) {
+      const x = (i / teeth) * 100;
+      const y = TEAR_TOP_PCT - (i % 2 === 0 ? 0 : TEAR_AMPLITUDE - Math.random() * 2);
+      bot.push(`${x.toFixed(2)}% ${y.toFixed(2)}%`);
+    }
+    tearClipPath.current = `polygon(${top.join(', ')})`;
+    tearClipPathBottom.current = `polygon(${bot.join(', ')}, 100% 100%, 0% 100%)`;
   }
+  // Shorter swipe (160px) so it stays well within the thumb zone on mobile.
+  const SWIPE_DISTANCE = 160;
 
   // Reset state whenever a new pack arrives
   useEffect(() => {
@@ -70,7 +82,7 @@ export function PackOpeningAnimation({ cards, packIcon = '📦', packImage, onCl
   const onPointerMove = (e: React.PointerEvent) => {
     if (!dragRef.current.active || phase !== 'swipe') return;
     const dx = Math.max(0, e.clientX - dragRef.current.startX);
-    const p = Math.min(1, dx / 260);
+    const p = Math.min(1, dx / SWIPE_DISTANCE);
     setRipProgress(p);
     // Re-trigger short rip crackles at progress checkpoints
     const tick = Math.floor(p * 4);
@@ -136,8 +148,9 @@ export function PackOpeningAnimation({ cards, packIcon = '📦', packImage, onCl
           >
             {/* Top half (gets pulled away with a torn zig-zag edge) */}
             <div
-              className="absolute inset-x-0 top-0 h-[52%]"
+              className="absolute inset-x-0 top-0"
               style={{
+                height: '100%',
                 transform: `translate(${ripProgress * 220}px, ${ripProgress * -30}px) rotate(${ripProgress * 14}deg)`,
                 transition: dragRef.current.active ? 'none' : 'transform 200ms ease',
                 transformOrigin: 'bottom left',
@@ -153,35 +166,60 @@ export function PackOpeningAnimation({ cards, packIcon = '📦', packImage, onCl
               )}
             </div>
 
-            {/* Bottom half (stays) — also clipped with the inverse tear */}
+            {/* Bottom (stays) — clipped with the inverse tear */}
             <div
-              className="absolute inset-x-0 bottom-0 h-1/2"
+              className="absolute inset-0"
               style={{
-                clipPath:
-                  'polygon(0% 100%, 100% 100%, 100% 12%, 95% 6%, 90% 14%, 85% 4%, 80% 12%, 75% 6%, 70% 14%, 65% 4%, 60% 12%, 55% 6%, 50% 14%, 45% 4%, 40% 12%, 35% 6%, 30% 14%, 25% 4%, 20% 12%, 15% 6%, 10% 14%, 5% 4%, 0% 12%)',
+                clipPath: tearClipPathBottom.current,
+                WebkitClipPath: tearClipPathBottom.current,
               }}
             >
               {packImage ? (
-                <img
-                  src={packImage}
-                  alt=""
-                  className="w-full h-[300px] object-contain"
-                  style={{ transform: 'translateY(-50%)' }}
-                />
+                <img src={packImage} alt="" className="w-full h-[300px] object-contain" />
               ) : (
-                <div className="w-full h-[300px] flex items-center justify-center text-[120px]" style={{ transform: 'translateY(-50%)' }}>
+                <div className="w-full h-[300px] flex items-center justify-center text-[120px]">
                   {packIcon}
                 </div>
               )}
             </div>
 
-            {/* Light leak through the tear */}
+            {/* Shiny swipe indicator line — sits exactly along the tear */}
+            <div
+              className="absolute left-0 right-0 pointer-events-none overflow-hidden"
+              style={{
+                top: `calc(${TEAR_TOP_PCT}% - 6px)`,
+                height: 12,
+                opacity: 1 - ripProgress * 0.8,
+              }}
+            >
+              {/* base bright bar */}
+              <div
+                className="absolute inset-0 rounded-full"
+                style={{
+                  background:
+                    'linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,240,180,0.95) 20%, rgba(255,255,255,1) 50%, rgba(255,240,180,0.95) 80%, rgba(255,255,255,0) 100%)',
+                  boxShadow: '0 0 12px rgba(255,240,180,0.9), 0 0 24px rgba(255,200,80,0.5)',
+                  filter: 'blur(0.5px)',
+                }}
+              />
+              {/* moving sheen */}
+              <div
+                className="absolute inset-y-0 w-1/3 anim-sheen-slide"
+                style={{
+                  background:
+                    'linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,0.95), rgba(255,255,255,0))',
+                  mixBlendMode: 'screen',
+                }}
+              />
+            </div>
+
+            {/* Warm light leak that grows as the tear opens */}
             {ripProgress > 0.05 && (
               <div
                 className="absolute left-0 right-0 pointer-events-none"
                 style={{
-                  top: '46%',
-                  height: 16,
+                  top: `calc(${TEAR_TOP_PCT}% - 8px)`,
+                  height: 20,
                   background:
                     'radial-gradient(ellipse at center, rgba(255,240,180,0.95), rgba(255,240,180,0) 70%)',
                   opacity: Math.min(1, ripProgress * 1.4),
@@ -198,7 +236,7 @@ export function PackOpeningAnimation({ cards, packIcon = '📦', packImage, onCl
                     key={i}
                     className="absolute block bg-card/90 rounded-sm"
                     style={{
-                      top: '48%',
+                      top: `${TEAR_TOP_PCT - 2}%`,
                       left: `${20 + i * 12}%`,
                       width: 4 + (i % 3),
                       height: 6,
@@ -211,9 +249,12 @@ export function PackOpeningAnimation({ cards, packIcon = '📦', packImage, onCl
               </>
             )}
 
-            {/* Swipe hint arrow */}
+            {/* Swipe hint arrow — anchored just above the shiny line */}
             {ripProgress < 0.05 && (
-              <div className="absolute -top-10 left-1/2 -translate-x-1/2 text-white/90 text-xs flex items-center gap-1 animate-pulse whitespace-nowrap">
+              <div
+                className="absolute left-1/2 -translate-x-1/2 text-white/90 text-xs flex items-center gap-1 animate-pulse whitespace-nowrap"
+                style={{ top: `calc(${TEAR_TOP_PCT}% - 32px)` }}
+              >
                 <span>{t.swipeToOpen}</span>
                 <span>👉</span>
               </div>
