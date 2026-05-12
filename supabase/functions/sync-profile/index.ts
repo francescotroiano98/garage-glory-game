@@ -2,8 +2,8 @@ import { createClient, corsHeaders } from "https://esm.sh/@supabase/supabase-js@
 
 // Reasonable per-call caps (sync runs ~every 5s while playing).
 // These prevent a client from injecting absurd jumps in stats.
-const MAX_PROFIT_DELTA = 100_000;      // max profit increase per sync call
-const MAX_CARS_DELTA = 10;             // max cars sold increase per sync call
+const MAX_PROFIT_DELTA = 5_000_000;    // max profit increase per sync call
+const MAX_CARS_DELTA = 50;             // max cars sold increase per sync call
 const MAX_LEVEL_DELTA = 2;             // max level increase per sync call
 
 Deno.serve(async (req) => {

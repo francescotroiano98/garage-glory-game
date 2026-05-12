@@ -129,7 +129,7 @@ export function calculateDiySuccessChance(
   const baseDifficulty = partDef.diyDifficulty;
   
   // Base success: 25% + skill contribution + tool contribution + equipment bonus + part upgrade
-  const skillBonus = skillLevel * 2; // 2% per skill level
+  const skillBonus = skillLevel * 4; // 4% per skill level (more impactful)
   const toolBonus = toolLevel * 4; // 4% per tool level
   const equipBonus = hasSpecialEquipment ? 10 : 0;
   const partUpgradeBonus = partUpgradeLevel * 3; // 3% per part upgrade level

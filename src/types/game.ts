@@ -122,8 +122,9 @@ export interface Car {
   isInGarage: boolean;
   listedForSale: boolean;
   saleStartTime?: number;
-  /** True when the player has fully collected this model (base + reverse + gold). */
-  collectionBonus?: boolean;
+  /** Discount fraction applied based on which card variants of this model the
+   * player owns (0.05 base, 0.10 reverse, 0.15 gold and combinations up to 0.30). */
+  collectionBonus?: number;
 }
 
 // Progression Types - More levels for harder progression
