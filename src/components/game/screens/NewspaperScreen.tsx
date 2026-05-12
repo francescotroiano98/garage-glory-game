@@ -104,8 +104,10 @@ function VehicleDetailDialog({
             <div className="flex-1 min-w-0">
               <p className="font-bold text-sm truncate">{ad.car.name}</p>
               <p className="text-lg font-bold text-primary">{formatMoney(ad.car.askingPrice)}</p>
-              {ad.car.collectionBonus && (
-                <p className="text-[10px] font-bold text-yellow-500">🏆 Collection bonus −15%</p>
+              {!!ad.car.collectionBonus && (
+                <p className="text-[10px] font-bold text-yellow-500">
+                  🏆 Collection bonus −{Math.round((ad.car.collectionBonus || 0) * 100)}%
+                </p>
               )}
             </div>
           </div>
@@ -398,9 +400,9 @@ export function NewspaperScreen({ onCarBought }: NewspaperScreenProps) {
                     onClick={() => handleSelectAd(ad)}
                     showDamages={false}
                   />
-                  {ad.car.collectionBonus && (
+                  {!!ad.car.collectionBonus && (
                     <div className="absolute top-2 left-2 flex items-center gap-1 text-[10px] bg-yellow-500/90 text-black px-1.5 py-0.5 rounded-md font-bold border border-yellow-300 shadow">
-                      🏆 -15%
+                      🏆 -{Math.round((ad.car.collectionBonus || 0) * 100)}%
                     </div>
                   )}
                   {ad.negotiable && (

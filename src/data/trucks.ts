@@ -2,7 +2,7 @@ import { Car, TruckCategory, PartDamage, DamageLevel, PartType, PartCategory, TR
 import { PART_DEFINITIONS } from './parts';
 import { DAMAGE_MULTIPLIERS } from './cars';
 import { getVehicleNameByImage } from './vehicleNames';
-import { loadCollection, isVehicleCompleted, COLLECTION_COMPLETION_DISCOUNT } from './cards';
+import { loadCollection, getCollectionDiscount } from './cards';
 
 // Import truck images - 10 per style
 import pickup1 from '@/assets/trucks/pickup-1.png';
@@ -235,8 +235,8 @@ export function generateTruck(level: number): Car {
   
   const priceVariance = 0.75 + Math.random() * 0.35;
   let askingPrice = Math.round(currentValue * priceVariance);
-  const collectionBonus = isVehicleCompleted(loadCollection(), template.category, imageVariant + 1);
-  if (collectionBonus) askingPrice = Math.round(askingPrice * (1 - COLLECTION_COMPLETION_DISCOUNT));
+  const collectionBonus = getCollectionDiscount(loadCollection(), template.category, imageVariant + 1);
+  if (collectionBonus > 0) askingPrice = Math.round(askingPrice * (1 - collectionBonus));
 
   return {
     id: `truck_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,

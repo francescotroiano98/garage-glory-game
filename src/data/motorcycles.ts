@@ -2,7 +2,7 @@ import { Car, MotorcycleCategory, PartDamage, DamageLevel, PartType, PartCategor
 import { PART_DEFINITIONS } from './parts';
 import { DAMAGE_MULTIPLIERS } from './cars';
 import { getVehicleNameByImage } from './vehicleNames';
-import { loadCollection, isVehicleCompleted, COLLECTION_COMPLETION_DISCOUNT } from './cards';
+import { loadCollection, getCollectionDiscount } from './cards';
 
 // Import motorcycle images - 10 per category
 import scooter1 from '@/assets/motorcycles/scooter-1.png';
@@ -236,8 +236,8 @@ export function generateMotorcycle(level: number): Car {
   
   const priceVariance = 0.75 + Math.random() * 0.35;
   let askingPrice = Math.round(currentValue * priceVariance);
-  const collectionBonus = isVehicleCompleted(loadCollection(), template.category, imageVariant + 1);
-  if (collectionBonus) askingPrice = Math.round(askingPrice * (1 - COLLECTION_COMPLETION_DISCOUNT));
+  const collectionBonus = getCollectionDiscount(loadCollection(), template.category, imageVariant + 1);
+  if (collectionBonus > 0) askingPrice = Math.round(askingPrice * (1 - collectionBonus));
 
   return {
     id: `moto_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
