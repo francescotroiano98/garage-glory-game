@@ -15,7 +15,7 @@ import { CATEGORY_DISPLAY_NAMES } from '@/utils/partTranslations';
 import { getCategoriesForLevel } from '@/types/game';
 import { getMotoCategoriesForLevel } from '@/data/motorcycles';
 import { getTruckCategoriesForLevel } from '@/data/trucks';
-import { Newspaper, RefreshCw, DollarSign, Zap, Filter, Search } from 'lucide-react';
+import { Newspaper, RefreshCw, DollarSign, Zap, Filter, Search, RotateCcw, ArrowUpDown } from 'lucide-react';
 import { useSound } from '@/hooks/useSound';
 import { getPartName, getDamageLevelName } from '@/utils/partTranslations';
 import newspaperBg from '@/assets/newspaper-bg.jpg';
@@ -28,6 +28,22 @@ const NEGOTIATION_ENERGY_COST = 2;
 const INSPECT_ENERGY_COST = 2;
 
 type VehicleTypeFilter = 'all' | 'car' | 'motorcycle' | 'truck';
+type SortMode = 'default' | 'price_asc' | 'price_desc' | 'name_asc';
+
+// Module-level filter store: persists selections across screen unmounts.
+const FILTER_STORE: {
+  type: VehicleTypeFilter;
+  category: string;
+  priceMin: number;
+  priceMax: number;
+  sort: SortMode;
+} = {
+  type: 'all',
+  category: 'all',
+  priceMin: 0,
+  priceMax: 1_000_000,
+  sort: 'default',
+};
 
 interface VehicleDetailDialogProps {
   ad: NewspaperAd | null;
@@ -218,8 +234,25 @@ export function NewspaperScreen({ onCarBought }: NewspaperScreenProps) {
   const [negotiatePrice, setNegotiatePrice] = useState(0);
   const [isNegotiating, setIsNegotiating] = useState(false);
   const [negotiationCount, setNegotiationCount] = useState(0);
-  const [typeFilter, setTypeFilter] = useState<VehicleTypeFilter>('all');
-  const [categoryFilter, setCategoryFilter] = useState<string>('all');
+  const [typeFilter, setTypeFilterRaw] = useState<VehicleTypeFilter>(FILTER_STORE.type);
+  const [categoryFilter, setCategoryFilterRaw] = useState<string>(FILTER_STORE.category);
+  const [priceMin, setPriceMinRaw] = useState<number>(FILTER_STORE.priceMin);
+  const [priceMax, setPriceMaxRaw] = useState<number>(FILTER_STORE.priceMax);
+  const [sortMode, setSortModeRaw] = useState<SortMode>(FILTER_STORE.sort);
+
+  const setTypeFilter = (v: VehicleTypeFilter) => { FILTER_STORE.type = v; setTypeFilterRaw(v); };
+  const setCategoryFilter = (v: string) => { FILTER_STORE.category = v; setCategoryFilterRaw(v); };
+  const setPriceMin = (v: number) => { FILTER_STORE.priceMin = v; setPriceMinRaw(v); };
+  const setPriceMax = (v: number) => { FILTER_STORE.priceMax = v; setPriceMaxRaw(v); };
+  const setSortMode = (v: SortMode) => { FILTER_STORE.sort = v; setSortModeRaw(v); };
+
+  const resetFilters = () => {
+    setTypeFilter('all');
+    setCategoryFilter('all');
+    setPriceMin(0);
+    setPriceMax(1_000_000);
+    setSortMode('default');
+  };
   const { playSound } = useSound();
 
   useEffect(() => {
@@ -265,13 +298,27 @@ export function NewspaperScreen({ onCarBought }: NewspaperScreenProps) {
 
   // Filter ads
   const filteredAds = useMemo(() => {
-    return ads.filter(ad => {
+    const filtered = ads.filter(ad => {
       const vType = ad.car.vehicleType || 'car';
       if (typeFilter !== 'all' && vType !== typeFilter) return false;
       if (categoryFilter !== 'all' && ad.car.category !== categoryFilter) return false;
+      if (ad.car.askingPrice < priceMin) return false;
+      if (ad.car.askingPrice > priceMax) return false;
       return true;
     });
-  }, [ads, typeFilter, categoryFilter]);
+    switch (sortMode) {
+      case 'price_asc': return [...filtered].sort((a, b) => a.car.askingPrice - b.car.askingPrice);
+      case 'price_desc': return [...filtered].sort((a, b) => b.car.askingPrice - a.car.askingPrice);
+      case 'name_asc': return [...filtered].sort((a, b) => a.car.name.localeCompare(b.car.name));
+      default: return filtered;
+    }
+  }, [ads, typeFilter, categoryFilter, priceMin, priceMax, sortMode]);
+
+  // Compute dynamic price bounds from current ads
+  const adsMaxPrice = useMemo(() => {
+    if (ads.length === 0) return 1_000_000;
+    return Math.max(...ads.map(a => a.car.askingPrice));
+  }, [ads]);
 
   const handleSelectAd = (ad: NewspaperAd) => {
     setSelectedAd(ad);
@@ -345,8 +392,8 @@ export function NewspaperScreen({ onCarBought }: NewspaperScreenProps) {
           </div>
 
           {/* Filters */}
-          <div className="flex gap-2 mt-3">
-            <div className="flex gap-1">
+          <div className="flex flex-wrap gap-2 mt-3">
+            <div className="flex gap-1 flex-wrap">
               {(['all', 'car', 'motorcycle', 'truck'] as VehicleTypeFilter[]).map(type => (
                 <Button
                   key={type}
@@ -360,7 +407,7 @@ export function NewspaperScreen({ onCarBought }: NewspaperScreenProps) {
               ))}
             </div>
             <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-              <SelectTrigger className="h-7 text-xs w-[140px]">
+              <SelectTrigger className="h-7 text-xs w-[130px]">
                 <SelectValue placeholder={t.allCategories} />
               </SelectTrigger>
               <SelectContent>
@@ -372,12 +419,48 @@ export function NewspaperScreen({ onCarBought }: NewspaperScreenProps) {
                 ))}
               </SelectContent>
             </Select>
+            <Select value={sortMode} onValueChange={(v) => setSortMode(v as SortMode)}>
+              <SelectTrigger className="h-7 text-xs w-[130px]">
+                <ArrowUpDown className="w-3 h-3 mr-1" />
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="default">{language === 'it' ? 'Predefinito' : 'Default'}</SelectItem>
+                <SelectItem value="price_asc">{language === 'it' ? 'Prezzo ↑' : 'Price ↑'}</SelectItem>
+                <SelectItem value="price_desc">{language === 'it' ? 'Prezzo ↓' : 'Price ↓'}</SelectItem>
+                <SelectItem value="name_asc">{language === 'it' ? 'Nome A-Z' : 'Name A-Z'}</SelectItem>
+              </SelectContent>
+            </Select>
+            <Button size="sm" variant="outline" className="h-7 text-xs px-2" onClick={resetFilters}>
+              <RotateCcw className="w-3 h-3 mr-1" />
+              {language === 'it' ? 'Reset' : 'Reset'}
+            </Button>
+          </div>
+
+          {/* Price range */}
+          <div className="mt-3 px-1">
+            <div className="flex items-center justify-between text-[11px] text-muted-foreground mb-1">
+              <span>{language === 'it' ? 'Prezzo' : 'Price'}</span>
+              <span className="font-medium text-foreground">
+                {formatMoney(priceMin)} — {priceMax >= 1_000_000 ? '∞' : formatMoney(priceMax)}
+              </span>
+            </div>
+            <Slider
+              value={[priceMin, Math.min(priceMax, Math.max(adsMaxPrice, 1000))]}
+              min={0}
+              max={Math.max(adsMaxPrice, 1000)}
+              step={Math.max(50, Math.round(Math.max(adsMaxPrice, 1000) / 100))}
+              onValueChange={([min, max]) => {
+                setPriceMin(min);
+                setPriceMax(max >= adsMaxPrice ? 1_000_000 : max);
+              }}
+            />
           </div>
         </div>
         <div className={`overflow-y-auto p-4 space-y-4 ${
                             garageFull
-                              ? "h-[calc(100svh-420px)]"
-                              : "h-[calc(100svh-400px)]"
+                              ? "h-[calc(100svh-490px)]"
+                              : "h-[calc(100svh-470px)]"
                         }`}>
           {garageFull && (
           <div className="mx-4 mt-4 p-3 bg-destructive/20 border-2 border-destructive/50 rounded-lg backdrop-blur-sm">
