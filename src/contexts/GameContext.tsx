@@ -793,6 +793,11 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
       case 'xp':
         dispatch({ type: 'ADD_XP', payload: challenge.reward });
         break;
+      case 'pack':
+        if (challenge.rewardPackId) {
+          dispatch({ type: 'GIVE_PACK', payload: { packId: challenge.rewardPackId, count: challenge.reward || 1 } });
+        }
+        break;
     }
 
     // Mark as claimed
@@ -820,6 +825,11 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
          break;
        case 'xp':
          dispatch({ type: 'ADD_XP', payload: challenge.reward });
+         break;
+       case 'pack':
+         if (challenge.rewardPackId) {
+           dispatch({ type: 'GIVE_PACK', payload: { packId: challenge.rewardPackId, count: challenge.reward || 1 } });
+         }
          break;
      }
  
