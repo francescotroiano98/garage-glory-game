@@ -214,6 +214,8 @@ export interface GameState {
   activeSales: SaleState[];
   achievements: Achievement[]; // NEW: Achievements
   negotiationAttempts: number; // NEW: Track negotiation attempts for buying
+  /** Free packs awarded from challenges; map packId -> count */
+  pendingPacks?: Record<string, number>;
 }
 
 // Customer Types - 20 different types

@@ -10,7 +10,9 @@ export interface DailyChallenge {
     | 'obtain_rare_cards' | 'complete_vehicles';
   target: number;
   reward: number;
-  rewardType: 'money' | 'energy' | 'xp';
+  rewardType: 'money' | 'energy' | 'xp' | 'pack';
+  /** When rewardType === 'pack', id of the pack from PACK_TYPES */
+  rewardPackId?: string;
    isWeekly?: boolean;
 }
 
@@ -49,6 +51,13 @@ const DAILY_CHALLENGE_TEMPLATES: Omit<DailyChallenge, 'id'>[] = [
   { title: 'New Finds', description: 'Get 3 new cards', icon: '🆕', type: 'obtain_new_cards', target: 3, reward: 30, rewardType: 'xp' },
   { title: 'Card Sweep', description: 'Sell 5 duplicate cards', icon: '♻️', type: 'sell_card_duplicates', target: 5, reward: 250, rewardType: 'money' },
   { title: 'Rare Pull', description: 'Get 1 Reverse or Gold card', icon: '✨', type: 'obtain_rare_cards', target: 1, reward: 50, rewardType: 'xp' },
+
+  // Pack-reward daily challenges
+  { title: 'Daily Hustle', description: 'Sell 2 cars to win a Base Pack', icon: '🎁', type: 'sell_cars', target: 2, reward: 1, rewardType: 'pack', rewardPackId: 'base' },
+  { title: 'Profit Pack', description: 'Earn $1,500 profit to win a Base Pack', icon: '🎁', type: 'earn_profit', target: 1500, reward: 1, rewardType: 'pack', rewardPackId: 'base' },
+  { title: 'Wrench Reward', description: 'Repair 8 parts to win a Base Pack', icon: '🎁', type: 'repair_parts', target: 8, reward: 1, rewardType: 'pack', rewardPackId: 'base' },
+  { title: 'Lucky Shopper', description: 'Buy 3 cars to win a Premium Pack', icon: '🎁', type: 'buy_cars', target: 3, reward: 1, rewardType: 'pack', rewardPackId: 'premium' },
+  { title: 'Card Streak', description: 'Get 5 new cards to win a Base Pack', icon: '🎁', type: 'obtain_new_cards', target: 5, reward: 1, rewardType: 'pack', rewardPackId: 'base' },
 ];
  
  // Weekly challenge templates (harder, bigger rewards)
@@ -62,6 +71,13 @@ const DAILY_CHALLENGE_TEMPLATES: Omit<DailyChallenge, 'id'>[] = [
    { title: 'Set Builder', description: 'Complete 1 vehicle (base+reverse+gold)', icon: '🏆', type: 'complete_vehicles', target: 1, reward: 3000, rewardType: 'money', isWeekly: true },
    { title: 'Master Collector', description: 'Complete 3 vehicles this week', icon: '👑', type: 'complete_vehicles', target: 3, reward: 8000, rewardType: 'money', isWeekly: true },
    { title: 'Rare Hunter', description: 'Get 5 Reverse/Gold cards this week', icon: '💎', type: 'obtain_rare_cards', target: 5, reward: 250, rewardType: 'xp', isWeekly: true },
+
+   // Pack-reward weekly challenges
+   { title: 'Weekly Bonus Pack', description: 'Sell 8 cars to win a Premium Pack', icon: '🎁', type: 'sell_cars', target: 8, reward: 1, rewardType: 'pack', rewardPackId: 'premium', isWeekly: true },
+   { title: 'Legendary Effort', description: 'Earn $15,000 profit to win a Legendary Pack', icon: '🎁', type: 'earn_profit', target: 15000, reward: 1, rewardType: 'pack', rewardPackId: 'legendary', isWeekly: true },
+   { title: 'MEGA Mechanic', description: 'Repair 60 parts to win a MEGA Base Pack', icon: '🎁', type: 'repair_parts', target: 60, reward: 1, rewardType: 'pack', rewardPackId: 'mega_base', isWeekly: true },
+   { title: 'Pack Frenzy', description: 'Open 15 packs to win a MEGA Premium Pack', icon: '🎁', type: 'open_packs', target: 15, reward: 1, rewardType: 'pack', rewardPackId: 'mega_premium', isWeekly: true },
+   { title: 'Card Master', description: 'Complete 2 vehicles to win a MEGA Gold Pack', icon: '🎁', type: 'complete_vehicles', target: 2, reward: 1, rewardType: 'pack', rewardPackId: 'mega_gold', isWeekly: true },
  ];
 
 export interface DailyChallengeProgress {
@@ -89,12 +105,12 @@ export function generateDailyChallenges(date: string): DailyChallenge[] {
     return x - Math.floor(x) - 0.5;
   });
   
-  // Pick 3 challenges of different types
+  // Pick 4 challenges of different types
   const types = new Set<string>();
   const selected: DailyChallenge[] = [];
   
   for (const template of shuffled) {
-    if (!types.has(template.type) && selected.length < 3) {
+    if (!types.has(template.type) && selected.length < 4) {
       types.add(template.type);
       selected.push({
         ...template,
@@ -118,7 +134,7 @@ export function generateDailyChallenges(date: string): DailyChallenge[] {
    const selected: DailyChallenge[] = [];
    
    for (const template of shuffled) {
-     if (!types.has(template.type) && selected.length < 2) {
+     if (!types.has(template.type) && selected.length < 3) {
        types.add(template.type);
        selected.push({
          ...template,
