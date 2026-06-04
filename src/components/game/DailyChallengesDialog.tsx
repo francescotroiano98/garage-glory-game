@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
  import { DailyChallengeState, DailyChallenge, DailyChallengeProgress } from '@/data/dailyChallenges';
-import { Check, Gift, Zap, DollarSign, Star } from 'lucide-react';
+import { Check, Gift, Zap, DollarSign, Star, Package } from 'lucide-react';
  import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
  import { useLanguage } from '@/contexts/LanguageContext';
 
@@ -29,15 +29,17 @@ export function DailyChallengesDialog({
       case 'money': return <DollarSign className="w-3 h-3" />;
       case 'energy': return <Zap className="w-3 h-3" />;
       case 'xp': return <Star className="w-3 h-3" />;
+      case 'pack': return <Package className="w-3 h-3" />;
       default: return <Gift className="w-3 h-3" />;
     }
   };
 
-  const getRewardLabel = (type: string, amount: number) => {
+  const getRewardLabel = (type: string, amount: number, packId?: string) => {
     switch (type) {
       case 'money': return `$${amount}`;
       case 'energy': return `+${amount} ⚡`;
       case 'xp': return `+${amount} XP`;
+      case 'pack': return `${amount}× ${packId ? packId.replace('_', ' ') : 'pack'}`;
       default: return `${amount}`;
     }
   };
@@ -89,7 +91,7 @@ export function DailyChallengesDialog({
              {claimed ? (
                <Badge variant="outline" className="text-xs opacity-50">
                  {getRewardIcon(challenge.rewardType)}
-                 <span className="ml-1">{getRewardLabel(challenge.rewardType, challenge.reward)}</span>
+                 <span className="ml-1">{getRewardLabel(challenge.rewardType, challenge.reward, challenge.rewardPackId)}</span>
                </Badge>
              ) : completed ? (
                <Button
@@ -103,7 +105,7 @@ export function DailyChallengesDialog({
              ) : (
                <Badge variant="secondary" className="text-xs">
                  {getRewardIcon(challenge.rewardType)}
-                 <span className="ml-1">{getRewardLabel(challenge.rewardType, challenge.reward)}</span>
+                 <span className="ml-1">{getRewardLabel(challenge.rewardType, challenge.reward, challenge.rewardPackId)}</span>
                </Badge>
              )}
            </div>

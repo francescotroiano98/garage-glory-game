@@ -55,14 +55,19 @@ export function ShopScreen() {
   const [openedPackIcon, setOpenedPackIcon] = useState<string>('📦');
   const [openedPackImage, setOpenedPackImage] = useState<string | undefined>(undefined);
 
-  const buyPack = useCallback((packId: string) => {
+  const buyPack = useCallback((packId: string, free: boolean = false) => {
     const pack = PACK_TYPES.find(p => p.id === packId);
-    if (!pack || !canAfford(pack.cost)) {
+    if (!pack) return;
+    if (!free && !canAfford(pack.cost)) {
       toast.error(t.notEnoughMoney);
       playSound('error');
       return;
     }
-    dispatch({ type: 'SPEND_MONEY', payload: pack.cost });
+    if (free) {
+      dispatch({ type: 'CONSUME_PACK', payload: { packId } });
+    } else {
+      dispatch({ type: 'SPEND_MONEY', payload: pack.cost });
+    }
     const cards = openPack(pack, state.level);
     const collection = loadCollection();
     // Track newly-obtained cards & newly-completed vehicles for challenges
@@ -205,7 +210,9 @@ export function ShopScreen() {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
-            {PACK_TYPES.map(pack => (
+            {PACK_TYPES.map(pack => {
+              const freeCount = state.pendingPacks?.[pack.id] || 0;
+              return (
               <div key={pack.id} className="flex items-center gap-3 p-2 bg-secondary/30 rounded-lg">
                 {pack.image ? (
                   <img
@@ -220,19 +227,38 @@ export function ShopScreen() {
                   <span className="text-2xl">{pack.icon}</span>
                 )}
                 <div className="flex-1 min-w-0">
-                  <div className="font-medium text-sm">{language === 'it' ? pack.nameIt : pack.name}</div>
+                  <div className="font-medium text-sm flex items-center gap-1">
+                    {language === 'it' ? pack.nameIt : pack.name}
+                    {freeCount > 0 && (
+                      <Badge variant="default" className="h-4 px-1 text-[10px] animate-pulse">×{freeCount}</Badge>
+                    )}
+                  </div>
                   <div className="text-[10px] text-muted-foreground">{language === 'it' ? pack.descriptionIt : pack.description}</div>
                 </div>
-                <Button
-                  size="sm"
-                  onClick={() => buyPack(pack.id)}
-                  disabled={!canAfford(pack.cost)}
-                  className="shrink-0 h-8"
-                >
-                  {formatMoney(pack.cost)}
-                </Button>
+                <div className="flex flex-col gap-1 shrink-0">
+                  {freeCount > 0 && (
+                    <Button
+                      size="sm"
+                      variant="default"
+                      onClick={() => buyPack(pack.id, true)}
+                      className="h-7 text-[11px] gap-1 bg-gradient-to-br from-yellow-500 to-amber-600 hover:from-yellow-400 hover:to-amber-500 text-black"
+                    >
+                      <Package className="w-3 h-3" />
+                      {language === 'it' ? 'Apri Gratis' : 'Open Free'}
+                    </Button>
+                  )}
+                  <Button
+                    size="sm"
+                    onClick={() => buyPack(pack.id)}
+                    disabled={!canAfford(pack.cost)}
+                    className="h-7"
+                  >
+                    {formatMoney(pack.cost)}
+                  </Button>
+                </div>
               </div>
-            ))}
+              );
+            })}
           </CardContent>
         </Card>
 

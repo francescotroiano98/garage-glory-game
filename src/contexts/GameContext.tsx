@@ -53,6 +53,7 @@ const INITIAL_STATE: GameState = {
   activeSales: [],
   achievements: getInitialAchievements(),
   negotiationAttempts: 0,
+  pendingPacks: {},
 };
 
 type GameAction =
@@ -88,6 +89,8 @@ type GameAction =
   | { type: 'UNLOCK_ACHIEVEMENT'; payload: string }
   | { type: 'INCREMENT_NEGOTIATION_ATTEMPTS' }
   | { type: 'RESET_NEGOTIATION_ATTEMPTS' }
+  | { type: 'GIVE_PACK'; payload: { packId: string; count?: number } }
+  | { type: 'CONSUME_PACK'; payload: { packId: string } }
   | { type: 'LOAD_STATE'; payload: GameState };
 
 function gameReducer(state: GameState, action: GameAction): GameState {
@@ -345,6 +348,22 @@ function gameReducer(state: GameState, action: GameAction): GameState {
       return { ...state, negotiationAttempts: state.negotiationAttempts + 1 };
     case 'RESET_NEGOTIATION_ATTEMPTS':
       return { ...state, negotiationAttempts: 0 };
+    case 'GIVE_PACK': {
+      const prev = state.pendingPacks || {};
+      const count = action.payload.count ?? 1;
+      return {
+        ...state,
+        pendingPacks: { ...prev, [action.payload.packId]: (prev[action.payload.packId] || 0) + count },
+      };
+    }
+    case 'CONSUME_PACK': {
+      const prev = state.pendingPacks || {};
+      const current = prev[action.payload.packId] || 0;
+      if (current <= 0) return state;
+      const next = { ...prev, [action.payload.packId]: current - 1 };
+      if (next[action.payload.packId] <= 0) delete next[action.payload.packId];
+      return { ...state, pendingPacks: next };
+    }
     case 'LOAD_STATE': {
       // Calculate energy regeneration from time spent offline
       const now = Date.now();
@@ -368,6 +387,7 @@ function gameReducer(state: GameState, action: GameAction): GameState {
         achievements: action.payload.achievements || getInitialAchievements(),
         lastEnergyBonus: action.payload.lastEnergyBonus || 0,
         negotiationAttempts: action.payload.negotiationAttempts || 0,
+        pendingPacks: action.payload.pendingPacks || {},
         skills: {
           ...INITIAL_STATE.skills,
           ...action.payload.skills,
@@ -773,6 +793,11 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
       case 'xp':
         dispatch({ type: 'ADD_XP', payload: challenge.reward });
         break;
+      case 'pack':
+        if (challenge.rewardPackId) {
+          dispatch({ type: 'GIVE_PACK', payload: { packId: challenge.rewardPackId, count: challenge.reward || 1 } });
+        }
+        break;
     }
 
     // Mark as claimed
@@ -800,6 +825,11 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
          break;
        case 'xp':
          dispatch({ type: 'ADD_XP', payload: challenge.reward });
+         break;
+       case 'pack':
+         if (challenge.rewardPackId) {
+           dispatch({ type: 'GIVE_PACK', payload: { packId: challenge.rewardPackId, count: challenge.reward || 1 } });
+         }
          break;
      }
  
