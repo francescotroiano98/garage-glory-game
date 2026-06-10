@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { useGame } from '@/contexts/GameContext';
  import { useLanguage } from '@/contexts/LanguageContext';
 import { Button } from '@/components/ui/button';
@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ShoppingBag, Wrench, Search, Zap, Building, Check, Star, Plus, Settings, Package } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
  import { useSound } from '@/hooks/useSound';
 import { TOOL_UPGRADES, DIAGNOSTIC_UPGRADES, GARAGE_UPGRADES, ENERGY_UPGRADES, getXpForLevel } from '@/data/upgrades';
@@ -44,6 +45,14 @@ const TRUCK_PARTS: Record<PartCategory, PartType[]> = {
 type VehiclePartTab = 'car' | 'moto' | 'truck';
 
 const MAX_PART_LEVEL = 10;
+
+type PackSortMode = 'default' | 'price_asc' | 'price_desc' | 'name_asc';
+type PackTypeFilter = 'all' | 'standard' | 'mega';
+// Module-level store so pack filter/sort selection survives tab switches.
+const PACK_FILTER_STORE: { sort: PackSortMode; filter: PackTypeFilter } = {
+  sort: 'default',
+  filter: 'all',
+};
 
 export function ShopScreen() {
   const { state, dispatch, canAfford, getToolLevelIndex, getNegotiationBonus, getDiySuccessChance, updateChallengeProgress } = useGame();
