@@ -423,8 +423,8 @@ interface GameContextType {
   getEnergyBonusTimeRemaining: () => number;
   handleSaleComplete: (carId: string, salePrice: number) => void;
   dailyChallenges: DailyChallengeState;
-  claimChallengeReward: (challengeId: string) => void;
-   claimWeeklyChallengeReward: (challengeId: string) => void;
+  claimChallengeReward: (challengeId: string) => boolean;
+   claimWeeklyChallengeReward: (challengeId: string) => boolean;
   updateChallengeProgress: (type: string, amount: number) => void;
 }
 
