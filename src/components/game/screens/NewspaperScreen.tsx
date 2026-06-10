@@ -259,21 +259,19 @@ export function NewspaperScreen({ onCarBought }: NewspaperScreenProps) {
   const [negotiationCount, setNegotiationCount] = useState(0);
   const [typeFilter, setTypeFilterRaw] = useState<VehicleTypeFilter>(FILTER_STORE.type);
   const [categoryFilter, setCategoryFilterRaw] = useState<string>(FILTER_STORE.category);
-  const [priceMin, setPriceMinRaw] = useState<number>(FILTER_STORE.priceMin);
   const [priceMax, setPriceMaxRaw] = useState<number>(FILTER_STORE.priceMax);
   const [sortMode, setSortModeRaw] = useState<SortMode>(FILTER_STORE.sort);
 
-  const setTypeFilter = (v: VehicleTypeFilter) => { FILTER_STORE.type = v; setTypeFilterRaw(v); };
-  const setCategoryFilter = (v: string) => { FILTER_STORE.category = v; setCategoryFilterRaw(v); };
-  const setPriceMin = (v: number) => { FILTER_STORE.priceMin = v; setPriceMinRaw(v); };
-  const setPriceMax = (v: number) => { FILTER_STORE.priceMax = v; setPriceMaxRaw(v); };
-  const setSortMode = (v: SortMode) => { FILTER_STORE.sort = v; setSortModeRaw(v); };
+  const persist = () => saveFilterState(FILTER_STORE);
+  const setTypeFilter = (v: VehicleTypeFilter) => { FILTER_STORE.type = v; setTypeFilterRaw(v); persist(); };
+  const setCategoryFilter = (v: string) => { FILTER_STORE.category = v; setCategoryFilterRaw(v); persist(); };
+  const setPriceMax = (v: number) => { FILTER_STORE.priceMax = v; setPriceMaxRaw(v); persist(); };
+  const setSortMode = (v: SortMode) => { FILTER_STORE.sort = v; setSortModeRaw(v); persist(); };
 
   const resetFilters = () => {
     setTypeFilter('all');
     setCategoryFilter('all');
-    setPriceMin(0);
-    setPriceMax(1_000_000);
+    setPriceMax(0);
     setSortMode('default');
   };
   const { playSound } = useSound();
@@ -325,8 +323,7 @@ export function NewspaperScreen({ onCarBought }: NewspaperScreenProps) {
       const vType = ad.car.vehicleType || 'car';
       if (typeFilter !== 'all' && vType !== typeFilter) return false;
       if (categoryFilter !== 'all' && ad.car.category !== categoryFilter) return false;
-      if (ad.car.askingPrice < priceMin) return false;
-      if (ad.car.askingPrice > priceMax) return false;
+      if (priceMax > 0 && ad.car.askingPrice > priceMax) return false;
       return true;
     });
     switch (sortMode) {
