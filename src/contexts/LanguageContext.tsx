@@ -477,6 +477,12 @@ const translations: Record<Language, Translations> = {
     mech: 'Mech', int: 'Int', tiresShort: 'Tires',
     weeklyChallenges: 'Weekly Challenges',
     resetsMonday: 'Challenges reset Monday at midnight',
+    resetsIn: 'Resets in',
+    resetsAtMidnight: 'Resets at midnight',
+    maxPrice: 'Max price',
+    anyPrice: 'Any price',
+    sortBy: 'Sort',
+    filters: 'Filters',
 
     // New
     theOffice: 'The Office',
@@ -709,6 +715,12 @@ const translations: Record<Language, Translations> = {
     mech: 'Mecc', int: 'Int', tiresShort: 'Gomme',
     weeklyChallenges: 'Sfide Settimanali',
     resetsMonday: 'Le sfide si resettano lunedì a mezzanotte',
+    resetsIn: 'Reset tra',
+    resetsAtMidnight: 'Reset a mezzanotte',
+    maxPrice: 'Prezzo max',
+    anyPrice: 'Qualsiasi prezzo',
+    sortBy: 'Ordina',
+    filters: 'Filtri',
 
     // New
     theOffice: 'L\'Ufficio',
