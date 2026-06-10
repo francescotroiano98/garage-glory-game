@@ -12,6 +12,16 @@ import { MAX_LEVEL } from '@/types/game';
 import { useSound } from '@/hooks/useSound';
 import { useAdMob } from '@/hooks/useAdMob';
 import { DailyChallengesDialog } from './DailyChallengesDialog';
+import { PackOpeningAnimation } from './PackOpeningAnimation';
+import {
+  PACK_TYPES,
+  openPack,
+  loadCollection,
+  saveCollection,
+  addCardsToCollection,
+  getCompletedVehiclesCount,
+  CollectibleCard,
+} from '@/data/cards';
 import { toast } from 'sonner';
 import { AnimatedCounter } from '@/components/ui/animated-counter';
 import { useRef } from 'react';
@@ -31,6 +41,7 @@ export function StatsBar({ onOpenSettings }: { onOpenSettings?: () => void }) {
     dailyChallenges,
     claimChallengeReward,
     claimWeeklyChallengeReward,
+    updateChallengeProgress,
   } = useGame();
   const { t, formatMoney, currency } = useLanguage();
   const [timeRemaining, setTimeRemaining] = useState(0);
@@ -62,14 +73,55 @@ export function StatsBar({ onOpenSettings }: { onOpenSettings?: () => void }) {
     }
   };
 
+  const [openedCards, setOpenedCards] = useState<CollectibleCard[] | null>(null);
+  const [openedPackIcon, setOpenedPackIcon] = useState<string>('📦');
+  const [openedPackImage, setOpenedPackImage] = useState<string | undefined>(undefined);
+
+  const openPackReward = useCallback((packId: string) => {
+    const pack = PACK_TYPES.find(p => p.id === packId);
+    if (!pack) return;
+    // The claim has already dispatched GIVE_PACK; immediately consume + animate.
+    dispatch({ type: 'CONSUME_PACK', payload: { packId } });
+    const cards = openPack(pack, state.level);
+    const collection = loadCollection();
+    const ownedBefore = collection.ownedCards;
+    const newCards = cards.filter(c => !ownedBefore[c.id]).length;
+    const rareCards = cards.filter(c => c.rarity !== 'base').length;
+    const completedBefore = getCompletedVehiclesCount(collection);
+    const newCollection = addCardsToCollection(collection, cards);
+    const completedAfter = getCompletedVehiclesCount(newCollection);
+    saveCollection(newCollection);
+    setOpenedPackIcon(pack.icon);
+    setOpenedPackImage(pack.image);
+    setOpenedCards(cards);
+    updateChallengeProgress('open_packs', 1);
+    if (newCards > 0) updateChallengeProgress('obtain_new_cards', newCards);
+    if (rareCards > 0) updateChallengeProgress('obtain_rare_cards', rareCards);
+    const newlyCompleted = completedAfter - completedBefore;
+    if (newlyCompleted > 0) updateChallengeProgress('complete_vehicles', newlyCompleted);
+  }, [dispatch, state.level, updateChallengeProgress]);
+
   const handleClaimReward = (challengeId: string) => {
-    claimChallengeReward(challengeId);
+    const challenge = dailyChallenges.challenges.find(c => c.id === challengeId);
+    const granted = claimChallengeReward(challengeId);
+    if (!granted) return;
     playSound('achievement');
+    if (challenge?.rewardType === 'pack' && challenge.rewardPackId) {
+      setShowChallenges(false);
+      // Slight delay so the dialog finishes closing before the animation overlay opens
+      setTimeout(() => openPackReward(challenge.rewardPackId!), 200);
+    }
   };
 
   const handleClaimWeeklyReward = (challengeId: string) => {
-    claimWeeklyChallengeReward(challengeId);
+    const challenge = dailyChallenges.weeklyChallenges?.find(c => c.id === challengeId);
+    const granted = claimWeeklyChallengeReward(challengeId);
+    if (!granted) return;
     playSound('achievement');
+    if (challenge?.rewardType === 'pack' && challenge.rewardPackId) {
+      setShowChallenges(false);
+      setTimeout(() => openPackReward(challenge.rewardPackId!), 200);
+    }
   };
 
   const canWatchAd = useCallback(() => {
@@ -309,6 +361,14 @@ export function StatsBar({ onOpenSettings }: { onOpenSettings?: () => void }) {
         challengeState={dailyChallenges}
         onClaimReward={handleClaimReward}
         onClaimWeeklyReward={handleClaimWeeklyReward}
+      />
+
+      {/* Pack opening animation for rewards claimed from the challenge dialog */}
+      <PackOpeningAnimation
+        cards={openedCards}
+        packIcon={openedPackIcon}
+        packImage={openedPackImage}
+        onClose={() => setOpenedCards(null)}
       />
     </>
   );

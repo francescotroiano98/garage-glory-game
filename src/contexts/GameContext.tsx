@@ -423,8 +423,8 @@ interface GameContextType {
   getEnergyBonusTimeRemaining: () => number;
   handleSaleComplete: (carId: string, salePrice: number) => void;
   dailyChallenges: DailyChallengeState;
-  claimChallengeReward: (challengeId: string) => void;
-   claimWeeklyChallengeReward: (challengeId: string) => void;
+  claimChallengeReward: (challengeId: string) => boolean;
+   claimWeeklyChallengeReward: (challengeId: string) => boolean;
   updateChallengeProgress: (type: string, amount: number) => void;
 }
 
@@ -777,69 +777,57 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
   }, [state.carsInGarage, state.achievements, state, updateChallengeProgress]);
 
   const claimChallengeReward = useCallback((challengeId: string) => {
-    const challenge = dailyChallenges.challenges.find(c => c.id === challengeId);
-    const progressData = dailyChallenges.progress.find(p => p.challengeId === challengeId);
-    
-    if (!challenge || !progressData?.completed || progressData.claimed) return;
-
-    // Give reward
-    switch (challenge.rewardType) {
-      case 'money':
-        dispatch({ type: 'ADD_MONEY', payload: challenge.reward });
-        break;
-      case 'energy':
-        dispatch({ type: 'SET_ENERGY', payload: state.energy + challenge.reward });
-        break;
-      case 'xp':
-        dispatch({ type: 'ADD_XP', payload: challenge.reward });
-        break;
-      case 'pack':
-        if (challenge.rewardPackId) {
-          dispatch({ type: 'GIVE_PACK', payload: { packId: challenge.rewardPackId, count: challenge.reward || 1 } });
-        }
-        break;
-    }
-
-    // Mark as claimed
-    setDailyChallenges(prev => ({
-      ...prev,
-      progress: prev.progress.map(p =>
-        p.challengeId === challengeId ? { ...p, claimed: true } : p
-      ),
-    }));
+    let granted = false;
+    setDailyChallenges(prev => {
+      const challenge = prev.challenges.find(c => c.id === challengeId);
+      const progressData = prev.progress.find(p => p.challengeId === challengeId);
+      if (!challenge || !progressData?.completed || progressData.claimed) return prev;
+      granted = true;
+      switch (challenge.rewardType) {
+        case 'money': dispatch({ type: 'ADD_MONEY', payload: challenge.reward }); break;
+        case 'energy': dispatch({ type: 'SET_ENERGY', payload: state.energy + challenge.reward }); break;
+        case 'xp': dispatch({ type: 'ADD_XP', payload: challenge.reward }); break;
+        case 'pack':
+          if (challenge.rewardPackId) {
+            dispatch({ type: 'GIVE_PACK', payload: { packId: challenge.rewardPackId, count: challenge.reward || 1 } });
+          }
+          break;
+      }
+      return {
+        ...prev,
+        progress: prev.progress.map(p =>
+          p.challengeId === challengeId ? { ...p, claimed: true } : p
+        ),
+      };
+    });
+    return granted;
   }, [dailyChallenges, state.energy]);
  
    const claimWeeklyChallengeReward = useCallback((challengeId: string) => {
-     const challenge = dailyChallenges.weeklyChallenges?.find(c => c.id === challengeId);
-     const progressData = dailyChallenges.weeklyProgress?.find(p => p.challengeId === challengeId);
-     
-     if (!challenge || !progressData?.completed || progressData.claimed) return;
- 
-     // Give reward
-     switch (challenge.rewardType) {
-       case 'money':
-         dispatch({ type: 'ADD_MONEY', payload: challenge.reward });
-         break;
-       case 'energy':
-         dispatch({ type: 'SET_ENERGY', payload: state.energy + challenge.reward });
-         break;
-       case 'xp':
-         dispatch({ type: 'ADD_XP', payload: challenge.reward });
-         break;
-       case 'pack':
-         if (challenge.rewardPackId) {
-           dispatch({ type: 'GIVE_PACK', payload: { packId: challenge.rewardPackId, count: challenge.reward || 1 } });
-         }
-         break;
-     }
- 
-     // Mark as claimed
-     setDailyChallenges(prev => ({
-       ...prev,
-       weeklyProgress: (prev.weeklyProgress || []).map(p =>
-         p.challengeId === challengeId ? { ...p, claimed: true } : p
-       ),
-     }));
+     let granted = false;
+     setDailyChallenges(prev => {
+       const challenge = prev.weeklyChallenges?.find(c => c.id === challengeId);
+       const progressData = prev.weeklyProgress?.find(p => p.challengeId === challengeId);
+       if (!challenge || !progressData?.completed || progressData.claimed) return prev;
+       granted = true;
+       switch (challenge.rewardType) {
+         case 'money': dispatch({ type: 'ADD_MONEY', payload: challenge.reward }); break;
+         case 'energy': dispatch({ type: 'SET_ENERGY', payload: state.energy + challenge.reward }); break;
+         case 'xp': dispatch({ type: 'ADD_XP', payload: challenge.reward }); break;
+         case 'pack':
+           if (challenge.rewardPackId) {
+             dispatch({ type: 'GIVE_PACK', payload: { packId: challenge.rewardPackId, count: challenge.reward || 1 } });
+           }
+           break;
+       }
+       return {
+         ...prev,
+         weeklyProgress: (prev.weeklyProgress || []).map(p =>
+           p.challengeId === challengeId ? { ...p, claimed: true } : p
+         ),
+       };
+     });
+     return granted;
    }, [dailyChallenges, state.energy]);
 
   return (
