@@ -213,6 +213,12 @@ interface Translations {
   // Weekly challenges
   weeklyChallenges: string;
   resetsMonday: string;
+  resetsIn: string;
+  resetsAtMidnight: string;
+  maxPrice: string;
+  anyPrice: string;
+  sortBy: string;
+  filters: string;
 
   // === NEW TRANSLATIONS ===
   
