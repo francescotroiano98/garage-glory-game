@@ -96,7 +96,7 @@ export interface DailyChallengeState {
    weeklyProgress: DailyChallengeProgress[];
 }
 
-// Generate 3 random daily challenges
+// Generate up to 7 random daily challenges
 export function generateDailyChallenges(date: string): DailyChallenge[] {
   // Use date as seed for consistent challenges per day
   const seed = date.split('-').reduce((acc, val) => acc + parseInt(val), 0);
@@ -105,20 +105,31 @@ export function generateDailyChallenges(date: string): DailyChallenge[] {
     return x - Math.floor(x) - 0.5;
   });
   
-  // Pick 4 challenges of different types
-  const types = new Set<string>();
+  // Pick up to 7, preferring type diversity but allowing duplicates of type to fill slots
+  const MAX_DAILY = 7;
+  const seenIds = new Set<string>();
+  const typeCounts = new Map<string, number>();
   const selected: DailyChallenge[] = [];
-  
+
+  // First pass: unique types
   for (const template of shuffled) {
-    if (!types.has(template.type) && selected.length < 4) {
-      types.add(template.type);
-      selected.push({
-        ...template,
-        id: `${date}_${template.type}_${template.target}`,
-      });
-    }
+    if (selected.length >= MAX_DAILY) break;
+    if ((typeCounts.get(template.type) || 0) > 0) continue;
+    const id = `${date}_${template.type}_${template.target}`;
+    if (seenIds.has(id)) continue;
+    seenIds.add(id);
+    typeCounts.set(template.type, 1);
+    selected.push({ ...template, id });
   }
-  
+  // Second pass: allow type repeats with different targets
+  for (const template of shuffled) {
+    if (selected.length >= MAX_DAILY) break;
+    const id = `${date}_${template.type}_${template.target}`;
+    if (seenIds.has(id)) continue;
+    seenIds.add(id);
+    typeCounts.set(template.type, (typeCounts.get(template.type) || 0) + 1);
+    selected.push({ ...template, id });
+  }
   return selected;
 }
  

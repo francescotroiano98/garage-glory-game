@@ -59,8 +59,8 @@ export function PackOpeningAnimation({ cards, packIcon = '📦', packImage, onCl
     tearClipPath.current = `polygon(${top.join(', ')})`;
     tearClipPathBottom.current = `polygon(${bot.join(', ')}, 100% 100%, 0% 100%)`;
   }
-  // Shorter swipe (160px) so it stays well within the thumb zone on mobile.
-  const SWIPE_DISTANCE = 160;
+  // Shorter swipe so it stays well within the thumb zone on mobile.
+  const SWIPE_DISTANCE = 130;
 
   // Reset state whenever a new pack arrives
   useEffect(() => {
