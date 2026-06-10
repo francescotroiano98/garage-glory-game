@@ -63,6 +63,27 @@ export function ShopScreen() {
   const [openedCards, setOpenedCards] = useState<CollectibleCard[] | null>(null);
   const [openedPackIcon, setOpenedPackIcon] = useState<string>('📦');
   const [openedPackImage, setOpenedPackImage] = useState<string | undefined>(undefined);
+  const [packSort, setPackSortRaw] = useState<PackSortMode>(PACK_FILTER_STORE.sort);
+  const [packFilter, setPackFilterRaw] = useState<PackTypeFilter>(PACK_FILTER_STORE.filter);
+  const setPackSort = (v: PackSortMode) => { PACK_FILTER_STORE.sort = v; setPackSortRaw(v); };
+  const setPackFilter = (v: PackTypeFilter) => { PACK_FILTER_STORE.filter = v; setPackFilterRaw(v); };
+
+  const visiblePacks = useMemo(() => {
+    const filtered = PACK_TYPES.filter(p => {
+      const isMega = p.id.startsWith('mega_');
+      if (packFilter === 'mega') return isMega;
+      if (packFilter === 'standard') return !isMega;
+      return true;
+    });
+    switch (packSort) {
+      case 'price_asc': return [...filtered].sort((a, b) => a.cost - b.cost);
+      case 'price_desc': return [...filtered].sort((a, b) => b.cost - a.cost);
+      case 'name_asc': return [...filtered].sort((a, b) =>
+        (language === 'it' ? a.nameIt : a.name).localeCompare(language === 'it' ? b.nameIt : b.name)
+      );
+      default: return filtered;
+    }
+  }, [packSort, packFilter, language]);
 
   const buyPack = useCallback((packId: string, free: boolean = false) => {
     const pack = PACK_TYPES.find(p => p.id === packId);
@@ -219,7 +240,27 @@ export function ShopScreen() {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
-            {PACK_TYPES.map(pack => {
+            {/* Pack filters & sort */}
+            <div className="flex flex-wrap gap-2 pb-1">
+              <Select value={packFilter} onValueChange={(v) => setPackFilter(v as PackTypeFilter)}>
+                <SelectTrigger className="h-7 text-xs w-[120px]"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">{language === 'it' ? 'Tutti' : 'All'}</SelectItem>
+                  <SelectItem value="standard">{language === 'it' ? 'Standard' : 'Standard'}</SelectItem>
+                  <SelectItem value="mega">MEGA</SelectItem>
+                </SelectContent>
+              </Select>
+              <Select value={packSort} onValueChange={(v) => setPackSort(v as PackSortMode)}>
+                <SelectTrigger className="h-7 text-xs w-[140px]"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="default">{language === 'it' ? 'Predefinito' : 'Default'}</SelectItem>
+                  <SelectItem value="price_asc">{language === 'it' ? 'Prezzo ↑' : 'Price ↑'}</SelectItem>
+                  <SelectItem value="price_desc">{language === 'it' ? 'Prezzo ↓' : 'Price ↓'}</SelectItem>
+                  <SelectItem value="name_asc">{language === 'it' ? 'Nome A-Z' : 'Name A-Z'}</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            {visiblePacks.map(pack => {
               const freeCount = state.pendingPacks?.[pack.id] || 0;
               return (
               <div key={pack.id} className="flex items-center gap-3 p-2 bg-secondary/30 rounded-lg">
