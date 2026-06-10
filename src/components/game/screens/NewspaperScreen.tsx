@@ -5,7 +5,6 @@ import { CarCard } from '@/components/game/CarCard';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
-import { Slider } from '@/components/ui/slider';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { generateCar } from '@/data/cars';
 import { generateMotorcycle } from '@/data/motorcycles';
@@ -30,20 +29,43 @@ const INSPECT_ENERGY_COST = 2;
 type VehicleTypeFilter = 'all' | 'car' | 'motorcycle' | 'truck';
 type SortMode = 'default' | 'price_asc' | 'price_desc' | 'name_asc';
 
-// Module-level filter store: persists selections across screen unmounts.
-const FILTER_STORE: {
+// Filter persistence — survives screen unmount AND app restart via localStorage.
+const NEWSPAPER_FILTER_KEY = 'newspaper_filters_v1';
+interface NewspaperFilterState {
   type: VehicleTypeFilter;
   category: string;
-  priceMin: number;
-  priceMax: number;
+  priceMax: number; // 0 = any
   sort: SortMode;
-} = {
+}
+const DEFAULT_FILTER_STATE: NewspaperFilterState = {
   type: 'all',
   category: 'all',
-  priceMin: 0,
-  priceMax: 1_000_000,
+  priceMax: 0,
   sort: 'default',
 };
+function loadFilterState(): NewspaperFilterState {
+  try {
+    const raw = localStorage.getItem(NEWSPAPER_FILTER_KEY);
+    if (!raw) return { ...DEFAULT_FILTER_STATE };
+    return { ...DEFAULT_FILTER_STATE, ...JSON.parse(raw) };
+  } catch { return { ...DEFAULT_FILTER_STATE }; }
+}
+function saveFilterState(s: NewspaperFilterState) {
+  try { localStorage.setItem(NEWSPAPER_FILTER_KEY, JSON.stringify(s)); } catch {}
+}
+const FILTER_STORE: NewspaperFilterState = loadFilterState();
+
+/** Generate price ceiling options that scale with player level. */
+function getPriceCeilings(level: number): number[] {
+  // Roughly: level 1 caps ~$1k, scales geometrically up to supercars at level 20.
+  // Bands are coarse so the dropdown stays short (max ~8 options).
+  const allBands = [500, 1_000, 2_500, 5_000, 10_000, 25_000, 50_000, 100_000, 250_000, 500_000, 1_000_000, 5_000_000];
+  // Pick a top band scaled by level (~doubles every 2 levels)
+  const topIdx = Math.min(allBands.length - 1, Math.max(2, Math.floor(level / 1.8) + 2));
+  // Show 6 bands centered around topIdx, plus the top band
+  const startIdx = Math.max(0, topIdx - 5);
+  return allBands.slice(startIdx, topIdx + 1);
+}
 
 interface VehicleDetailDialogProps {
   ad: NewspaperAd | null;
