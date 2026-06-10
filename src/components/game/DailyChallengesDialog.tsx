@@ -1,4 +1,5 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
@@ -6,6 +7,30 @@ import { Badge } from '@/components/ui/badge';
 import { Check, Gift, Zap, DollarSign, Star, Package } from 'lucide-react';
  import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
  import { useLanguage } from '@/contexts/LanguageContext';
+
+function formatCountdown(ms: number): string {
+  if (ms <= 0) return '00:00:00';
+  const h = Math.floor(ms / 3_600_000);
+  const m = Math.floor((ms % 3_600_000) / 60_000);
+  const s = Math.floor((ms % 60_000) / 1000);
+  return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+}
+function msUntilNextMidnight(): number {
+  const now = new Date();
+  const next = new Date(now);
+  next.setHours(24, 0, 0, 0);
+  return next.getTime() - now.getTime();
+}
+function msUntilNextMonday(): number {
+  const now = new Date();
+  const next = new Date(now);
+  // ISO Monday = 1 (Sun = 0)
+  const day = now.getDay();
+  const daysUntilMon = day === 0 ? 1 : (8 - day);
+  next.setDate(now.getDate() + daysUntilMon);
+  next.setHours(0, 0, 0, 0);
+  return next.getTime() - now.getTime();
+}
 
 interface DailyChallengesDialogProps {
   open: boolean;
@@ -23,7 +48,13 @@ export function DailyChallengesDialog({
    onClaimWeeklyReward,
 }: DailyChallengesDialogProps) {
    const { t } = useLanguage();
-   
+   const [, tick] = useState(0);
+   useEffect(() => {
+     if (!open) return;
+     const id = setInterval(() => tick(x => x + 1), 1000);
+     return () => clearInterval(id);
+   }, [open]);
+
   const getRewardIcon = (type: string) => {
     switch (type) {
       case 'money': return <DollarSign className="w-3 h-3" />;
@@ -135,7 +166,7 @@ export function DailyChallengesDialog({
                return renderChallengeCard(challenge, progressData, () => onClaimReward(challenge.id));
              })}
              <p className="text-xs text-center text-muted-foreground">
-               Challenges reset daily at midnight
+              {t.resetsIn} {formatCountdown(msUntilNextMidnight())}
              </p>
            </TabsContent>
            
@@ -145,7 +176,7 @@ export function DailyChallengesDialog({
                return renderChallengeCard(challenge, progressData, () => onClaimWeeklyReward(challenge.id));
              })}
              <p className="text-xs text-center text-muted-foreground">
-               {t.resetsMonday}
+              {t.resetsIn} {formatCountdown(msUntilNextMonday())}
              </p>
            </TabsContent>
          </Tabs>
