@@ -332,13 +332,19 @@ export function NewspaperScreen({ onCarBought }: NewspaperScreenProps) {
       case 'name_asc': return [...filtered].sort((a, b) => a.car.name.localeCompare(b.car.name));
       default: return filtered;
     }
-  }, [ads, typeFilter, categoryFilter, priceMin, priceMax, sortMode]);
+  }, [ads, typeFilter, categoryFilter, priceMax, sortMode]);
 
-  // Compute dynamic price bounds from current ads
-  const adsMaxPrice = useMemo(() => {
-    if (ads.length === 0) return 1_000_000;
-    return Math.max(...ads.map(a => a.car.askingPrice));
-  }, [ads]);
+  // Price ceiling options scale with player level so we don't show $1M when
+  // the highest unlocked vehicle is worth $1k.
+  const priceCeilings = useMemo(() => getPriceCeilings(state.level), [state.level]);
+
+  // Clamp persisted priceMax to current available options
+  useEffect(() => {
+    if (priceMax > 0 && priceMax > priceCeilings[priceCeilings.length - 1]) {
+      setPriceMax(0);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [priceCeilings]);
 
   const handleSelectAd = (ad: NewspaperAd) => {
     setSelectedAd(ad);
@@ -457,24 +463,24 @@ export function NewspaperScreen({ onCarBought }: NewspaperScreenProps) {
             </Button>
           </div>
 
-          {/* Price range */}
-          <div className="mt-3 px-1">
-            <div className="flex items-center justify-between text-[11px] text-muted-foreground mb-1">
-              <span>{language === 'it' ? 'Prezzo' : 'Price'}</span>
-              <span className="font-medium text-foreground">
-                {formatMoney(priceMin)} — {priceMax >= 1_000_000 ? '∞' : formatMoney(priceMax)}
-              </span>
-            </div>
-            <Slider
-              value={[priceMin, Math.min(priceMax, Math.max(adsMaxPrice, 1000))]}
-              min={0}
-              max={Math.max(adsMaxPrice, 1000)}
-              step={Math.max(50, Math.round(Math.max(adsMaxPrice, 1000) / 100))}
-              onValueChange={([min, max]) => {
-                setPriceMin(min);
-                setPriceMax(max >= adsMaxPrice ? 1_000_000 : max);
-              }}
-            />
+          {/* Max price filter — level-scaled options */}
+          <div className="flex flex-wrap gap-2 mt-2">
+            <Select
+              value={priceMax === 0 ? 'any' : String(priceMax)}
+              onValueChange={(v) => setPriceMax(v === 'any' ? 0 : parseInt(v))}
+            >
+              <SelectTrigger className="h-7 text-xs w-[160px]">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="any">{t.anyPrice}</SelectItem>
+                {priceCeilings.map(p => (
+                  <SelectItem key={p} value={String(p)}>
+                    {t.maxPrice}: {formatMoney(p)}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
         </div>
         <div className={`overflow-y-auto p-4 space-y-4 ${
