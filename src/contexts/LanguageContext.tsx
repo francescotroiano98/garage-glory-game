@@ -215,10 +215,11 @@ interface Translations {
   resetsMonday: string;
   resetsIn: string;
   resetsAtMidnight: string;
-  maxPrice: string;
-  anyPrice: string;
-  sortBy: string;
-  filters: string;
+    maxPrice: string;
+    minPrice: string;
+    anyPrice: string;
+    sortBy: string;
+    filters: string;
 
   // === NEW TRANSLATIONS ===
   
@@ -480,6 +481,7 @@ const translations: Record<Language, Translations> = {
     resetsIn: 'Resets in',
     resetsAtMidnight: 'Resets at midnight',
     maxPrice: 'Max price',
+    minPrice: 'From',
     anyPrice: 'Any price',
     sortBy: 'Sort',
     filters: 'Filters',
@@ -718,6 +720,7 @@ const translations: Record<Language, Translations> = {
     resetsIn: 'Reset tra',
     resetsAtMidnight: 'Reset a mezzanotte',
     maxPrice: 'Prezzo max',
+    minPrice: 'Da',
     anyPrice: 'Qualsiasi prezzo',
     sortBy: 'Ordina',
     filters: 'Filtri',

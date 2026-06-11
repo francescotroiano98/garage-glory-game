@@ -259,19 +259,19 @@ export function NewspaperScreen({ onCarBought }: NewspaperScreenProps) {
   const [negotiationCount, setNegotiationCount] = useState(0);
   const [typeFilter, setTypeFilterRaw] = useState<VehicleTypeFilter>(FILTER_STORE.type);
   const [categoryFilter, setCategoryFilterRaw] = useState<string>(FILTER_STORE.category);
-  const [priceMax, setPriceMaxRaw] = useState<number>(FILTER_STORE.priceMax);
+  const [priceMin, setPriceMinRaw] = useState<number>(FILTER_STORE.priceMin);
   const [sortMode, setSortModeRaw] = useState<SortMode>(FILTER_STORE.sort);
 
   const persist = () => saveFilterState(FILTER_STORE);
   const setTypeFilter = (v: VehicleTypeFilter) => { FILTER_STORE.type = v; setTypeFilterRaw(v); persist(); };
   const setCategoryFilter = (v: string) => { FILTER_STORE.category = v; setCategoryFilterRaw(v); persist(); };
-  const setPriceMax = (v: number) => { FILTER_STORE.priceMax = v; setPriceMaxRaw(v); persist(); };
+  const setPriceMin = (v: number) => { FILTER_STORE.priceMin = v; setPriceMinRaw(v); persist(); };
   const setSortMode = (v: SortMode) => { FILTER_STORE.sort = v; setSortModeRaw(v); persist(); };
 
   const resetFilters = () => {
     setTypeFilter('all');
     setCategoryFilter('all');
-    setPriceMax(0);
+    setPriceMin(0);
     setSortMode('default');
   };
   const { playSound } = useSound();
@@ -323,7 +323,7 @@ export function NewspaperScreen({ onCarBought }: NewspaperScreenProps) {
       const vType = ad.car.vehicleType || 'car';
       if (typeFilter !== 'all' && vType !== typeFilter) return false;
       if (categoryFilter !== 'all' && ad.car.category !== categoryFilter) return false;
-      if (priceMax > 0 && ad.car.askingPrice > priceMax) return false;
+      if (priceMin > 0 && ad.car.askingPrice < priceMin) return false;
       return true;
     });
     switch (sortMode) {
@@ -332,16 +332,16 @@ export function NewspaperScreen({ onCarBought }: NewspaperScreenProps) {
       case 'name_asc': return [...filtered].sort((a, b) => a.car.name.localeCompare(b.car.name));
       default: return filtered;
     }
-  }, [ads, typeFilter, categoryFilter, priceMax, sortMode]);
+  }, [ads, typeFilter, categoryFilter, priceMin, sortMode]);
 
   // Price ceiling options scale with player level so we don't show $1M when
   // the highest unlocked vehicle is worth $1k.
   const priceCeilings = useMemo(() => getPriceCeilings(state.level), [state.level]);
 
-  // Clamp persisted priceMax to current available options
+  // Clamp persisted priceMin to current available options
   useEffect(() => {
-    if (priceMax > 0 && priceMax > priceCeilings[priceCeilings.length - 1]) {
-      setPriceMax(0);
+    if (priceMin > 0 && priceMin > priceCeilings[priceCeilings.length - 1]) {
+      setPriceMin(0);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [priceCeilings]);
@@ -463,11 +463,11 @@ export function NewspaperScreen({ onCarBought }: NewspaperScreenProps) {
             </Button>
           </div>
 
-          {/* Max price filter — level-scaled options */}
+          {/* Min price filter — level-scaled options */}
           <div className="flex flex-wrap gap-2 mt-2">
             <Select
-              value={priceMax === 0 ? 'any' : String(priceMax)}
-              onValueChange={(v) => setPriceMax(v === 'any' ? 0 : parseInt(v))}
+              value={priceMin === 0 ? 'any' : String(priceMin)}
+              onValueChange={(v) => setPriceMin(v === 'any' ? 0 : parseInt(v))}
             >
               <SelectTrigger className="h-7 text-xs w-[160px]">
                 <SelectValue />
@@ -476,7 +476,7 @@ export function NewspaperScreen({ onCarBought }: NewspaperScreenProps) {
                 <SelectItem value="any">{t.anyPrice}</SelectItem>
                 {priceCeilings.map(p => (
                   <SelectItem key={p} value={String(p)}>
-                    {t.maxPrice}: {formatMoney(p)}
+                    {t.minPrice}: {formatMoney(p)}
                   </SelectItem>
                 ))}
               </SelectContent>
