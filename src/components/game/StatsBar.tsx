@@ -211,6 +211,20 @@ const addTestEnergy = () => {
   });
 };
 
+  const addTestXp = () => {
+  dispatch({
+    type: 'SET_XP',
+    payload: state.xp + 1000,
+  });
+};
+
+const removeTestXp = () => {
+  dispatch({
+    type: 'SET_XP',
+    payload: Math.max(0, state.xp - 1000),
+  });
+};
+
   return (
     <>
       <div data-tutorial-id="tutorial-stats-bar" className="flex flex-col gap-1.5 bg-card/95 backdrop-blur-sm border-b-2 border-border p-3 sticky top-0 z-50 shrink-0">
@@ -222,6 +236,13 @@ const addTestEnergy = () => {
               
               <Button size="sm" onClick={addTestEnergy}>
                 ⚡
+              </Button>
+              <Button size="sm" onClick={addTestXp}>
+                +1000 XP
+              </Button>
+              
+              <Button size="sm" onClick={removeTestXp}>
+                -1000 XP
               </Button>
               <Button
                   size="sm"
