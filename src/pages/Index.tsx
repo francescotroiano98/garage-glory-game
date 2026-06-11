@@ -15,6 +15,7 @@ import { WelcomeScreen } from '@/components/game/screens/WelcomeScreen';
 import { TutorialOverlay } from '@/components/game/TutorialOverlay';
 import { useBackgroundMusic } from '@/hooks/useSound';
 import { ScreenTransition } from '@/components/ui/screen-transition';
+import { AssetPreloader } from '@/components/game/AssetPreloader';
 
 class GameErrorBoundary extends Component<{ children: ReactNode }, { hasError: boolean }> {
   constructor(props: { children: ReactNode }) {
@@ -220,13 +221,15 @@ function GameContent() {
 
 const Index = () => (
   <GameErrorBoundary>
-    <LanguageProvider>
-      <AuthProvider>
-        <GameProvider>
-          <GameContent />
-        </GameProvider>
-      </AuthProvider>
-    </LanguageProvider>
+    <AssetPreloader>
+      <LanguageProvider>
+        <AuthProvider>
+          <GameProvider>
+            <GameContent />
+          </GameProvider>
+        </AuthProvider>
+      </LanguageProvider>
+    </AssetPreloader>
   </GameErrorBoundary>
 );
 
