@@ -51,12 +51,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const signUp = async (email: string, password: string, username: string) => {
+    const cleanUsername = (username ?? '').trim();
+    if (cleanUsername.length < 2 || cleanUsername.length > 24) {
+      return { error: 'Username must be between 2 and 24 characters' };
+    }
+    if (!/^[A-Za-z0-9_\- ]+$/.test(cleanUsername)) {
+      return { error: 'Username contains invalid characters' };
+    }
     const { error } = await supabase.auth.signUp({
       email,
       password,
-      options: { data: { username } },
+      options: { data: { username: cleanUsername } },
     });
-    if (error) return { error: error.message };
+    if (error) {
+      const msg = /duplicate|unique|23505/i.test(error.message)
+        ? 'That username is already taken. Please choose another.'
+        : error.message;
+      return { error: msg };
+    }
     return { error: null };
   };
 
