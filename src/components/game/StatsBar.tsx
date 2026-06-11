@@ -213,15 +213,14 @@ const addTestEnergy = () => {
 
   const addTestXp = () => {
   dispatch({
-    type: 'SET_XP',
-    payload: state.xp + 1000,
+    type: 'ADD_XP',
+    payload: 1000,
   });
 };
-
 const removeTestXp = () => {
   dispatch({
-    type: 'SET_XP',
-    payload: Math.max(0, state.xp - 1000),
+    type: 'REMOVE_XP',
+    payload: 1000,
   });
 };
 
