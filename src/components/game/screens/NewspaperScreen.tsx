@@ -31,17 +31,17 @@ type VehicleTypeFilter = 'all' | 'car' | 'motorcycle' | 'truck';
 type SortMode = 'default' | 'price_asc' | 'price_desc' | 'name_asc';
 
 // Filter persistence — survives screen unmount AND app restart via localStorage.
-const NEWSPAPER_FILTER_KEY = 'newspaper_filters_v1';
+const NEWSPAPER_FILTER_KEY = 'newspaper_filters_v2';
 interface NewspaperFilterState {
   type: VehicleTypeFilter;
   category: string;
-  priceMax: number; // 0 = any
+  priceMin: number; // 0 = any
   sort: SortMode;
 }
 const DEFAULT_FILTER_STATE: NewspaperFilterState = {
   type: 'all',
   category: 'all',
-  priceMax: 0,
+  priceMin: 0,
   sort: 'default',
 };
 function loadFilterState(): NewspaperFilterState {
