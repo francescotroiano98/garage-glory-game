@@ -197,11 +197,32 @@ export function StatsBar({ onOpenSettings }: { onOpenSettings?: () => void }) {
   }, [state.money]);
   useEffect(() => { prevMoneyRef.current = state.money; }, [state.money]);
 
+  const addTestMoney = () => {
+  dispatch({
+    type: 'SET_MONEY',
+    payload: state.money + 999999,
+  });
+};
+
+const addTestEnergy = () => {
+  dispatch({
+    type: 'SET_ENERGY',
+    payload: state.energy + 999,
+  });
+};
+
   return (
     <>
       <div data-tutorial-id="tutorial-stats-bar" className="flex flex-col gap-1.5 bg-card/95 backdrop-blur-sm border-b-2 border-border p-3 sticky top-0 z-50 shrink-0">
         <div className="flex items-center gap-1.5">
             <div className="flex flex-row gap-1.5">
+              <Button size="sm" onClick={addTestMoney}>
+                $$$
+              </Button>
+              
+              <Button size="sm" onClick={addTestEnergy}>
+                ⚡
+              </Button>
               <Button
                   size="sm"
                   variant={canCollectEnergyBonus() ? "default" : "secondary"}
