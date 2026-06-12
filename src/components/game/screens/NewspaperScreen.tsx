@@ -8,8 +8,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Slider } from '@/components/ui/slider';
 import { generateCar } from '@/data/cars';
-import { generateMotorcycle } from '@/data/motorcycles';
-import { generateTruck } from '@/data/trucks';
+import { CAR_TEMPLATES } from '@/data/cars';
+import { generateMotorcycle, MOTO_TEMPLATES } from '@/data/motorcycles';
+import { generateTruck, TRUCK_TEMPLATES } from '@/data/trucks';
 import { NewspaperAd, Car, VehicleCategory } from '@/types/game';
 import { CATEGORY_DISPLAY_NAMES } from '@/utils/partTranslations';
 import { getCategoriesForLevel } from '@/types/game';
@@ -56,16 +57,34 @@ function saveFilterState(s: NewspaperFilterState) {
 }
 const FILTER_STORE: NewspaperFilterState = loadFilterState();
 
-/** Generate price ceiling options that scale with player level. */
+/**
+ * Generate price-floor options ("from X up") that reflect the ACTUAL maximum
+ * asking price the player can encounter at the current level. We compute the
+ * max baseValue across unlocked vehicle categories (cars+motos+trucks), apply
+ * the upper price variance (~1.10), then build 4-6 bands up to that ceiling.
+ * This avoids showing $500/$1k bands when max car is $1.5k, or $100k bands
+ * when max car is $5k.
+ */
 function getPriceCeilings(level: number): number[] {
-  // Roughly: level 1 caps ~$1k, scales geometrically up to supercars at level 20.
-  // Bands are coarse so the dropdown stays short (max ~8 options).
-  const allBands = [500, 1_000, 2_500, 5_000, 10_000, 25_000, 50_000, 100_000, 250_000, 500_000, 1_000_000, 5_000_000];
-  // Pick a top band scaled by level (~doubles every 2 levels)
-  const topIdx = Math.min(allBands.length - 1, Math.max(2, Math.floor(level / 1.8) + 2));
-  // Show 6 bands centered around topIdx, plus the top band
-  const startIdx = Math.max(0, topIdx - 5);
-  return allBands.slice(startIdx, topIdx + 1);
+  const carCats = getCategoriesForLevel(level) as readonly string[];
+  const motoCats = getMotoCategoriesForLevel(level) as readonly string[];
+  const truckCats = getTruckCategoriesForLevel(level) as readonly string[];
+  const maxBase = Math.max(
+    0,
+    ...CAR_TEMPLATES.filter(t => carCats.includes(t.category)).map(t => t.baseValue),
+    ...MOTO_TEMPLATES.filter(t => motoCats.includes(t.category)).map(t => t.baseValue),
+    ...TRUCK_TEMPLATES.filter(t => truckCats.includes(t.category)).map(t => t.baseValue),
+  );
+  // Asking price = currentValue * (0.75..1.10). currentValue ≤ baseValue.
+  const maxPrice = Math.max(500, Math.round(maxBase * 1.1));
+  const allBands = [
+    100, 250, 500, 1_000, 1_500, 2_500, 5_000, 7_500,
+    10_000, 15_000, 25_000, 40_000, 60_000, 100_000,
+    150_000, 250_000, 500_000, 1_000_000,
+  ];
+  const usable = allBands.filter(b => b < maxPrice);
+  // Keep the last ~5 bands so the dropdown is short but useful.
+  return usable.slice(-5);
 }
 
 interface VehicleDetailDialogProps {

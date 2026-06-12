@@ -185,9 +185,11 @@ export function PackOpeningAnimation({ cards, packIcon = '📦', packImage, onCl
 
             {/* Shiny swipe indicator line — sits exactly along the tear */}
             <div
-              className="absolute left-0 right-0 pointer-events-none overflow-hidden"
+              className="absolute pointer-events-none overflow-hidden"
               style={{
                 top: `calc(${TEAR_TOP_PCT}% - 6px)`,
+                left: '18%',
+                right: '18%',
                 height: 12,
                 opacity: 1 - ripProgress * 0.8,
               }}
@@ -216,9 +218,11 @@ export function PackOpeningAnimation({ cards, packIcon = '📦', packImage, onCl
             {/* Warm light leak that grows as the tear opens */}
             {ripProgress > 0.05 && (
               <div
-                className="absolute left-0 right-0 pointer-events-none"
+                className="absolute pointer-events-none"
                 style={{
                   top: `calc(${TEAR_TOP_PCT}% - 8px)`,
+                  left: '18%',
+                  right: '18%',
                   height: 20,
                   background:
                     'radial-gradient(ellipse at center, rgba(255,240,180,0.95), rgba(255,240,180,0) 70%)',
