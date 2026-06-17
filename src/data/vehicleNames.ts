@@ -46,6 +46,14 @@ const SPORT_NAMES = [
   'Track Missile', 'Race Replica', 'Hypersport', 'Carbon SBK', 'MotoGP Replica',
   'Retro Racer', 'Classic Sport', 'Vintage Custom', 'Brat Style', 'Bobber Custom',
 ];
+const CHOPPER_NAMES = [
+  'Vintage Chopper', 'Long Fork Custom', 'Lowrider Chopper', 'Bobber Chop', 'Highway Chopper',
+  'Cruiser Custom', 'Boulevard Chop', 'Classic Chopper', 'Retro Chop', 'Iron Chopper',
+];
+const ELECTRIC_NAMES = [
+  'Eco Electric', 'Urban Electric', 'Sport Electric', 'Volt Runner', 'Silent Cruiser',
+  'Future Bike', 'Lightning EV', 'Spark Rider', 'Voltage', 'Neon Electric',
+];
 
 const PICKUP_NAMES = [
   'Rusty Farm', 'Old Work', 'Vintage Hauler', 'Ranch Pickup', 'City Pickup',
@@ -67,6 +75,14 @@ const SEMI_NAMES = [
   'Day Cab', 'Regional Hauler', 'Light Semi', 'Long Hauler', 'Highway King',
   'Cross Country', 'Reefer Semi', 'Tanker Semi', 'Logging Truck', 'Mining Hauler',
 ];
+const DUMP_NAMES = [
+  'Construction Dump', 'Industrial Dump', 'Quarry Dump', 'Site Hauler', 'Rock Dump',
+  'Earth Mover', 'Sand Hauler', 'Aggregate Truck', 'Mine Dump', 'Heavy Dump',
+];
+const REEFER_NAMES = [
+  'Refrigerated Truck', 'Cold Chain', 'Reefer Box', 'Frost Hauler', 'Arctic Truck',
+  'Chill Express', 'Polar Cargo', 'Cool Runner', 'Freeze Hauler', 'Glacier Box',
+];
 
 // Map every category to its image-pool name list.
 const NAMES_BY_CATEGORY: Record<VehicleCategory, string[]> = {
@@ -80,14 +96,18 @@ const NAMES_BY_CATEGORY: Record<VehicleCategory, string[]> = {
   // Motorcycles
   moto_old_scooter: SCOOTER_NAMES, moto_scooter: SCOOTER_NAMES,
   moto_125: STREET_NAMES, moto_naked: STREET_NAMES,
+  moto_chopper: CHOPPER_NAMES,
   moto_touring: TOURING_NAMES, moto_adventure: TOURING_NAMES,
   moto_enduro: OFFROAD_NAMES,
   moto_supersport: SPORT_NAMES, moto_caferacer: SPORT_NAMES, moto_superbike: SPORT_NAMES,
+  moto_electric: ELECTRIC_NAMES,
   // Trucks
   truck_old_pickup: PICKUP_NAMES, truck_pickup: PICKUP_NAMES,
   truck_van: VAN_NAMES, truck_delivery: VAN_NAMES,
   truck_flatbed: FLATBED_NAMES, truck_box: FLATBED_NAMES,
+  truck_dump: DUMP_NAMES,
   truck_tow: TOW_NAMES,
+  truck_refrigerated: REEFER_NAMES,
   truck_semi_light: SEMI_NAMES, truck_semi: SEMI_NAMES, truck_heavy: SEMI_NAMES,
 };
 
