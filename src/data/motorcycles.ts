@@ -60,22 +60,30 @@ import sport8 from '@/assets/motorcycles/sport-8.png';
 import sport9 from '@/assets/motorcycles/sport-9.png';
 import sport10 from '@/assets/motorcycles/sport-10.png';
 
+// New categories — 1 image each, repeated across the 10 variant slots
+import chopper1 from '@/assets/motorcycles/chopper-1.png';
+import electric1 from '@/assets/motorcycles/electric-1.png';
+
 const SCOOTER_IMAGES = [scooter1, scooter2, scooter3, scooter4, scooter5, scooter6, scooter7, scooter8, scooter9, scooter10];
 const STREET_IMAGES = [street1, street2, street3, street4, street5, street6, street7, street8, street9, street10];
 const TOURING_IMAGES = [touring1, touring2, touring3, touring4, touring5, touring6, touring7, touring8, touring9, touring10];
 const OFFROAD_IMAGES = [offroad1, offroad2, offroad3, offroad4, offroad5, offroad6, offroad7, offroad8, offroad9, offroad10];
 const SPORT_IMAGES = [sport1, sport2, sport3, sport4, sport5, sport6, sport7, sport8, sport9, sport10];
+const CHOPPER_IMAGES = Array(10).fill(chopper1) as string[];
+const ELECTRIC_IMAGES = Array(10).fill(electric1) as string[];
 
 export const MOTO_IMAGES: Record<MotorcycleCategory, string[]> = {
   moto_old_scooter: SCOOTER_IMAGES,
   moto_scooter: SCOOTER_IMAGES,
   moto_125: STREET_IMAGES,
   moto_naked: STREET_IMAGES,
+  moto_chopper: CHOPPER_IMAGES,
   moto_touring: TOURING_IMAGES,
   moto_adventure: TOURING_IMAGES,
   moto_enduro: OFFROAD_IMAGES,
   moto_supersport: SPORT_IMAGES,
   moto_caferacer: SPORT_IMAGES,
+  moto_electric: ELECTRIC_IMAGES,
   moto_superbike: SPORT_IMAGES,
 };
 
@@ -151,14 +159,25 @@ export const MOTO_TEMPLATES: Array<{ name: string; category: MotorcycleCategory;
   { name: 'Bobber Custom', category: 'moto_caferacer', baseValue: 13500 },
   { name: 'Carbon Superbike', category: 'moto_superbike', baseValue: 32000 },
   { name: 'MotoGP Replica', category: 'moto_superbike', baseValue: 45000 },
+
+  // Chopper (level 16)
+  { name: 'Vintage Chopper', category: 'moto_chopper', baseValue: 8000 },
+  { name: 'Custom Chopper', category: 'moto_chopper', baseValue: 9000 },
+  { name: 'Long Fork Chopper', category: 'moto_chopper', baseValue: 10000 },
+
+  // Electric (level 36)
+  { name: 'Eco Electric', category: 'moto_electric', baseValue: 20000 },
+  { name: 'Urban Electric', category: 'moto_electric', baseValue: 22000 },
+  { name: 'Sport Electric', category: 'moto_electric', baseValue: 25000 },
 ];
 
 // Get motorcycle categories available at a given level
 export function getMotoCategoriesForLevel(level: number): MotorcycleCategory[] {
   const allCategories: MotorcycleCategory[] = [
     'moto_old_scooter', 'moto_scooter', 'moto_125',
-    'moto_naked', 'moto_touring', 'moto_adventure',
-    'moto_enduro', 'moto_supersport', 'moto_caferacer', 'moto_superbike'
+    'moto_naked', 'moto_chopper', 'moto_touring', 'moto_adventure',
+    'moto_enduro', 'moto_supersport', 'moto_caferacer',
+    'moto_electric', 'moto_superbike'
   ];
   return allCategories.filter(cat => MOTO_CATEGORY_UNLOCK_LEVEL[cat] <= level);
 }
