@@ -65,21 +65,28 @@ export function getSkillUpgradeCost(currentLevel: number): number {
 }
 
 // XP required for next level
-// Levels 1-5: 1000 XP each, 6-15: 2000 XP each, 16+: 3000 XP each
+// Tuned for 40 levels: 1-5 → 1000, 6-15 → 2000, 16-25 → 3000,
+// 26-35 → 4500, 36+ → 6000.
 export function getXpForLevel(level: number): number {
   if (level >= MAX_LEVEL) return Infinity;
   if (level <= 5) return 1000;
   if (level <= 15) return 2000;
-  return 3000;
+  if (level <= 25) return 3000;
+  if (level <= 35) return 4500;
+  return 6000;
 }
 
 // Skill points per level
 export function getSkillPointsForLevel(level: number): number {
-  // 1 point at levels 1-5, 2 points at 6-10, 3 points at 11-15, 4 points at 16-20
+  // Scales smoothly up to level 40
   if (level <= 5) return 1;
   if (level <= 10) return 2;
   if (level <= 15) return 3;
-  return 4;
+  if (level <= 20) return 4;
+  if (level <= 25) return 5;
+  if (level <= 30) return 6;
+  if (level <= 35) return 7;
+  return 8;
 }
 
 // Tool level index helper

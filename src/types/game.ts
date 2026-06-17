@@ -52,37 +52,47 @@ export type CarCategory =
   | 'suv_large' | 'crossover' | 'muscle' | 'sports' | 'sports_premium'
   | 'luxury_entry' | 'luxury_mid' | 'luxury_full' | 'exotic' | 'supercar';
 
-// 10 motorcycle categories - unlocked at odd levels
+// 12 motorcycle categories
 export type MotorcycleCategory =
   | 'moto_old_scooter' | 'moto_scooter' | 'moto_125'
-  | 'moto_naked' | 'moto_touring' | 'moto_adventure'
-  | 'moto_enduro' | 'moto_supersport' | 'moto_caferacer' | 'moto_superbike';
+  | 'moto_naked' | 'moto_chopper' | 'moto_touring' | 'moto_adventure'
+  | 'moto_enduro' | 'moto_supersport' | 'moto_caferacer'
+  | 'moto_electric' | 'moto_superbike';
 
 export type TruckCategory =
   | 'truck_old_pickup' | 'truck_pickup' | 'truck_van' | 'truck_delivery' | 'truck_flatbed'
-  | 'truck_box' | 'truck_tow' | 'truck_semi_light' | 'truck_semi' | 'truck_heavy';
+  | 'truck_dump' | 'truck_box' | 'truck_tow' | 'truck_refrigerated'
+  | 'truck_semi_light' | 'truck_semi' | 'truck_heavy';
 
 export type VehicleCategory = CarCategory | MotorcycleCategory | TruckCategory;
 
-// Map levels to car categories
+// Map levels to car categories.
+// Only 12 categories are actively unlocked/spawned across the 40 levels.
+// The remaining 8 (compact, wagon, suv_small, suv_large, sports, luxury_entry,
+// luxury_full, exotic) are kept in the type system for save/collection
+// compatibility but never unlock (level 999).
 export const CATEGORY_UNLOCK_LEVEL: Record<CarCategory, number> = {
-  junker: 1, beater: 2, economy: 3, compact: 4, hatchback: 5,
-  sedan: 6, wagon: 7, coupe: 8, suv_small: 9, suv_mid: 10,
-  suv_large: 11, crossover: 12, muscle: 13, sports: 14, sports_premium: 15,
-  luxury_entry: 16, luxury_mid: 17, luxury_full: 18, exotic: 19, supercar: 20,
+  junker: 1, beater: 4, economy: 8, hatchback: 12,
+  sedan: 16, coupe: 20, suv_mid: 23, crossover: 26,
+  muscle: 29, sports_premium: 32, luxury_mid: 36, supercar: 40,
+  // Deprecated / inactive categories
+  compact: 999, wagon: 999, suv_small: 999, suv_large: 999,
+  sports: 999, luxury_entry: 999, luxury_full: 999, exotic: 999,
 };
 
-// Map levels to motorcycle categories
+// Map levels to motorcycle categories (12 across 40 levels)
 export const MOTO_CATEGORY_UNLOCK_LEVEL: Record<MotorcycleCategory, number> = {
-  moto_old_scooter: 1, moto_scooter: 3, moto_125: 5,
-  moto_naked: 7, moto_touring: 9, moto_adventure: 11,
-  moto_enduro: 13, moto_supersport: 15, moto_caferacer: 17, moto_superbike: 19,
+  moto_old_scooter: 1, moto_scooter: 4, moto_125: 8,
+  moto_naked: 12, moto_chopper: 16, moto_touring: 20,
+  moto_adventure: 23, moto_enduro: 26, moto_supersport: 29,
+  moto_caferacer: 32, moto_electric: 36, moto_superbike: 40,
 };
 
-// Map levels to truck categories (even levels)
+// Map levels to truck categories (12 across 40 levels)
 export const TRUCK_CATEGORY_UNLOCK_LEVEL: Record<TruckCategory, number> = {
-  truck_old_pickup: 2, truck_pickup: 4, truck_van: 6, truck_delivery: 8, truck_flatbed: 10,
-  truck_box: 12, truck_tow: 14, truck_semi_light: 16, truck_semi: 18, truck_heavy: 20,
+  truck_old_pickup: 1, truck_pickup: 4, truck_van: 8, truck_delivery: 12,
+  truck_flatbed: 16, truck_dump: 20, truck_box: 23, truck_tow: 26,
+  truck_refrigerated: 29, truck_semi_light: 32, truck_semi: 36, truck_heavy: 40,
 };
 
 // Category display names
@@ -95,13 +105,14 @@ export const CATEGORY_NAMES: Record<VehicleCategory, string> = {
   luxury_mid: 'Mid Luxury', luxury_full: 'Full Luxury', exotic: 'Exotic', supercar: 'Supercar',
   // Motorcycles
   moto_old_scooter: 'Old Scooter', moto_scooter: 'Scooter', moto_125: '125cc',
-  moto_naked: 'Naked', moto_touring: 'Touring', moto_adventure: 'Adventure',
+  moto_naked: 'Naked', moto_chopper: 'Chopper', moto_touring: 'Touring', moto_adventure: 'Adventure',
   moto_enduro: 'Enduro', moto_supersport: 'Supersport', moto_caferacer: 'Cafe Racer',
-  moto_superbike: 'Superbike',
+  moto_electric: 'Electric', moto_superbike: 'Superbike',
   // Trucks
   truck_old_pickup: 'Old Pickup', truck_pickup: 'Pickup', truck_van: 'Van',
-  truck_delivery: 'Delivery', truck_flatbed: 'Flatbed', truck_box: 'Box Truck',
-  truck_tow: 'Tow Truck', truck_semi_light: 'Light Semi', truck_semi: 'Semi',
+  truck_delivery: 'Delivery', truck_flatbed: 'Flatbed', truck_dump: 'Dump Truck',
+  truck_box: 'Box Truck', truck_tow: 'Tow Truck', truck_refrigerated: 'Refrigerated',
+  truck_semi_light: 'Light Semi', truck_semi: 'Semi',
   truck_heavy: 'Heavy Duty',
 };
 
@@ -256,7 +267,7 @@ export interface RepairProgress {
 }
 
 // XP calculation based on profit margin
-export const MAX_LEVEL = 20;
+export const MAX_LEVEL = 40;
 
 export function calculateXpFromSale(purchasePrice: number, totalRepairCost: number, salePrice: number): number {
   const totalInvestment = purchasePrice + totalRepairCost;
@@ -275,21 +286,24 @@ export function calculateXpFromSale(purchasePrice: number, totalRepairCost: numb
 }
 
 // XP required for each level
-// Levels 1-5: 1000 XP each, 6-15: 2000 XP each, 16+: 3000 XP each
+// Tuned for 40 levels: 1-5 → 1000, 6-15 → 2000, 16-25 → 3000,
+// 26-35 → 4500, 36+ → 6000.
 export function getXpForLevel(level: number): number {
   if (level >= MAX_LEVEL) return Infinity;
   if (level <= 5) return 1000;
   if (level <= 15) return 2000;
-  return 3000;
+  if (level <= 25) return 3000;
+  if (level <= 35) return 4500;
+  return 6000;
 }
 
 // Get categories available at a given level
 export function getCategoriesForLevel(level: number): CarCategory[] {
-  const allCategories: CarCategory[] = [
-    'junker', 'beater', 'economy', 'compact', 'hatchback',
-    'sedan', 'wagon', 'coupe', 'suv_small', 'suv_mid',
-    'suv_large', 'crossover', 'muscle', 'sports', 'sports_premium',
-    'luxury_entry', 'luxury_mid', 'luxury_full', 'exotic', 'supercar'
+  // Only the 12 active categories are considered.
+  const activeCategories: CarCategory[] = [
+    'junker', 'beater', 'economy', 'hatchback',
+    'sedan', 'coupe', 'suv_mid', 'crossover',
+    'muscle', 'sports_premium', 'luxury_mid', 'supercar',
   ];
-  return allCategories.filter(cat => CATEGORY_UNLOCK_LEVEL[cat] <= level);
+  return activeCategories.filter(cat => CATEGORY_UNLOCK_LEVEL[cat] <= level);
 }
