@@ -1,3 +1,4 @@
+// Edge function: validates and updates leaderboard stats server-side.
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.95.0";
 
 const corsHeaders = {
