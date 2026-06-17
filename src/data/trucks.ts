@@ -60,11 +60,17 @@ import semi8 from '@/assets/trucks/semi-8.png';
 import semi9 from '@/assets/trucks/semi-9.png';
 import semi10 from '@/assets/trucks/semi-10.png';
 
+// New categories — 1 image each, repeated across the 10 variant slots
+import dump1 from '@/assets/trucks/dump-1.png';
+import refrigerated1 from '@/assets/trucks/refrigerated-1.png';
+
 const PICKUP_IMAGES = [pickup1, pickup2, pickup3, pickup4, pickup5, pickup6, pickup7, pickup8, pickup9, pickup10];
 const VAN_IMAGES = [van1, van2, van3, van4, van5, van6, van7, van8, van9, van10];
 const FLATBED_IMAGES = [flatbed1, flatbed2, flatbed3, flatbed4, flatbed5, flatbed6, flatbed7, flatbed8, flatbed9, flatbed10];
 const TOW_IMAGES = [tow1, tow2, tow3, tow4, tow5, tow6, tow7, tow8, tow9, tow10];
 const SEMI_IMAGES = [semi1, semi2, semi3, semi4, semi5, semi6, semi7, semi8, semi9, semi10];
+const DUMP_IMAGES = Array(10).fill(dump1) as string[];
+const REFRIGERATED_IMAGES = Array(10).fill(refrigerated1) as string[];
 
 export const TRUCK_IMAGES: Record<TruckCategory, string[]> = {
   truck_old_pickup: PICKUP_IMAGES,
@@ -72,8 +78,10 @@ export const TRUCK_IMAGES: Record<TruckCategory, string[]> = {
   truck_van: VAN_IMAGES,
   truck_delivery: VAN_IMAGES,
   truck_flatbed: FLATBED_IMAGES,
+  truck_dump: DUMP_IMAGES,
   truck_box: FLATBED_IMAGES,
   truck_tow: TOW_IMAGES,
+  truck_refrigerated: REFRIGERATED_IMAGES,
   truck_semi_light: SEMI_IMAGES,
   truck_semi: SEMI_IMAGES,
   truck_heavy: SEMI_IMAGES,
@@ -151,13 +159,24 @@ export const TRUCK_TEMPLATES: Array<{ name: string; category: TruckCategory; bas
   { name: 'Tanker Semi', category: 'truck_semi', baseValue: 39000 },
   { name: 'Logging Truck', category: 'truck_heavy', baseValue: 56000 },
   { name: 'Mining Hauler', category: 'truck_heavy', baseValue: 65000 },
+
+  // Dump (level 20)
+  { name: 'Construction Dump', category: 'truck_dump', baseValue: 14000 },
+  { name: 'Industrial Dump', category: 'truck_dump', baseValue: 15000 },
+  { name: 'Quarry Dump', category: 'truck_dump', baseValue: 16000 },
+
+  // Refrigerated (level 29)
+  { name: 'Refrigerated Truck', category: 'truck_refrigerated', baseValue: 26000 },
+  { name: 'Cold Chain Truck', category: 'truck_refrigerated', baseValue: 28000 },
+  { name: 'Reefer Box Truck', category: 'truck_refrigerated', baseValue: 30000 },
 ];
 
 // Get truck categories available at a given level
 export function getTruckCategoriesForLevel(level: number): TruckCategory[] {
   const allCategories: TruckCategory[] = [
     'truck_old_pickup', 'truck_pickup', 'truck_van', 'truck_delivery', 'truck_flatbed',
-    'truck_box', 'truck_tow', 'truck_semi_light', 'truck_semi', 'truck_heavy'
+    'truck_dump', 'truck_box', 'truck_tow', 'truck_refrigerated',
+    'truck_semi_light', 'truck_semi', 'truck_heavy'
   ];
   return allCategories.filter(cat => TRUCK_CATEGORY_UNLOCK_LEVEL[cat] <= level);
 }
