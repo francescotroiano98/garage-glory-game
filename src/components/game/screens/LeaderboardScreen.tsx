@@ -3,7 +3,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Trophy, Medal, Crown } from 'lucide-react';
+import { Trophy, Medal, Crown, RefreshCw } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 interface LeaderboardEntry {
   username: string;
@@ -17,15 +18,22 @@ export function LeaderboardScreen() {
   const { username: myUsername } = useAuth();
   const [entries, setEntries] = useState<LeaderboardEntry[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     loadLeaderboard();
+    // Auto-refresh every 15s while the screen is mounted so newly synced
+    // profits show up without needing to switch tabs.
+    const id = setInterval(() => loadLeaderboard(true), 15000);
+    return () => clearInterval(id);
   }, []);
 
-  const loadLeaderboard = async () => {
+  const loadLeaderboard = async (silent = false) => {
+    if (!silent) setRefreshing(true);
     const { data } = await supabase.rpc('get_leaderboard');
     if (data) setEntries(data as LeaderboardEntry[]);
     setLoading(false);
+    setRefreshing(false);
   };
 
   const getRankIcon = (index: number) => {
@@ -38,10 +46,21 @@ export function LeaderboardScreen() {
   return (
     <div className="flex flex-col h-[100svh] pb-20">
       <div className="p-4 border-b-2 border-border bg-gradient-to-b from-secondary/30 to-transparent shrink-0 sticky top-0 z-20 bg-background/95 backdrop-blur-sm">
-        <h1 className="text-xl font-bold flex items-center gap-2">
-          <Trophy className="w-5 h-5 text-yellow-500" />
-          {t.leaderboard}
-        </h1>
+        <div className="flex items-center justify-between">
+          <h1 className="text-xl font-bold flex items-center gap-2">
+            <Trophy className="w-5 h-5 text-yellow-500" />
+            {t.leaderboard}
+          </h1>
+          <Button
+            size="sm"
+            variant="ghost"
+            onClick={() => loadLeaderboard()}
+            disabled={refreshing}
+            aria-label="Refresh leaderboard"
+          >
+            <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
+          </Button>
+        </div>
       </div>
 
       <div className="h-[calc(100svh-258px)] overflow-y-auto p-4 space-y-4">
