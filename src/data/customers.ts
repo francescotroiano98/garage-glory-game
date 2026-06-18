@@ -41,7 +41,7 @@ export const CUSTOMER_PERSONALITIES: Record<CustomerPersonality, {
     trustRange: [5, 8],
     budgetMultiplier: [1.0, 1.2],
     traits: ['🚗 Loves cars', '🔧 Knows mechanics'],
-    preferredCategories: ['sports', 'sports_premium', 'exotic'],
+    preferredCategories: ['muscle', 'sports_premium', 'supercar'],
   },
   businessman: {
     name: 'Businessman',
@@ -50,7 +50,7 @@ export const CUSTOMER_PERSONALITIES: Record<CustomerPersonality, {
     trustRange: [4, 7],
     budgetMultiplier: [0.9, 1.1],
     traits: ['⏰ Values time', '📊 Negotiates hard'],
-    preferredCategories: ['sedan', 'luxury_entry', 'luxury_mid'],
+    preferredCategories: ['sedan', 'luxury_mid', 'supercar'],
   },
   first_timer: {
     name: 'First-time Buyer',
@@ -67,7 +67,7 @@ export const CUSTOMER_PERSONALITIES: Record<CustomerPersonality, {
     trustRange: [4, 7],
     budgetMultiplier: [1.1, 1.4],
     traits: ['🏆 Seeks quality', '💎 Pays premium'],
-    preferredCategories: ['sports_premium', 'exotic', 'supercar'],
+    preferredCategories: ['sports_premium', 'luxury_mid', 'supercar'],
   },
   commuter: {
     name: 'Daily Commuter',
@@ -85,7 +85,7 @@ export const CUSTOMER_PERSONALITIES: Record<CustomerPersonality, {
     trustRange: [5, 8],
     budgetMultiplier: [0.9, 1.1],
     traits: ['👨‍👩‍👧 Needs space', '🛡️ Safety first'],
-    preferredCategories: ['suv_mid', 'suv_large', 'sedan', 'crossover'],
+    preferredCategories: ['suv_mid', 'sedan', 'crossover'],
   },
   student: {
     name: 'Student',
@@ -144,7 +144,7 @@ export const CUSTOMER_PERSONALITIES: Record<CustomerPersonality, {
     trustRange: [5, 8],
     budgetMultiplier: [1.2, 1.5],
     traits: ['💎 Money is no object', '✨ Wants the best'],
-    preferredCategories: ['luxury_mid', 'luxury_full', 'exotic', 'supercar'],
+    preferredCategories: ['luxury_mid', 'sports_premium', 'supercar'],
   },
   budget: {
     name: 'Budget Buyer',

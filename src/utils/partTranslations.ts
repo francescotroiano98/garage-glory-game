@@ -61,12 +61,9 @@ export function getDamageLevelName(level: string, t: Record<string, string>): st
 // Vehicle category display names by language
 export const CATEGORY_DISPLAY_NAMES: Record<Language, Record<VehicleCategory, string>> = {
   en: {
-    junker: 'Junker', beater: 'Beater', economy: 'Economy', compact: 'Compact',
-    hatchback: 'Hatchback', sedan: 'Sedan', wagon: 'Wagon', coupe: 'Coupe',
-    suv_small: 'Small SUV', suv_mid: 'Mid SUV', suv_large: 'Large SUV',
-    crossover: 'Crossover', muscle: 'Muscle', sports: 'Sports',
-    sports_premium: 'Premium Sports', luxury_entry: 'Entry Luxury',
-    luxury_mid: 'Mid Luxury', luxury_full: 'Full Luxury', exotic: 'Exotic', supercar: 'Supercar',
+    junker: 'Junker', beater: 'Beater', economy: 'Economy', hatchback: 'Hatchback',
+    sedan: 'Sedan', coupe: 'Coupe', suv_mid: 'Mid SUV', crossover: 'Crossover',
+    muscle: 'Muscle', sports_premium: 'Premium Sports', luxury_mid: 'Mid Luxury', supercar: 'Supercar',
     moto_old_scooter: 'Old Scooter', moto_scooter: 'Scooter', moto_125: '125cc',
     moto_naked: 'Naked', moto_chopper: 'Chopper', moto_touring: 'Touring', moto_adventure: 'Adventure',
     moto_enduro: 'Enduro', moto_supersport: 'Supersport', moto_caferacer: 'Cafe Racer',
@@ -78,12 +75,9 @@ export const CATEGORY_DISPLAY_NAMES: Record<Language, Record<VehicleCategory, st
     truck_heavy: 'Heavy Duty',
   },
   it: {
-    junker: 'Rottame', beater: 'Malandata', economy: 'Utilitaria', compact: 'Compatta',
-    hatchback: 'Berlina Compatta', sedan: 'Berlina', wagon: 'Familiare', coupe: 'Coupé',
-    suv_small: 'SUV Piccolo', suv_mid: 'SUV Medio', suv_large: 'SUV Grande',
-    crossover: 'Crossover', muscle: 'Muscle Car', sports: 'Sportiva',
-    sports_premium: 'Sportiva Premium', luxury_entry: 'Lusso Base',
-    luxury_mid: 'Lusso Medio', luxury_full: 'Lusso Totale', exotic: 'Esotica', supercar: 'Supercar',
+    junker: 'Rottame', beater: 'Malandata', economy: 'Utilitaria', hatchback: 'Berlina Compatta',
+    sedan: 'Berlina', coupe: 'Coupé', suv_mid: 'SUV Medio', crossover: 'Crossover',
+    muscle: 'Muscle Car', sports_premium: 'Sportiva Premium', luxury_mid: 'Lusso Medio', supercar: 'Supercar',
     moto_old_scooter: 'Motorino Vecchio', moto_scooter: 'Scooter', moto_125: '125cc',
     moto_naked: 'Naked', moto_chopper: 'Chopper', moto_touring: 'Touring', moto_adventure: 'Adventure',
     moto_enduro: 'Enduro', moto_supersport: 'Supersport', moto_caferacer: 'Cafe Racer',

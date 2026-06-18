@@ -4,7 +4,7 @@ import { getVehicleNameByImage } from './vehicleNames';
 import { loadCollection, getCollectionDiscount } from './cards';
 
 // Import car images - 10 per category for variety
-// Economy images (junker, beater, economy, compact, hatchback)
+// Economy images (junker, beater, economy, hatchback)
 import economy1 from '@/assets/cars/economy-1.png';
 import economy2 from '@/assets/cars/economy-2.png';
 import economy3 from '@/assets/cars/economy-3.png';
@@ -16,7 +16,7 @@ import economy8 from '@/assets/cars/economy-8.png';
 import economy9 from '@/assets/cars/economy-9.png';
 import economy10 from '@/assets/cars/economy-10.png';
 
-// Sedan images (sedan, wagon, coupe)
+// Sedan images (sedan, coupe)
 import sedan1 from '@/assets/cars/sedan-1.png';
 import sedan2 from '@/assets/cars/sedan-2.png';
 import sedan3 from '@/assets/cars/sedan-3.png';
@@ -28,7 +28,7 @@ import sedan8 from '@/assets/cars/sedan-8.png';
 import sedan9 from '@/assets/cars/sedan-9.png';
 import sedan10 from '@/assets/cars/sedan-10.png';
 
-// SUV images (suv_small, suv_mid, suv_large, crossover)
+// SUV images (suv_mid, crossover)
 import suv1 from '@/assets/cars/suv-1.png';
 import suv2 from '@/assets/cars/suv-2.png';
 import suv3 from '@/assets/cars/suv-3.png';
@@ -40,7 +40,7 @@ import suv8 from '@/assets/cars/suv-8.png';
 import suv9 from '@/assets/cars/suv-9.png';
 import suv10 from '@/assets/cars/suv-10.png';
 
-// Sports images (muscle, sports, sports_premium, exotic)
+// Sports images (muscle, sports_premium)
 import sports1 from '@/assets/cars/sports-1.png';
 import sports2 from '@/assets/cars/sports-2.png';
 import sports3 from '@/assets/cars/sports-3.png';
@@ -52,7 +52,7 @@ import sports8 from '@/assets/cars/sports-8.png';
 import sports9 from '@/assets/cars/sports-9.png';
 import sports10 from '@/assets/cars/sports-10.png';
 
-// Luxury images (luxury_entry, luxury_mid, luxury_full, supercar)
+// Luxury images (luxury_mid, supercar)
 import luxury1 from '@/assets/cars/luxury-1.png';
 import luxury2 from '@/assets/cars/luxury-2.png';
 import luxury3 from '@/assets/cars/luxury-3.png';
@@ -76,22 +76,14 @@ export const CAR_IMAGES: Record<CarCategory, string[]> = {
   junker: ECONOMY_IMAGES,
   beater: ECONOMY_IMAGES,
   economy: ECONOMY_IMAGES,
-  compact: ECONOMY_IMAGES,
   hatchback: ECONOMY_IMAGES,
   sedan: SEDAN_IMAGES,
-  wagon: SEDAN_IMAGES,
   coupe: SEDAN_IMAGES,
-  suv_small: SUV_IMAGES,
   suv_mid: SUV_IMAGES,
-  suv_large: SUV_IMAGES,
   crossover: SUV_IMAGES,
   muscle: SPORTS_IMAGES,
-  sports: SPORTS_IMAGES,
   sports_premium: SPORTS_IMAGES,
-  exotic: SPORTS_IMAGES,
-  luxury_entry: LUXURY_IMAGES,
   luxury_mid: LUXURY_IMAGES,
-  luxury_full: LUXURY_IMAGES,
   supercar: LUXURY_IMAGES,
 };
 
@@ -120,12 +112,7 @@ export const CAR_TEMPLATES: Array<{ name: string; category: CarCategory; baseVal
   { name: 'Compact Hatch', category: 'economy', baseValue: 800 },
   { name: 'City Runner', category: 'economy', baseValue: 950 },
   { name: 'Budget Wagon', category: 'economy', baseValue: 750 },
-  
-  // Level 4 - Compact
-  { name: 'Mini Coupe', category: 'compact', baseValue: 1100 },
-  { name: 'Urban Hatch', category: 'compact', baseValue: 1050 },
-  { name: 'Eco Sprint', category: 'compact', baseValue: 1000 },
-  
+
   // Level 5 - Hatchback
   { name: 'Metro Cruiser', category: 'hatchback', baseValue: 1300 },
   { name: 'Penny Saver', category: 'hatchback', baseValue: 1250 },
@@ -135,32 +122,17 @@ export const CAR_TEMPLATES: Array<{ name: string; category: CarCategory; baseVal
   { name: 'Family Sedan', category: 'sedan', baseValue: 1800 },
   { name: 'Classic Sedan', category: 'sedan', baseValue: 2000 },
   { name: 'Touring Sedan', category: 'sedan', baseValue: 2200 },
-  
-  // Level 7 - Wagon
-  { name: 'Estate Wagon', category: 'wagon', baseValue: 2400 },
-  { name: 'Family Wagon', category: 'wagon', baseValue: 2600 },
-  { name: 'Touring Wagon', category: 'wagon', baseValue: 2800 },
-  
+
   // Level 8 - Coupe
   { name: 'Sport Coupe', category: 'coupe', baseValue: 3000 },
   { name: 'Grand Coupe', category: 'coupe', baseValue: 3200 },
   { name: 'Turbo Coupe', category: 'coupe', baseValue: 3500 },
-  
-  // Level 9 - Small SUV
-  { name: 'Compact SUV', category: 'suv_small', baseValue: 3500 },
-  { name: 'Urban Crossover', category: 'suv_small', baseValue: 3800 },
-  { name: 'City Explorer', category: 'suv_small', baseValue: 3600 },
-  
+
   // Level 10 - Mid SUV
   { name: 'Family SUV', category: 'suv_mid', baseValue: 4500 },
   { name: 'Trail Blazer', category: 'suv_mid', baseValue: 4800 },
   { name: 'Adventure SUV', category: 'suv_mid', baseValue: 5000 },
-  
-  // Level 11 - Large SUV
-  { name: 'Premium SUV', category: 'suv_large', baseValue: 6000 },
-  { name: 'Expedition SUV', category: 'suv_large', baseValue: 6500 },
-  { name: 'Grand Explorer', category: 'suv_large', baseValue: 7000 },
-  
+
   // Level 12 - Crossover
   { name: 'Luxury Crossover', category: 'crossover', baseValue: 7500 },
   { name: 'Sport Crossover', category: 'crossover', baseValue: 8000 },
@@ -170,37 +142,17 @@ export const CAR_TEMPLATES: Array<{ name: string; category: CarCategory; baseVal
   { name: 'Muscle Classic', category: 'muscle', baseValue: 9000 },
   { name: 'Power Runner', category: 'muscle', baseValue: 9500 },
   { name: 'Street Beast', category: 'muscle', baseValue: 10000 },
-  
-  // Level 14 - Sports
-  { name: 'Sports Coupe', category: 'sports', baseValue: 12000 },
-  { name: 'Track Monster', category: 'sports', baseValue: 13000 },
-  { name: 'Speed Demon', category: 'sports', baseValue: 14000 },
-  
+
   // Level 15 - Premium Sports
   { name: 'GT Racer', category: 'sports_premium', baseValue: 18000 },
   { name: 'Drift King', category: 'sports_premium', baseValue: 19000 },
   { name: 'Street Rocket', category: 'sports_premium', baseValue: 20000 },
-  
-  // Level 16 - Entry Luxury
-  { name: 'Entry Luxury', category: 'luxury_entry', baseValue: 25000 },
-  { name: 'Business Class', category: 'luxury_entry', baseValue: 27000 },
-  { name: 'Executive Sedan', category: 'luxury_entry', baseValue: 28000 },
-  
+
   // Level 17 - Mid Luxury
   { name: 'Grand Tourer', category: 'luxury_mid', baseValue: 35000 },
   { name: 'Royal Sedan', category: 'luxury_mid', baseValue: 38000 },
   { name: 'Prestige Coupe', category: 'luxury_mid', baseValue: 40000 },
-  
-  // Level 18 - Full Luxury
-  { name: 'Elite Roadster', category: 'luxury_full', baseValue: 50000 },
-  { name: 'Platinum Edition', category: 'luxury_full', baseValue: 55000 },
-  { name: 'Premium Convertible', category: 'luxury_full', baseValue: 60000 },
-  
-  // Level 19 - Exotic
-  { name: 'Exotic Racer', category: 'exotic', baseValue: 80000 },
-  { name: 'Limited Edition', category: 'exotic', baseValue: 90000 },
-  { name: 'Rare Import', category: 'exotic', baseValue: 100000 },
-  
+
   // Level 20 - Supercar
   { name: 'Hypercar', category: 'supercar', baseValue: 150000 },
   { name: 'Ultimate Machine', category: 'supercar', baseValue: 180000 },
@@ -216,54 +168,30 @@ export const CAR_TEMPLATES: Array<{ name: string; category: CarCategory; baseVal
   // Economy
   { name: 'Thrifty Hatch', category: 'economy', baseValue: 880 },
   { name: 'Daily Driver', category: 'economy', baseValue: 920 },
-  // Compact
-  { name: 'Pocket Rocket', category: 'compact', baseValue: 1150 },
-  { name: 'Tiny Tourer', category: 'compact', baseValue: 1080 },
   // Hatchback
   { name: 'Zippy Hatch', category: 'hatchback', baseValue: 1350 },
   { name: 'Suburban Hatch', category: 'hatchback', baseValue: 1450 },
   // Sedan
   { name: 'Executive Saloon', category: 'sedan', baseValue: 2100 },
   { name: 'Heritage Sedan', category: 'sedan', baseValue: 2300 },
-  // Wagon
-  { name: 'Cargo Wagon', category: 'wagon', baseValue: 2500 },
-  { name: 'Vintage Estate', category: 'wagon', baseValue: 2700 },
   // Coupe
   { name: 'Boulevard Coupe', category: 'coupe', baseValue: 3100 },
   { name: 'Twin-Turbo Coupe', category: 'coupe', baseValue: 3700 },
-  // Suv small
-  { name: 'Trail Compact', category: 'suv_small', baseValue: 3700 },
-  { name: 'Weekend SUV', category: 'suv_small', baseValue: 3900 },
   // Suv mid
   { name: 'Outback Cruiser', category: 'suv_mid', baseValue: 4700 },
   { name: 'Heritage SUV', category: 'suv_mid', baseValue: 4900 },
-  // Suv large
-  { name: 'Frontier SUV', category: 'suv_large', baseValue: 6200 },
-  { name: 'Pioneer SUV', category: 'suv_large', baseValue: 6800 },
   // Crossover
   { name: 'Hybrid Crossover', category: 'crossover', baseValue: 7800 },
   { name: 'Apex Crossover', category: 'crossover', baseValue: 8200 },
   // Muscle
   { name: 'Big Block Bruiser', category: 'muscle', baseValue: 9200 },
   { name: 'Detroit Iron', category: 'muscle', baseValue: 9700 },
-  // Sports
-  { name: 'Apex Coupe', category: 'sports', baseValue: 12500 },
-  { name: 'Canyon Carver', category: 'sports', baseValue: 13500 },
   // Sports premium
   { name: 'Targa Master', category: 'sports_premium', baseValue: 18500 },
   { name: 'Carbon Edition', category: 'sports_premium', baseValue: 19500 },
-  // Luxury entry
-  { name: 'Diplomat Sedan', category: 'luxury_entry', baseValue: 26000 },
-  { name: 'Chairman Edition', category: 'luxury_entry', baseValue: 28500 },
   // Luxury mid
   { name: 'Royal Tourer', category: 'luxury_mid', baseValue: 36000 },
   { name: 'Imperial Coupe', category: 'luxury_mid', baseValue: 39000 },
-  // Luxury full
-  { name: 'Crown Limousine', category: 'luxury_full', baseValue: 52000 },
-  { name: 'Sapphire Sedan', category: 'luxury_full', baseValue: 58000 },
-  // Exotic
-  { name: 'Carbon Predator', category: 'exotic', baseValue: 85000 },
-  { name: 'Silver Arrow', category: 'exotic', baseValue: 95000 },
   // Supercar
   { name: 'Phantom Hyper', category: 'supercar', baseValue: 170000 },
   { name: 'Apex One-Off', category: 'supercar', baseValue: 220000 },

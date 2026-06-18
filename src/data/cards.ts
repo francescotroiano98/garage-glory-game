@@ -145,18 +145,11 @@ export const CARD_SELL_VALUES: Record<CardRarity, number> = {
   gold: 500,
 };
 
-// All vehicle categories for cards.
-// Deprecated car categories (compact, wagon, suv_small, suv_large, sports,
-// luxury_entry, luxury_full, exotic) are kept here so that pre-existing
-// saved collections still resolve their card IDs, but they will never be
-// dropped from new packs because they never appear in the per-level pool.
+// All vehicle categories for cards currently used in the game.
 const ALL_CARD_CATEGORIES: VehicleCategory[] = [
   // Active car categories (12)
   'junker', 'beater', 'economy', 'hatchback', 'sedan', 'coupe',
   'suv_mid', 'crossover', 'muscle', 'sports_premium', 'luxury_mid', 'supercar',
-  // Deprecated car categories (kept for legacy save compatibility)
-  'compact', 'wagon', 'suv_small', 'suv_large', 'sports',
-  'luxury_entry', 'luxury_full', 'exotic',
   // Motorcycles (12)
   'moto_old_scooter', 'moto_scooter', 'moto_125',
   'moto_naked', 'moto_chopper', 'moto_touring', 'moto_adventure',

@@ -88,11 +88,10 @@ const REEFER_NAMES = [
 const NAMES_BY_CATEGORY: Record<VehicleCategory, string[]> = {
   // Cars
   junker: ECONOMY_NAMES, beater: ECONOMY_NAMES, economy: ECONOMY_NAMES,
-  compact: ECONOMY_NAMES, hatchback: ECONOMY_NAMES,
-  sedan: SEDAN_NAMES, wagon: SEDAN_NAMES, coupe: SEDAN_NAMES,
-  suv_small: SUV_NAMES, suv_mid: SUV_NAMES, suv_large: SUV_NAMES, crossover: SUV_NAMES,
-  muscle: SPORTS_NAMES, sports: SPORTS_NAMES, sports_premium: SPORTS_NAMES, exotic: SPORTS_NAMES,
-  luxury_entry: LUXURY_NAMES, luxury_mid: LUXURY_NAMES, luxury_full: LUXURY_NAMES, supercar: LUXURY_NAMES,
+  hatchback: ECONOMY_NAMES, sedan: SEDAN_NAMES, coupe: SEDAN_NAMES,
+  suv_mid: SUV_NAMES, crossover: SUV_NAMES,
+  muscle: SPORTS_NAMES, sports_premium: SPORTS_NAMES,
+  luxury_mid: LUXURY_NAMES, supercar: LUXURY_NAMES,
   // Motorcycles
   moto_old_scooter: SCOOTER_NAMES, moto_scooter: SCOOTER_NAMES,
   moto_125: STREET_NAMES, moto_naked: STREET_NAMES,

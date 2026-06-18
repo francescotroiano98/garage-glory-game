@@ -60,17 +60,35 @@ import sport8 from '@/assets/motorcycles/sport-8.png';
 import sport9 from '@/assets/motorcycles/sport-9.png';
 import sport10 from '@/assets/motorcycles/sport-10.png';
 
-// New categories — 1 image each, repeated across the 10 variant slots
+// New categories — 10 image variants each
 import chopper1 from '@/assets/motorcycles/chopper-1.png';
+import chopper2 from '@/assets/motorcycles/chopper-2.png';
+import chopper3 from '@/assets/motorcycles/chopper-3.png';
+import chopper4 from '@/assets/motorcycles/chopper-4.png';
+import chopper5 from '@/assets/motorcycles/chopper-5.png';
+import chopper6 from '@/assets/motorcycles/chopper-6.png';
+import chopper7 from '@/assets/motorcycles/chopper-7.png';
+import chopper8 from '@/assets/motorcycles/chopper-8.png';
+import chopper9 from '@/assets/motorcycles/chopper-9.png';
+import chopper10 from '@/assets/motorcycles/chopper-10.png';
 import electric1 from '@/assets/motorcycles/electric-1.png';
+import electric2 from '@/assets/motorcycles/electric-2.png';
+import electric3 from '@/assets/motorcycles/electric-3.png';
+import electric4 from '@/assets/motorcycles/electric-4.png';
+import electric5 from '@/assets/motorcycles/electric-5.png';
+import electric6 from '@/assets/motorcycles/electric-6.png';
+import electric7 from '@/assets/motorcycles/electric-7.png';
+import electric8 from '@/assets/motorcycles/electric-8.png';
+import electric9 from '@/assets/motorcycles/electric-9.png';
+import electric10 from '@/assets/motorcycles/electric-10.png';
 
 const SCOOTER_IMAGES = [scooter1, scooter2, scooter3, scooter4, scooter5, scooter6, scooter7, scooter8, scooter9, scooter10];
 const STREET_IMAGES = [street1, street2, street3, street4, street5, street6, street7, street8, street9, street10];
 const TOURING_IMAGES = [touring1, touring2, touring3, touring4, touring5, touring6, touring7, touring8, touring9, touring10];
 const OFFROAD_IMAGES = [offroad1, offroad2, offroad3, offroad4, offroad5, offroad6, offroad7, offroad8, offroad9, offroad10];
 const SPORT_IMAGES = [sport1, sport2, sport3, sport4, sport5, sport6, sport7, sport8, sport9, sport10];
-const CHOPPER_IMAGES = Array(10).fill(chopper1) as string[];
-const ELECTRIC_IMAGES = Array(10).fill(electric1) as string[];
+const CHOPPER_IMAGES = [chopper1, chopper2, chopper3, chopper4, chopper5, chopper6, chopper7, chopper8, chopper9, chopper10];
+const ELECTRIC_IMAGES = [electric1, electric2, electric3, electric4, electric5, electric6, electric7, electric8, electric9, electric10];
 
 export const MOTO_IMAGES: Record<MotorcycleCategory, string[]> = {
   moto_old_scooter: SCOOTER_IMAGES,
