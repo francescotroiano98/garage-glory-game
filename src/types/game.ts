@@ -45,12 +45,11 @@ export interface PartDamage {
   diyAttempts?: number;
 }
 
-// 20 car categories - one unlocked per level
+// 12 car categories
 export type CarCategory = 
-  | 'junker' | 'beater' | 'economy' | 'compact' | 'hatchback'
-  | 'sedan' | 'wagon' | 'coupe' | 'suv_small' | 'suv_mid'
-  | 'suv_large' | 'crossover' | 'muscle' | 'sports' | 'sports_premium'
-  | 'luxury_entry' | 'luxury_mid' | 'luxury_full' | 'exotic' | 'supercar';
+  | 'junker' | 'beater' | 'economy' | 'hatchback'
+  | 'sedan' | 'coupe' | 'suv_mid' | 'crossover'
+  | 'muscle' | 'sports_premium' | 'luxury_mid' | 'supercar';
 
 // 12 motorcycle categories
 export type MotorcycleCategory =
@@ -66,18 +65,11 @@ export type TruckCategory =
 
 export type VehicleCategory = CarCategory | MotorcycleCategory | TruckCategory;
 
-// Map levels to car categories.
-// Only 12 categories are actively unlocked/spawned across the 40 levels.
-// The remaining 8 (compact, wagon, suv_small, suv_large, sports, luxury_entry,
-// luxury_full, exotic) are kept in the type system for save/collection
-// compatibility but never unlock (level 999).
+// Map levels to car categories (12 across 40 levels)
 export const CATEGORY_UNLOCK_LEVEL: Record<CarCategory, number> = {
   junker: 1, beater: 4, economy: 8, hatchback: 12,
   sedan: 16, coupe: 20, suv_mid: 23, crossover: 26,
   muscle: 29, sports_premium: 32, luxury_mid: 36, supercar: 40,
-  // Deprecated / inactive categories
-  compact: 999, wagon: 999, suv_small: 999, suv_large: 999,
-  sports: 999, luxury_entry: 999, luxury_full: 999, exotic: 999,
 };
 
 // Map levels to motorcycle categories (12 across 40 levels)
@@ -97,12 +89,9 @@ export const TRUCK_CATEGORY_UNLOCK_LEVEL: Record<TruckCategory, number> = {
 
 // Category display names
 export const CATEGORY_NAMES: Record<VehicleCategory, string> = {
-  junker: 'Junker', beater: 'Beater', economy: 'Economy', compact: 'Compact',
-  hatchback: 'Hatchback', sedan: 'Sedan', wagon: 'Wagon', coupe: 'Coupe',
-  suv_small: 'Small SUV', suv_mid: 'Mid SUV', suv_large: 'Large SUV',
-  crossover: 'Crossover', muscle: 'Muscle', sports: 'Sports',
-  sports_premium: 'Premium Sports', luxury_entry: 'Entry Luxury',
-  luxury_mid: 'Mid Luxury', luxury_full: 'Full Luxury', exotic: 'Exotic', supercar: 'Supercar',
+  junker: 'Junker', beater: 'Beater', economy: 'Economy', hatchback: 'Hatchback',
+  sedan: 'Sedan', coupe: 'Coupe', suv_mid: 'Mid SUV', crossover: 'Crossover',
+  muscle: 'Muscle', sports_premium: 'Premium Sports', luxury_mid: 'Mid Luxury', supercar: 'Supercar',
   // Motorcycles
   moto_old_scooter: 'Old Scooter', moto_scooter: 'Scooter', moto_125: '125cc',
   moto_naked: 'Naked', moto_chopper: 'Chopper', moto_touring: 'Touring', moto_adventure: 'Adventure',

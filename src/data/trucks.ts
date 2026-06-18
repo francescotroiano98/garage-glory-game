@@ -60,17 +60,35 @@ import semi8 from '@/assets/trucks/semi-8.png';
 import semi9 from '@/assets/trucks/semi-9.png';
 import semi10 from '@/assets/trucks/semi-10.png';
 
-// New categories — 1 image each, repeated across the 10 variant slots
+// New categories — 10 image variants each
 import dump1 from '@/assets/trucks/dump-1.png';
+import dump2 from '@/assets/trucks/dump-2.png';
+import dump3 from '@/assets/trucks/dump-3.png';
+import dump4 from '@/assets/trucks/dump-4.png';
+import dump5 from '@/assets/trucks/dump-5.png';
+import dump6 from '@/assets/trucks/dump-6.png';
+import dump7 from '@/assets/trucks/dump-7.png';
+import dump8 from '@/assets/trucks/dump-8.png';
+import dump9 from '@/assets/trucks/dump-9.png';
+import dump10 from '@/assets/trucks/dump-10.png';
 import refrigerated1 from '@/assets/trucks/refrigerated-1.png';
+import refrigerated2 from '@/assets/trucks/refrigerated-2.png';
+import refrigerated3 from '@/assets/trucks/refrigerated-3.png';
+import refrigerated4 from '@/assets/trucks/refrigerated-4.png';
+import refrigerated5 from '@/assets/trucks/refrigerated-5.png';
+import refrigerated6 from '@/assets/trucks/refrigerated-6.png';
+import refrigerated7 from '@/assets/trucks/refrigerated-7.png';
+import refrigerated8 from '@/assets/trucks/refrigerated-8.png';
+import refrigerated9 from '@/assets/trucks/refrigerated-9.png';
+import refrigerated10 from '@/assets/trucks/refrigerated-10.png';
 
 const PICKUP_IMAGES = [pickup1, pickup2, pickup3, pickup4, pickup5, pickup6, pickup7, pickup8, pickup9, pickup10];
 const VAN_IMAGES = [van1, van2, van3, van4, van5, van6, van7, van8, van9, van10];
 const FLATBED_IMAGES = [flatbed1, flatbed2, flatbed3, flatbed4, flatbed5, flatbed6, flatbed7, flatbed8, flatbed9, flatbed10];
 const TOW_IMAGES = [tow1, tow2, tow3, tow4, tow5, tow6, tow7, tow8, tow9, tow10];
 const SEMI_IMAGES = [semi1, semi2, semi3, semi4, semi5, semi6, semi7, semi8, semi9, semi10];
-const DUMP_IMAGES = Array(10).fill(dump1) as string[];
-const REFRIGERATED_IMAGES = Array(10).fill(refrigerated1) as string[];
+const DUMP_IMAGES = [dump1, dump2, dump3, dump4, dump5, dump6, dump7, dump8, dump9, dump10];
+const REFRIGERATED_IMAGES = [refrigerated1, refrigerated2, refrigerated3, refrigerated4, refrigerated5, refrigerated6, refrigerated7, refrigerated8, refrigerated9, refrigerated10];
 
 export const TRUCK_IMAGES: Record<TruckCategory, string[]> = {
   truck_old_pickup: PICKUP_IMAGES,
