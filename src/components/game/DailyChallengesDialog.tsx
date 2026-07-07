@@ -147,20 +147,20 @@ export function DailyChallengesDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-sm">
-        <DialogHeader>
+      <DialogContent className="max-w-sm max-h-[85svh] flex flex-col">
+        <DialogHeader className="shrink-0">
           <DialogTitle className="flex items-center gap-2">
              🎯 {t.dailyChallenges}
           </DialogTitle>
         </DialogHeader>
 
-         <Tabs defaultValue="daily" className="w-full">
-           <TabsList className="grid w-full grid-cols-2">
+         <Tabs defaultValue="daily" className="w-full flex flex-col min-h-0 flex-1">
+           <TabsList className="grid w-full grid-cols-2 shrink-0">
              <TabsTrigger value="daily">📅 {t.dailyChallenges}</TabsTrigger>
              <TabsTrigger value="weekly">📆 {t.weeklyChallenges}</TabsTrigger>
            </TabsList>
            
-           <TabsContent value="daily" className="space-y-3 mt-3">
+           <TabsContent value="daily" className="space-y-3 mt-3 overflow-y-auto flex-1 min-h-0 pr-1">
              {challengeState.challenges.map((challenge) => {
                const progressData = challengeState.progress.find(p => p.challengeId === challenge.id);
                return renderChallengeCard(challenge, progressData, () => onClaimReward(challenge.id));
@@ -170,7 +170,7 @@ export function DailyChallengesDialog({
              </p>
            </TabsContent>
            
-           <TabsContent value="weekly" className="space-y-3 mt-3">
+           <TabsContent value="weekly" className="space-y-3 mt-3 overflow-y-auto flex-1 min-h-0 pr-1">
              {challengeState.weeklyChallenges?.map((challenge) => {
                const progressData = challengeState.weeklyProgress?.find(p => p.challengeId === challenge.id);
                return renderChallengeCard(challenge, progressData, () => onClaimWeeklyReward(challenge.id));
