@@ -250,6 +250,7 @@ export function StatsBar({ onOpenSettings }: { onOpenSettings?: () => void }) {
               size="sm"
               onClick={() => setShowChallenges(true)}
               className="h-8 w-8 p-0 relative"
+              aria-label="Open daily and weekly challenges"
             >
               <Target className="w-4 h-4 text-accent" />
               {(claimableChallenges + claimableWeeklyChallenges) > 0 && (
@@ -264,6 +265,7 @@ export function StatsBar({ onOpenSettings }: { onOpenSettings?: () => void }) {
               size="sm"
               onClick={() => setShowAchievements(true)}
               className="h-8 w-8 p-0"
+              aria-label="Open achievements"
             >
               <Trophy className="w-4 h-4 text-yellow-500" />
             </Button>
@@ -310,6 +312,7 @@ export function StatsBar({ onOpenSettings }: { onOpenSettings?: () => void }) {
                 size="sm"
                 onClick={onOpenSettings}
                 className="h-8 w-8 p-0"
+                aria-label="Open settings"
               >
                 <Settings className="w-4 h-4" />
               </Button>

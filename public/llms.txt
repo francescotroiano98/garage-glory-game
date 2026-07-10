@@ -1,0 +1,8 @@
+# Garage Glory
+
+> Retro 1970s-styled car mechanic tycoon simulator. Buy vehicles, diagnose issues, repair parts, upgrade tools and negotiate sales to grow your garage empire.
+
+Garage Glory is a single-page web and Android game built with React, Vite and Capacitor. Gameplay revolves around a Garage (mechanical work) and an Office (negotiations, sales and newspaper purchases). Players unlock cars, motorcycles and trucks across 12 categories each, level up to 40, complete daily and weekly challenges, collect gacha cards and climb a global leaderboard.
+
+## Pages
+- [Play Garage Glory](/): main game — garage, office, shop, collection, leaderboard and settings.

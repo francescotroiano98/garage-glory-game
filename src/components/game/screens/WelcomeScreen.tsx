@@ -68,6 +68,7 @@ export function WelcomeScreen({ onComplete }: WelcomeScreenProps) {
               <Wrench className="w-10 h-10 text-primary" />
             </div>
             <h1 className="text-2xl font-bold">{t.welcomeTitle}</h1>
+            <p className="text-sm font-medium text-foreground/80 mt-1">Car Mechanic Tycoon Simulator</p>
             <p className="text-xs text-muted-foreground mt-1">{t.loginToPlay}</p>
           </div>
 
