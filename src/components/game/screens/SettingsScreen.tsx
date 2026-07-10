@@ -4,13 +4,14 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Slider } from '@/components/ui/slider';
-import { Settings, RotateCcw, Trophy, DollarSign, Car, Star, Volume2, VolumeX, Music, Globe, LogOut, User } from 'lucide-react';
+import { Settings, RotateCcw, Trophy, DollarSign, Car, Star, Volume2, VolumeX, Music, Globe, LogOut, User, Shield } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { useSound, useBackgroundMusic } from '@/hooks/useSound';
 
 export function SettingsScreen() {
   const { state } = useGame();
   const { t, language, setLanguage, currency, setCurrency, formatMoney } = useLanguage();
-  const { user, username, signOut } = useAuth();
+  const { user, username, signOut, isAdmin } = useAuth();
   const { muted, toggleMute, sfxVolume, setSfxVolume } = useSound();
   const { playing, toggleMusic, musicVolume, setMusicVolume } = useBackgroundMusic();
 
@@ -207,6 +208,14 @@ export function SettingsScreen() {
             </CardHeader>
             <CardContent className="space-y-3">
               <p className="text-sm text-muted-foreground">{t.loggedInAs}: <strong>{username || user.email}</strong></p>
+              {isAdmin && (
+                <Link to="/admin" className="block">
+                  <Button variant="default" className="w-full">
+                    <Shield className="w-4 h-4 mr-2" />
+                    Admin Panel
+                  </Button>
+                </Link>
+              )}
               <Button variant="outline" className="w-full border-2" onClick={signOut}>
                 <LogOut className="w-4 h-4 mr-2" />
                 {t.logOut}

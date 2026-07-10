@@ -10,6 +10,7 @@ interface AuthContextType {
   signIn: (email: string, password: string) => Promise<{ error: string | null }>;
   signOut: () => Promise<void>;
   username: string | null;
+  isAdmin: boolean;
   updateProfile: (data: { total_profit?: number; total_cars_sold?: number; level?: number }) => Promise<void>;
 }
 
@@ -20,6 +21,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const [username, setUsername] = useState<string | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
@@ -28,8 +30,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (session?.user) {
         // Defer profile fetch to avoid deadlock
         setTimeout(() => fetchUsername(session.user.id), 0);
+        setTimeout(() => fetchIsAdmin(session.user.id), 0);
       } else {
         setUsername(null);
+        setIsAdmin(false);
       }
     });
 
@@ -38,6 +42,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(session?.user ?? null);
       if (session?.user) {
         fetchUsername(session.user.id);
+        fetchIsAdmin(session.user.id);
       }
       setLoading(false);
     });
@@ -48,6 +53,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const fetchUsername = async (userId: string) => {
     const { data } = await supabase.from('profiles').select('username').eq('user_id', userId).single();
     if (data) setUsername(data.username);
+  };
+
+  const fetchIsAdmin = async (userId: string) => {
+    const { data } = await supabase
+      .from('user_roles')
+      .select('role')
+      .eq('user_id', userId)
+      .eq('role', 'admin')
+      .maybeSingle();
+    setIsAdmin(!!data);
   };
 
   const signUp = async (email: string, password: string, username: string) => {
@@ -96,7 +111,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, session, loading, signUp, signIn, signOut, username, updateProfile }}>
+    <AuthContext.Provider value={{ user, session, loading, signUp, signIn, signOut, username, isAdmin, updateProfile }}>
       {children}
     </AuthContext.Provider>
   );
