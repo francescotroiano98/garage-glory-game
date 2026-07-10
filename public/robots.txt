@@ -12,3 +12,5 @@ Allow: /
 
 User-agent: *
 Allow: /
+
+Sitemap: https://garage-glory-game.lovable.app/sitemap.xml
