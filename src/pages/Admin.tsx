@@ -17,6 +17,7 @@ interface AdminUser {
   total_profit: number;
   total_cars_sold: number;
   level: number;
+  money: number;
   created_at: string;
 }
 
@@ -134,6 +135,7 @@ function AdminInner() {
           const currentProfit = (edit.total_profit as number) ?? u.total_profit;
           const currentCars = (edit.total_cars_sold as number) ?? u.total_cars_sold;
           const currentLevel = (edit.level as number) ?? u.level;
+          const currentMoney = (edit.money as number) ?? u.money ?? 0;
           return (
             <Card key={u.user_id} className="border-2">
               <CardHeader className="pb-2">
@@ -162,6 +164,11 @@ function AdminInner() {
                     Veicoli venduti
                     <Input type="number" min={0} value={currentCars}
                       onChange={(e) => setField(u.user_id, 'total_cars_sold', parseInt(e.target.value) || 0)} className="mt-1" />
+                  </label>
+                  <label className="text-xs col-span-2">
+                    Denaro in-game ($)
+                    <Input type="number" min={0} value={currentMoney}
+                      onChange={(e) => setField(u.user_id, 'money', parseInt(e.target.value) || 0)} className="mt-1" />
                   </label>
                 </div>
                 <div className="flex flex-wrap gap-2 pt-2">

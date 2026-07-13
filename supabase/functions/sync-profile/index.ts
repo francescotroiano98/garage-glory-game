@@ -12,6 +12,7 @@ const corsHeaders = {
 const MAX_PROFIT_DELTA = 5_000_000;    // max profit increase per sync call
 const MAX_CARS_DELTA = 50;             // max cars sold increase per sync call
 const MAX_LEVEL_DELTA = 2;             // max level increase per sync call
+const MAX_MONEY = 1_000_000_000;       // hard cap on stored money
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -42,6 +43,7 @@ Deno.serve(async (req) => {
     const totalProfit = Number(body.total_profit);
     const totalCarsSold = Number(body.total_cars_sold);
     const level = Number(body.level);
+    const money = body.money === undefined || body.money === null ? null : Number(body.money);
 
     if (
       !Number.isFinite(totalProfit) || totalProfit < 0 ||
@@ -51,17 +53,21 @@ Deno.serve(async (req) => {
       return json({ error: "Invalid stats payload" }, 400);
     }
 
+    if (money !== null && (!Number.isFinite(money) || money < 0)) {
+      return json({ error: "Invalid money payload" }, 400);
+    }
+
     // Service-role client to read & update bypassing RLS safely after our own checks.
     const admin = createClient(supabaseUrl, serviceKey);
 
     const { data: current, error: readErr } = await admin
       .from("profiles")
-      .select("total_profit, total_cars_sold, level")
+      .select("total_profit, total_cars_sold, level, money")
       .eq("user_id", userId)
       .maybeSingle();
     if (readErr) return json({ error: "Profile read failed" }, 500);
 
-    const cur = current ?? { total_profit: 0, total_cars_sold: 0, level: 1 };
+    const cur = current ?? { total_profit: 0, total_cars_sold: 0, level: 1, money: 500 };
 
     // Stats are monotonic: never allow decreases (prevents resetting low to game the leaderboard later).
     const safeProfit = Math.max(
@@ -77,12 +83,19 @@ Deno.serve(async (req) => {
       Math.min(level, Number(cur.level) + MAX_LEVEL_DELTA),
     );
 
+    // Money is NOT monotonic (players spend), so we just cap the absolute value.
+    // If money not provided, keep current server value (admin-safe).
+    const safeMoney = money === null
+      ? Number(cur.money ?? 500)
+      : Math.max(0, Math.min(Math.floor(money), MAX_MONEY));
+
     const { error: updErr } = await admin
       .from("profiles")
       .update({
         total_profit: safeProfit,
         total_cars_sold: safeCars,
         level: safeLevel,
+        money: safeMoney,
       })
       .eq("user_id", userId);
     if (updErr) return json({ error: "Profile update failed" }, 500);
@@ -92,6 +105,7 @@ Deno.serve(async (req) => {
       total_profit: safeProfit,
       total_cars_sold: safeCars,
       level: safeLevel,
+      money: safeMoney,
       clamped:
         safeProfit !== totalProfit ||
         safeCars !== totalCarsSold ||

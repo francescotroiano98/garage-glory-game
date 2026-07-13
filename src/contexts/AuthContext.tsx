@@ -11,7 +11,8 @@ interface AuthContextType {
   signOut: () => Promise<void>;
   username: string | null;
   isAdmin: boolean;
-  updateProfile: (data: { total_profit?: number; total_cars_sold?: number; level?: number }) => Promise<void>;
+  serverMoney: number | null;
+  updateProfile: (data: { total_profit?: number; total_cars_sold?: number; level?: number; money?: number }) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -22,6 +23,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
   const [username, setUsername] = useState<string | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [serverMoney, setServerMoney] = useState<number | null>(null);
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
@@ -29,11 +31,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(session?.user ?? null);
       if (session?.user) {
         // Defer profile fetch to avoid deadlock
-        setTimeout(() => fetchUsername(session.user.id), 0);
+        setTimeout(() => fetchProfile(session.user.id), 0);
         setTimeout(() => fetchIsAdmin(session.user.id), 0);
       } else {
         setUsername(null);
         setIsAdmin(false);
+        setServerMoney(null);
       }
     });
 
@@ -41,7 +44,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setSession(session);
       setUser(session?.user ?? null);
       if (session?.user) {
-        fetchUsername(session.user.id);
+        fetchProfile(session.user.id);
         fetchIsAdmin(session.user.id);
       }
       setLoading(false);
@@ -50,9 +53,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => subscription.unsubscribe();
   }, []);
 
-  const fetchUsername = async (userId: string) => {
-    const { data } = await supabase.from('profiles').select('username').eq('user_id', userId).single();
-    if (data) setUsername(data.username);
+  const fetchProfile = async (userId: string) => {
+    const { data } = await supabase.from('profiles').select('username, money').eq('user_id', userId).single();
+    if (data) {
+      setUsername(data.username);
+      setServerMoney(typeof data.money === 'number' ? data.money : Number(data.money ?? 500));
+    }
   };
 
   const fetchIsAdmin = async (userId: string) => {
@@ -97,21 +103,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await supabase.auth.signOut();
   };
 
-  const updateProfile = async (data: { total_profit?: number; total_cars_sold?: number; level?: number }) => {
+  const updateProfile = async (data: { total_profit?: number; total_cars_sold?: number; level?: number; money?: number }) => {
     if (!user) return;
     // Stats are validated server-side via the sync-profile edge function to prevent
     // client-side tampering of leaderboard rankings.
-    await supabase.functions.invoke('sync-profile', {
+    const { data: res } = await supabase.functions.invoke('sync-profile', {
       body: {
         total_profit: data.total_profit ?? 0,
         total_cars_sold: data.total_cars_sold ?? 0,
         level: data.level ?? 1,
+        money: data.money,
       },
     });
+    if (res && typeof res.money === 'number') setServerMoney(res.money);
   };
 
   return (
-    <AuthContext.Provider value={{ user, session, loading, signUp, signIn, signOut, username, isAdmin, updateProfile }}>
+    <AuthContext.Provider value={{ user, session, loading, signUp, signIn, signOut, username, isAdmin, serverMoney, updateProfile }}>
       {children}
     </AuthContext.Provider>
   );
