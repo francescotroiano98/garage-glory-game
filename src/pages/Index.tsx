@@ -51,19 +51,33 @@ const WELCOME_KEY = 'car_mechanic_welcome_done';
 // Syncs game state to profile DB
 function ProfileSync() {
   const { state } = useGame();
-  const { user, updateProfile } = useAuth();
+  const { user, updateProfile, serverMoney } = useAuth();
+  const { dispatch } = useGame();
+
+  // On login (or when admin updates server money), hydrate local money from server.
+  const [hydrated, setHydrated] = useState(false);
+  useEffect(() => {
+    if (!user) { setHydrated(false); return; }
+    if (serverMoney === null) return;
+    if (!hydrated) {
+      dispatch({ type: 'SET_MONEY', payload: serverMoney });
+      setHydrated(true);
+    }
+  }, [user, serverMoney, hydrated, dispatch]);
 
   useEffect(() => {
     if (!user) return;
+    if (!hydrated) return; // don't push local (stale) money before we've loaded server value
     const timeout = setTimeout(() => {
       updateProfile({
         total_profit: state.totalProfit,
         total_cars_sold: state.totalCarsSold,
         level: state.level,
+        money: state.money,
       });
     }, 5000);
     return () => clearTimeout(timeout);
-  }, [user, state.totalProfit, state.totalCarsSold, state.level]);
+  }, [user, hydrated, state.totalProfit, state.totalCarsSold, state.level, state.money]);
 
   return null;
 }

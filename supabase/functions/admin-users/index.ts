@@ -48,7 +48,7 @@ Deno.serve(async (req) => {
     if (action === 'list') {
       const { data: profiles, error } = await admin
         .from('profiles')
-        .select('id, user_id, username, total_profit, total_cars_sold, level, created_at, updated_at')
+        .select('id, user_id, username, total_profit, total_cars_sold, level, money, created_at, updated_at')
         .order('total_profit', { ascending: false });
       if (error) return json({ error: error.message }, 500);
 
@@ -69,13 +69,14 @@ Deno.serve(async (req) => {
     }
 
     if (action === 'update') {
-      const { user_id, username, total_profit, total_cars_sold, level } = body;
+      const { user_id, username, total_profit, total_cars_sold, level, money } = body;
       if (!user_id) return json({ error: 'user_id required' }, 400);
       const patch: Record<string, unknown> = {};
       if (typeof username === 'string') patch.username = username.trim();
       if (typeof total_profit === 'number') patch.total_profit = Math.max(0, Math.floor(total_profit));
       if (typeof total_cars_sold === 'number') patch.total_cars_sold = Math.max(0, Math.floor(total_cars_sold));
       if (typeof level === 'number') patch.level = Math.max(1, Math.min(40, Math.floor(level)));
+      if (typeof money === 'number') patch.money = Math.max(0, Math.min(1_000_000_000, Math.floor(money)));
       if (Object.keys(patch).length === 0) return json({ error: 'No fields to update' }, 400);
       const { error } = await admin.from('profiles').update(patch).eq('user_id', user_id);
       if (error) return json({ error: error.message }, 500);
@@ -87,7 +88,7 @@ Deno.serve(async (req) => {
       if (!user_id) return json({ error: 'user_id required' }, 400);
       const { error } = await admin
         .from('profiles')
-        .update({ total_profit: 0, total_cars_sold: 0, level: 1 })
+        .update({ total_profit: 0, total_cars_sold: 0, level: 1, money: 500 })
         .eq('user_id', user_id);
       if (error) return json({ error: error.message }, 500);
       return json({ ok: true });
