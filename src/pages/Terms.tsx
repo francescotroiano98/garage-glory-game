@@ -7,8 +7,8 @@ function Content() {
   const { language } = useLanguage();
   const it = language === 'it';
   return (
-    <div className="min-h-screen bg-background">
-      <div className="max-w-2xl mx-auto p-4 sm:p-6">
+    <div className="h-[100svh] overflow-y-auto bg-background">
+      <div className="max-w-2xl mx-auto p-4 sm:p-6 pb-16">
         <Link to="/"><Button variant="ghost" size="sm" className="mb-4"><ArrowLeft className="w-4 h-4 mr-2" />{it ? 'Torna al gioco' : 'Back to game'}</Button></Link>
         <article className="prose prose-invert max-w-none space-y-4 text-sm leading-relaxed">
           <h1 className="text-2xl font-bold">{it ? 'Termini di Servizio' : 'Terms of Service'}</h1>
