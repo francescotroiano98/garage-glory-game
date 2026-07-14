@@ -436,9 +436,9 @@ export function NewspaperScreen({ onCarBought }: NewspaperScreenProps) {
             </Button>
           </div>
 
-          {/* Filters */}
-          <div className="flex flex-wrap gap-2 mt-3">
-            <div className="flex gap-1 flex-wrap">
+          {/* Filters — grouped by row for clarity */}
+          {/* Row 1: vehicle type pills */}
+          <div className="flex gap-1 flex-wrap mt-3">
               {(['all', 'car', 'motorcycle', 'truck'] as VehicleTypeFilter[]).map(type => (
                 <Button
                   key={type}
@@ -450,9 +450,12 @@ export function NewspaperScreen({ onCarBought }: NewspaperScreenProps) {
                   {type === 'all' ? t.allVehicles : type === 'car' ? `🚗 ${t.cars}` : type === 'motorcycle' ? `🏍️ ${t.motorcycles}` : `🚛 ${t.trucks}`}
                 </Button>
               ))}
-            </div>
+          </div>
+
+          {/* Row 2: category + min price (filters) */}
+          <div className="flex flex-wrap gap-2 mt-2">
             <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-              <SelectTrigger className="h-7 text-xs w-[130px]">
+              <SelectTrigger className="h-7 text-xs flex-1 min-w-[140px]">
                 <SelectValue placeholder={t.allCategories} />
               </SelectTrigger>
               <SelectContent>
@@ -464,31 +467,11 @@ export function NewspaperScreen({ onCarBought }: NewspaperScreenProps) {
                 ))}
               </SelectContent>
             </Select>
-            <Select value={sortMode} onValueChange={(v) => setSortMode(v as SortMode)}>
-              <SelectTrigger className="h-7 text-xs w-[130px]">
-                <ArrowUpDown className="w-3 h-3 mr-1" />
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="default">{language === 'it' ? 'Predefinito' : 'Default'}</SelectItem>
-                <SelectItem value="price_asc">{language === 'it' ? 'Prezzo ↑' : 'Price ↑'}</SelectItem>
-                <SelectItem value="price_desc">{language === 'it' ? 'Prezzo ↓' : 'Price ↓'}</SelectItem>
-                <SelectItem value="name_asc">{language === 'it' ? 'Nome A-Z' : 'Name A-Z'}</SelectItem>
-              </SelectContent>
-            </Select>
-            <Button size="sm" variant="outline" className="h-7 text-xs px-2" onClick={resetFilters}>
-              <RotateCcw className="w-3 h-3 mr-1" />
-              {language === 'it' ? 'Reset' : 'Reset'}
-            </Button>
-          </div>
-
-          {/* Min price filter — level-scaled options */}
-          <div className="flex flex-wrap gap-2 mt-2">
             <Select
               value={priceMin === 0 ? 'any' : String(priceMin)}
               onValueChange={(v) => setPriceMin(v === 'any' ? 0 : parseInt(v))}
             >
-              <SelectTrigger className="h-7 text-xs w-[160px]">
+              <SelectTrigger className="h-7 text-xs flex-1 min-w-[140px]">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -500,6 +483,26 @@ export function NewspaperScreen({ onCarBought }: NewspaperScreenProps) {
                 ))}
               </SelectContent>
             </Select>
+          </div>
+
+          {/* Row 3: sort (separated from filters) + reset */}
+          <div className="flex gap-2 mt-2">
+            <Select value={sortMode} onValueChange={(v) => setSortMode(v as SortMode)}>
+              <SelectTrigger className="h-7 text-xs flex-1">
+                <ArrowUpDown className="w-3 h-3 mr-1 shrink-0" />
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="default">{language === 'it' ? 'Predefinito' : 'Default'}</SelectItem>
+                <SelectItem value="price_asc">{language === 'it' ? 'Prezzo ↑' : 'Price ↑'}</SelectItem>
+                <SelectItem value="price_desc">{language === 'it' ? 'Prezzo ↓' : 'Price ↓'}</SelectItem>
+                <SelectItem value="name_asc">{language === 'it' ? 'Nome A-Z' : 'Name A-Z'}</SelectItem>
+              </SelectContent>
+            </Select>
+            <Button size="sm" variant="outline" className="h-7 text-xs px-2 shrink-0" onClick={resetFilters}>
+              <RotateCcw className="w-3 h-3 mr-1" />
+              {language === 'it' ? 'Reset' : 'Reset'}
+            </Button>
           </div>
         </div>
         <div className={`overflow-y-auto p-4 space-y-4 ${

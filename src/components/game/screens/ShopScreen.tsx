@@ -598,10 +598,10 @@ export function ShopScreen() {
           <CardHeader className="pb-2">
             <CardTitle className="text-base flex items-center gap-2">
               <Search className="w-4 h-4" />
-              Diagnostic Equipment
+              {t.diagnosticEquipment}
             </CardTitle>
             <CardDescription>
-              Current: <Badge variant="secondary" className="capitalize">{state.diagnosticLevel.replace('_', ' ')}</Badge>
+              {t.current}: <Badge variant="secondary" className="capitalize">{state.diagnosticLevel.replace('_', ' ')}</Badge>
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-2">
@@ -637,10 +637,10 @@ export function ShopScreen() {
           <CardHeader className="pb-2">
             <CardTitle className="text-base flex items-center gap-2">
               <Building className="w-4 h-4" />
-              Garage
+              {t.garage}
             </CardTitle>
             <CardDescription>
-              Current: {state.garageUpgrades.carBays} car bay{state.garageUpgrades.carBays !== 1 ? 's' : ''}
+              {t.current}: {state.garageUpgrades.carBays} {language === 'it' ? (state.garageUpgrades.carBays !== 1 ? 'postazioni' : 'postazione') : (state.garageUpgrades.carBays !== 1 ? 'car bays' : 'car bay')}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-2">
@@ -701,10 +701,10 @@ export function ShopScreen() {
           <CardHeader className="pb-2">
             <CardTitle className="text-base flex items-center gap-2">
               <Zap className="w-4 h-4" />
-              Energy Capacity
+              {t.energyCapacity}
             </CardTitle>
             <CardDescription>
-              Current max: {state.maxEnergy}
+              {t.current}: {state.maxEnergy}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-2">
