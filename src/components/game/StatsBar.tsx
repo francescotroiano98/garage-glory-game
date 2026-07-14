@@ -32,6 +32,13 @@ const AD_ENERGY_REWARD = 50;
 const AD_WATCH_DURATION = 5000; // 5 seconds simulated ad (web fallback)
 const AD_COOLDOWN = 120000; // 2 minutes between ads
 
+// Money safety-net bonus: when the player runs out of money (< $10), grant a
+// small $30 top-up on a 10-minute cooldown. Mirrors the energy gift bonus UX.
+const MONEY_BONUS_AMOUNT = 30;
+const MONEY_BONUS_COOLDOWN = 10 * 60 * 1000;
+const MONEY_BONUS_KEY = 'money_bonus_last_v1';
+const MONEY_BONUS_THRESHOLD = 10;
+
 export function StatsBar({ onOpenSettings }: { onOpenSettings?: () => void }) {
   const { 
     state, 
@@ -50,6 +57,10 @@ export function StatsBar({ onOpenSettings }: { onOpenSettings?: () => void }) {
   const [showDetails, setShowDetails] = useState(false);
   const [isWatchingAd, setIsWatchingAd] = useState(false);
   const [lastAdWatch, setLastAdWatch] = useState(0);
+  const [lastMoneyBonus, setLastMoneyBonus] = useState<number>(() => {
+    try { return parseInt(localStorage.getItem(MONEY_BONUS_KEY) || '0', 10) || 0; } catch { return 0; }
+  });
+  const [moneyBonusTick, setMoneyBonusTick] = useState(0);
   const { playSound } = useSound();
   const { isNative, isShowingAd, showRewardedAd, prepareRewardedAd } = useAdMob();
   // Preload rewarded ad on native
@@ -62,6 +73,7 @@ export function StatsBar({ onOpenSettings }: { onOpenSettings?: () => void }) {
   useEffect(() => {
     const interval = setInterval(() => {
       setTimeRemaining(getEnergyBonusTimeRemaining());
+      setMoneyBonusTick(x => x + 1);
     }, 1000);
     return () => clearInterval(interval);
   }, [getEnergyBonusTimeRemaining]);
@@ -71,6 +83,18 @@ export function StatsBar({ onOpenSettings }: { onOpenSettings?: () => void }) {
       dispatch({ type: 'COLLECT_ENERGY_BONUS' });
       playSound('energyBonus');
     }
+  };
+
+  const moneyBonusRemaining = Math.max(0, MONEY_BONUS_COOLDOWN - (Date.now() - lastMoneyBonus));
+  const canCollectMoneyBonus = state.money < MONEY_BONUS_THRESHOLD && moneyBonusRemaining === 0;
+  const showMoneyBonus = state.money < MONEY_BONUS_THRESHOLD;
+  const handleCollectMoneyBonus = () => {
+    if (!canCollectMoneyBonus) return;
+    dispatch({ type: 'ADD_MONEY', payload: MONEY_BONUS_AMOUNT });
+    const now = Date.now();
+    setLastMoneyBonus(now);
+    try { localStorage.setItem(MONEY_BONUS_KEY, String(now)); } catch {}
+    playSound('energyBonus');
   };
 
   const [openedCards, setOpenedCards] = useState<CollectibleCard[] | null>(null);
@@ -200,56 +224,65 @@ export function StatsBar({ onOpenSettings }: { onOpenSettings?: () => void }) {
   return (
     <>
       <div data-tutorial-id="tutorial-stats-bar" className="flex flex-col gap-1.5 bg-card/95 backdrop-blur-sm border-b-2 border-border p-3 sticky top-0 z-50 shrink-0">
-        <div className="flex items-center gap-1.5">
-            <div className="flex flex-row gap-1.5">
-              <Button
-                  size="sm"
-                  variant={canCollectEnergyBonus() ? "default" : "secondary"}
-                  onClick={handleCollectBonus}
-                  disabled={!canCollectEnergyBonus()}
-                  className="h-7 px-2 text-xs"
-                >
-                  <Gift className="w-3.5 h-3.5 mr-1" />
-                  {canCollectEnergyBonus() ? '+30' : formatTime(timeRemaining)}
-                </Button>
-                {showAdButton && (
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={handleWatchAd}
-                    disabled={!canWatchAd() || isWatchingAd || isShowingAd}
-                    className="h-7 px-2 text-xs border-accent text-accent hover:bg-accent/10"
-                  >
-                    <PlayCircle className="w-3.5 h-3.5 mr-1" />
-                    {isWatchingAd || isShowingAd ? '...' : adCooldown > 0 ? formatTime(adCooldown) : `+${AD_ENERGY_REWARD}`}
-                </Button>
-              )}
-            </div>  
-            <div className="flex items-center gap-1.5 bg-yellow-500/15 px-2.5 py-1 rounded-lg border border-yellow-500/30">
+        <div className="flex items-center gap-1.5 flex-wrap">
+          {/* Energy chip with inline gift bonus */}
+          <div className="flex items-center gap-1 bg-yellow-500/15 pl-2 pr-1 py-0.5 rounded-lg border border-yellow-500/30">
             <Zap className="w-4 h-4 text-yellow-500" />
-            <span className="text-sm font-bold text-yellow-600 min-w-[40px]">{state.energy}</span>
-          </div>
-        </div>
-        <div className="flex items-center justify-between gap-3">
-          {/* Left side: Money & Energy in column */}
-          <div className="flex flex-col gap-1.5">
-            {/* Money */}
-            <div className={cn(
-              "flex items-center gap-1.5 bg-primary/15 px-2.5 py-1 rounded-lg border border-primary/30 transition-shadow",
-              moneyPulse && "animate-bounce-success shadow-glow-success"
-            )}>
-              {currency === 'EUR' ? <Euro className="w-4 h-4 text-primary" /> : currency === 'GBP' ? <PoundSterling className="w-4 h-4 text-primary" /> : <DollarSign className="w-4 h-4 text-primary" />}
-              <AnimatedCounter value={state.money} className="font-bold text-sm text-primary min-w-[60px]" />
-            </div>          
+            <span className="text-sm font-bold text-yellow-600 min-w-[28px]">{state.energy}</span>
+            <Button
+              size="sm"
+              variant={canCollectEnergyBonus() ? 'default' : 'ghost'}
+              onClick={handleCollectBonus}
+              disabled={!canCollectEnergyBonus()}
+              className="h-6 px-1.5 text-[10px] gap-0.5"
+              aria-label="Collect energy bonus"
+            >
+              <Gift className="w-3 h-3" />
+              {canCollectEnergyBonus() ? '+30' : formatTime(timeRemaining)}
+            </Button>
           </div>
 
-          {/* Right side: Actions */}
-          <div className="flex items-center gap-1">
+          {/* Money chip (single currency icon, with optional +30 rescue) */}
+          <div className={cn(
+            "flex items-center gap-1 bg-primary/15 pl-2 pr-1 py-0.5 rounded-lg border border-primary/30 transition-shadow",
+            moneyPulse && "animate-bounce-success shadow-glow-success"
+          )}>
+            <AnimatedCounter value={state.money} className="font-bold text-sm text-primary min-w-[52px]" />
+            {showMoneyBonus && (
+              <Button
+                size="sm"
+                variant={canCollectMoneyBonus ? 'default' : 'ghost'}
+                onClick={handleCollectMoneyBonus}
+                disabled={!canCollectMoneyBonus}
+                className="h-6 px-1.5 text-[10px] gap-0.5"
+                aria-label="Collect money bonus"
+              >
+                <Gift className="w-3 h-3" />
+                {canCollectMoneyBonus ? `+${MONEY_BONUS_AMOUNT}` : formatTime(moneyBonusRemaining)}
+              </Button>
+            )}
+          </div>
+
+          {showAdButton && (
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={handleWatchAd}
+              disabled={!canWatchAd() || isWatchingAd || isShowingAd}
+              className="h-7 px-1.5 text-[11px] border-accent text-accent hover:bg-accent/10 gap-0.5"
+              aria-label="Watch rewarded ad"
+            >
+              <PlayCircle className="w-3.5 h-3.5" />
+              {isWatchingAd || isShowingAd ? '...' : adCooldown > 0 ? formatTime(adCooldown) : `+${AD_ENERGY_REWARD}`}
+            </Button>
+          )}
+
+          <div className="flex items-center gap-0.5 ml-auto">
             <Button
               variant="ghost"
               size="sm"
               onClick={() => setShowChallenges(true)}
-              className="h-8 w-8 p-0 relative"
+              className="h-7 w-7 p-0 relative"
               aria-label="Open daily and weekly challenges"
             >
               <Target className="w-4 h-4 text-accent" />
@@ -264,7 +297,7 @@ export function StatsBar({ onOpenSettings }: { onOpenSettings?: () => void }) {
               variant="ghost"
               size="sm"
               onClick={() => setShowAchievements(true)}
-              className="h-8 w-8 p-0"
+              className="h-7 w-7 p-0"
               aria-label="Open achievements"
             >
               <Trophy className="w-4 h-4 text-yellow-500" />
@@ -272,8 +305,8 @@ export function StatsBar({ onOpenSettings }: { onOpenSettings?: () => void }) {
 
             <Popover open={showDetails} onOpenChange={setShowDetails}>
               <PopoverTrigger asChild>
-                <Button variant="outline" size="sm" className="h-8 px-2.5 text-sm gap-1.5 border-2">
-                  <Star className="w-3.5 h-3.5 text-primary" />
+                <Button variant="outline" size="sm" className="h-7 px-2 text-xs gap-1 border-2">
+                  <Star className="w-3 h-3 text-primary" />
                   Lv.{state.level}
                   {state.skillPoints > 0 && (
                     <Badge variant="default" className="h-4 px-1 text-[9px]">+{state.skillPoints}</Badge>
@@ -311,13 +344,12 @@ export function StatsBar({ onOpenSettings }: { onOpenSettings?: () => void }) {
                 variant="ghost"
                 size="sm"
                 onClick={onOpenSettings}
-                className="h-8 w-8 p-0"
+                className="h-7 w-7 p-0"
                 aria-label="Open settings"
               >
                 <Settings className="w-4 h-4" />
               </Button>
             )}
-          </div>
         </div>
       </div>
 
