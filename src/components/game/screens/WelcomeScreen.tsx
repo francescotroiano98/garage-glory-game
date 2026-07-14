@@ -1,10 +1,11 @@
 import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { useLanguage, Language, Currency } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
-import { Wrench, Globe, DollarSign, Mail, Lock, User } from 'lucide-react';
+import { Wrench, Globe, DollarSign, Mail, Lock, User, Shield } from 'lucide-react';
 
 interface WelcomeScreenProps {
   onComplete: (showTutorial: boolean) => void;
@@ -15,11 +16,13 @@ const USERNAME_KEY = 'game_player_name';
 export function WelcomeScreen({ onComplete }: WelcomeScreenProps) {
   const { t, language, setLanguage, currency, setCurrency } = useLanguage();
   const { signUp, signIn, user } = useAuth();
+  const navigate = useNavigate();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [wantTutorial, setWantTutorial] = useState(true);
   const [mode, setMode] = useState<'welcome' | 'login' | 'signup'>('welcome');
+  const [adminLogin, setAdminLogin] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -54,6 +57,8 @@ export function WelcomeScreen({ onComplete }: WelcomeScreenProps) {
     setLoading(false);
     if (result.error) {
       setError(result.error);
+    } else if (adminLogin) {
+      navigate('/admin');
     } else {
       onComplete(false);
     }
@@ -135,12 +140,29 @@ export function WelcomeScreen({ onComplete }: WelcomeScreenProps) {
                 <Button onClick={handleStart} variant="ghost" className="w-full h-10 text-muted-foreground">
                   {t.playAsGuest}
                 </Button>
+                <button
+                  type="button"
+                  onClick={() => { setAdminLogin(true); setMode('login'); }}
+                  className="w-full text-xs text-muted-foreground/70 hover:text-primary flex items-center justify-center gap-1 mt-2"
+                >
+                  <Shield className="w-3 h-3" /> {language === 'it' ? 'Accesso Admin' : 'Admin Login'}
+                </button>
               </div>
+              <p className="text-[10px] text-center text-muted-foreground pt-2">
+                <Link to="/privacy" className="underline hover:text-primary">{language === 'it' ? 'Privacy' : 'Privacy'}</Link>
+                {' · '}
+                <Link to="/terms" className="underline hover:text-primary">{language === 'it' ? 'Termini' : 'Terms'}</Link>
+              </p>
             </>
           )}
 
           {(mode === 'signup' || mode === 'login') && (
             <>
+              {adminLogin && (
+                <div className="p-2 rounded-md bg-primary/10 border border-primary/30 text-xs text-center flex items-center justify-center gap-1">
+                  <Shield className="w-3 h-3" /> {language === 'it' ? 'Accesso amministratore' : 'Administrator access'}
+                </div>
+              )}
               {mode === 'signup' && (
                 <div>
                   <label className="text-sm font-medium mb-1.5 flex items-center gap-1.5">
@@ -175,7 +197,7 @@ export function WelcomeScreen({ onComplete }: WelcomeScreenProps) {
                 </button>
               </p>
 
-              <Button onClick={() => setMode('welcome')} variant="ghost" size="sm" className="w-full">
+              <Button onClick={() => { setMode('welcome'); setAdminLogin(false); }} variant="ghost" size="sm" className="w-full">
                 ← {t.goBack}
               </Button>
             </>

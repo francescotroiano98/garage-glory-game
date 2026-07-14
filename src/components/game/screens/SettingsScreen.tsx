@@ -4,9 +4,11 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Slider } from '@/components/ui/slider';
-import { Settings, RotateCcw, Trophy, DollarSign, Car, Star, Volume2, VolumeX, Music, Globe, LogOut, User, Shield } from 'lucide-react';
+import { Settings, RotateCcw, Trophy, DollarSign, Car, Star, Volume2, VolumeX, Music, Globe, LogOut, User, Shield, FileText, Trash2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useSound, useBackgroundMusic } from '@/hooks/useSound';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 export function SettingsScreen() {
   const { state } = useGame();
@@ -31,6 +33,22 @@ export function SettingsScreen() {
       // Hard reload to a clean state
       window.location.replace(window.location.pathname + window.location.search);
     }
+  };
+
+  const handleDeleteAccount = async () => {
+    const msg = language === 'it'
+      ? 'Eliminare definitivamente il tuo account? Questa azione è irreversibile e cancellerà i tuoi progressi dal server.'
+      : 'Permanently delete your account? This is irreversible and will erase your progress from the server.';
+    if (!confirm(msg)) return;
+    const { data, error } = await supabase.functions.invoke('delete-account', { body: {} });
+    if (error || data?.error) {
+      toast.error(data?.error ?? error?.message ?? 'Failed to delete account');
+      return;
+    }
+    try { localStorage.clear(); } catch {}
+    try { sessionStorage.clear(); } catch {}
+    await supabase.auth.signOut();
+    window.location.replace(window.location.pathname);
   };
 
   return (
@@ -220,9 +238,27 @@ export function SettingsScreen() {
                 <LogOut className="w-4 h-4 mr-2" />
                 {t.logOut}
               </Button>
+              <Button variant="outline" className="w-full border-2 border-destructive/40 text-destructive hover:bg-destructive/10" onClick={handleDeleteAccount}>
+                <Trash2 className="w-4 h-4 mr-2" />
+                {language === 'it' ? 'Elimina il mio account' : 'Delete my account'}
+              </Button>
             </CardContent>
           </Card>
         )}
+
+        {/* Legal */}
+        <Card className="border-2">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base flex items-center gap-2">
+              <FileText className="w-4 h-4 text-primary" />
+              {language === 'it' ? 'Informazioni legali' : 'Legal'}
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="grid grid-cols-2 gap-2">
+            <Link to="/privacy"><Button variant="outline" size="sm" className="w-full border-2">Privacy</Button></Link>
+            <Link to="/terms"><Button variant="outline" size="sm" className="w-full border-2">{language === 'it' ? 'Termini' : 'Terms'}</Button></Link>
+          </CardContent>
+        </Card>
 
         {/* Reset */}
         <Card className="border-2 border-destructive/30">
