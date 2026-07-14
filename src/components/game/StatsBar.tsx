@@ -352,6 +352,7 @@ export function StatsBar({ onOpenSettings }: { onOpenSettings?: () => void }) {
             )}
         </div>
       </div>
+      </div>
 
       <Dialog open={showAchievements} onOpenChange={setShowAchievements}>
         <DialogContent className="max-w-sm max-h-[80vh] overflow-y-auto">
