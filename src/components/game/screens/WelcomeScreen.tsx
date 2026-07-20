@@ -17,6 +17,10 @@ export function WelcomeScreen({ onComplete }: WelcomeScreenProps) {
   const { t, language, setLanguage, currency, setCurrency } = useLanguage();
   const { signUp, signIn, user } = useAuth();
   const navigate = useNavigate();
+  const nextParam = (() => {
+    const p = new URLSearchParams(window.location.search).get("next");
+    return p && p.startsWith("/") && !p.startsWith("//") ? p : null;
+  })();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -45,6 +49,7 @@ export function WelcomeScreen({ onComplete }: WelcomeScreenProps) {
       setError(result.error);
     } else {
       localStorage.setItem(USERNAME_KEY, name.trim());
+      if (nextParam) { window.location.href = nextParam; return; }
       onComplete(wantTutorial);
     }
   };
@@ -57,6 +62,8 @@ export function WelcomeScreen({ onComplete }: WelcomeScreenProps) {
     setLoading(false);
     if (result.error) {
       setError(result.error);
+    } else if (nextParam) {
+      window.location.href = nextParam;
     } else if (adminLogin) {
       navigate('/admin');
     } else {
